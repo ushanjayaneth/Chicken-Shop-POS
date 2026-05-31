@@ -3569,7 +3569,8 @@ const HW = {
         return;
     }
     if(this.devs.receipt.status !== 'connected') { toast('Receipt Printer not connected', 'error'); return; }
-    const cur=S.settings.currency;const shop=S.settings.shopName;
+    const cur=S.settings.currency;
+    const shop = (S.settings.shopName === 'රංගන කමියුනිකේට්ශන්') ? 'RMC - Rangana Mobile Communication' : S.settings.shopName;
     const date=new Date(sale.date).toLocaleString();
     const ESC=0x1B;const LF=0x0A;const GS=0x1D;
     
@@ -3600,7 +3601,13 @@ const HW = {
     const itemsBytes = enc.encode(items);
     
     // Footer & Note (Centered)
-    let foot = `${S.settings.receiptNote}\n\n`;
+    let rawNote = S.settings.receiptNote || '';
+    if (rawNote.includes('රංගන කමියුනිකේට්ශන්')) {
+       rawNote = rawNote
+         .replace(/රංගන කමියුනිකේට්ශන්/g, 'RMC - Rangana Mobile Communication')
+         .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
+    }
+    let foot = `${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n\n`;
     const footBytes = enc.encode(foot);
     
     const bcStr = sale.billId || (sale.id||'').slice(-8).toUpperCase();
@@ -3646,7 +3653,8 @@ const HW = {
   },
   
   _buildReceiptText(sale) {
-    const cur=S.settings.currency;const shop=S.settings.shopName;
+    const cur=S.settings.currency;
+    const shop = (S.settings.shopName === 'රංගන කමියුනිකේට්ශන්') ? 'RMC - Rangana Mobile Communication' : S.settings.shopName;
     const date=new Date(sale.date).toLocaleString();
     let text = `${shop}\n${date}\nSale #${(sale.id||'').slice(-8)}\n${'-'.repeat(32)}\n`;
     (sale.items||[]).forEach(si=>{
@@ -3656,7 +3664,14 @@ const HW = {
     text+=`${'-'.repeat(32)}\n`;
     if(sale.cartDiscount>0)text+=`Discount: -${cur} ${sale.cartDiscount.toFixed(2)}\n`;
     text+=`TOTAL: ${cur} ${(sale.total||0).toFixed(2)}\n\n`;
-    text+=`${S.settings.receiptNote}\n`;
+    
+    let rawNote = S.settings.receiptNote || shop;
+    if (rawNote.includes('රංගන කමියුනිකේට්ශන්')) {
+       rawNote = rawNote
+         .replace(/රංගන කමියුනිකේට්ශන්/g, 'RMC - Rangana Mobile Communication')
+         .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
+    }
+    text+=`${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n`;
     return text;
   },
 
@@ -3688,7 +3703,8 @@ const HW = {
     };
 
     if (type === 'pos') {
-        const cur=S.settings.currency;const shop=S.settings.shopName;
+        const cur=S.settings.currency;
+        const shop = (S.settings.shopName === 'රංගන කමියුනිකේට්ශන්') ? 'RMC - Rangana Mobile Communication' : S.settings.shopName;
         const date=new Date(data.date).toLocaleString();
         
         centerText(shop, "4", y); y += 40;
@@ -3714,7 +3730,13 @@ const HW = {
         leftText("TOTAL:", "3", y); rightText(`${cur} ${(data.total||0).toFixed(2)}`, "3", y); y += 40;
         drawLine(y); y += 15;
         
-        centerText(S.settings.receiptNote || 'Thank You!', "2", y); y += 30;
+        let rawNote = S.settings.receiptNote || 'Thank You!';
+        if (rawNote.includes('රංගන කමියුනිකේට්ශන්')) {
+           rawNote = rawNote
+             .replace(/රංගන කමියුනිකේට්ශන්/g, 'RMC - Rangana Mobile Communication')
+             .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
+        }
+        centerText(rawNote.replace(/[^\x00-\x7F\n]/g, ''), "2", y); y += 30;
         
         let code = data.billId || (data.id||'').slice(-8).toUpperCase();
         let bcW = ((code.length + 2) * 11) + 35;
@@ -3750,7 +3772,7 @@ const HW = {
            
            const c1 = codes[i];
            if (c1) {
-               const rmcName = (S.settings.shopName || 'RMC').substring(0, 12);
+               const rmcName = 'RMC';
                const rmcX = Math.round(144 - ((rmcName.length * 14) / 2));
                tspl += `TEXT ${rmcX},10,"4",0,1,1,"${rmcName}"\r\n`;
                
@@ -3775,7 +3797,7 @@ const HW = {
            
            const c2 = codes[i+1];
            if (c2) {
-               const rmcName2 = (S.settings.shopName || 'RMC').substring(0, 12);
+               const rmcName2 = 'RMC';
                const rmcX2 = Math.round(464 - ((rmcName2.length * 14) / 2));
                tspl += `TEXT ${rmcX2},10,"4",0,1,1,"${rmcName2}"\r\n`;
                
