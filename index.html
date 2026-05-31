@@ -275,13 +275,15 @@ td{padding:9px 12px;font-size:12.5px;vertical-align:middle;}
 .bc-preview{background:#fff;border-radius:var(--r8);padding:10px;text-align:center;margin-top:8px;}
 .bc-preview svg{max-width:100%;height:60px;}
 /* Receipt */
-.receipt{background:#fff;color:#000;font-family:'Courier New',monospace;font-size:12px;padding:18px;border-radius:8px;max-width:280px;margin:0 auto;}
-.receipt-h{text-align:center;margin-bottom:12px;border-bottom:2px dashed #ddd;padding-bottom:10px;}
-.receipt-title{font-size:16px;font-weight:700;letter-spacing:1px;}
-.receipt-sub{font-size:11px;color:#666;}
-.r-line{display:flex;justify-content:space-between;margin-bottom:3px;font-size:12px;}
-.r-total{border-top:2px dashed #ddd;margin-top:8px;padding-top:8px;}
-.r-footer{text-align:center;margin-top:10px;font-size:10px;color:#888;border-top:1px dashed #ddd;padding-top:8px;}
+.receipt{background:#fff;color:#000;font-family:'JetBrains Mono','Courier New',monospace;font-size:12px;padding:24px;border-radius:6px;max-width:300px;margin:0 auto;box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);position:relative;border-top:6px solid var(--cyan);transition:transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);transform:rotateX(2deg) translateY(0);}
+.receipt:hover{transform:rotateX(0deg) translateY(-4px);box-shadow:0 25px 50px rgba(0,242,254,0.15);}
+.receipt::after{content:'';position:absolute;bottom:-8px;left:0;right:0;height:8px;background-image:linear-gradient(-45deg, var(--bg2) 4px, transparent 0), linear-gradient(45deg, var(--bg2) 4px, transparent 0);background-size:8px 16px;z-index:10;}
+.receipt-h{text-align:center;margin-bottom:16px;border-bottom:2px dashed #e2e8f0;padding-bottom:12px;}
+.receipt-title{font-size:17px;font-weight:800;letter-spacing:0.5px;color:#0f172a;}
+.receipt-sub{font-size:11px;color:#64748b;margin-top:4px;}
+.r-line{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;color:#334155;}
+.r-total{border-top:2px dashed #e2e8f0;margin-top:12px;padding-top:12px;}
+.r-footer{text-align:center;margin-top:16px;font-size:10.5px;color:#64748b;border-top:1px dashed #e2e8f0;padding-top:12px;}
 /* Barcode print sheet */
 .bc-sheet-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
 .bc-label-card{background:var(--glass);border:1px solid var(--border2);border-radius:var(--r8);padding:8px;text-align:center;}
@@ -412,7 +414,8 @@ td{padding:9px 12px;font-size:12.5px;vertical-align:middle;}
 @media print{
   body>*{display:none!important;}
   .overlay.open{display:block!important;position:fixed;inset:0;background:#fff;z-index:99999;}
-  .receipt{box-shadow:none;border-radius:0;margin:0;max-width:100%;}
+  .receipt{box-shadow:none!important;border-radius:0!important;margin:0!important;max-width:100%!important;transform:none!important;border-top:none!important;}
+  .receipt::after{display:none!important;}
   .modal-head,.modal-foot{display:none!important;}
   #bcPrintPreview{display:block!important;}
 }
@@ -706,7 +709,7 @@ body { padding-bottom: 24px; } /* Room for shortcut bar */
             <div class="total-row" id="loanRow" style="display:none;"><span style="color:var(--red)" data-lang="loanItems">💳 Loan items</span><span id="loanItemCount" class="mono" style="color:var(--red)">0</span></div>
             <div class="total-row grand"><span data-lang="total">Total</span><span class="amount" id="cartTotal">Rs. 0.00</span></div>
           </div>
-          <button class="checkout-btn" id="checkoutBtn" onclick="CheckoutPayment.open()" disabled data-lang="completeSale">💳 Complete Sale</button>
+          <button class="checkout-btn" id="checkoutBtn" onclick="Checkout.runDirectCheckout()" disabled data-lang="completeSale">💳 Complete Sale</button>
           <button class="checkout-btn" id="loanCheckoutBtn" onclick="Checkout.runWithLoan()" disabled data-lang="sendLoans"
             style="display:none;margin-top:6px;background:linear-gradient(135deg,var(--red),#c02020);font-size:13px;padding:10px;">
             💳 Send Loan Items to Loans Page →
@@ -988,13 +991,17 @@ body { padding-bottom: 24px; } /* Room for shortcut bar */
   </div>
 </div>
 <div class="overlay" id="receiptModal">
-  <div class="modal modal-sm">
-    <div class="modal-head"><div class="modal-title">🧾 Receipt</div><button class="modal-x" onclick="Modal.close('receiptModal')">✕</button></div>
+  <div class="modal modal-sm" style="max-width: 350px;">
+    <div class="modal-head"><div class="modal-title" style="font-weight: 800; font-size: 15px;">🧾 Receipt Preview (බිල්පත)</div><button class="modal-x" onclick="Modal.close('receiptModal')">✕</button></div>
     <div id="receiptBody"></div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="Modal.close('receiptModal')">Close</button>
-      <button class="btn btn-ghost" onclick="HW.printReceipt(window._lastSale)" id="btPrintBtn" style="display:none">📡 BT Print</button>
-      <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+    <div class="modal-foot" style="flex-direction:column; gap:8px; border-top:1px solid var(--border); padding-top:15px; margin-top:15px; width:100%;">
+      <div style="display:flex; gap:6px; width:100%;">
+        <button class="btn btn-ghost" onclick="HW.printReceipt(window._lastSale)" id="btPrintBtn" style="display:none; flex:1; padding:10px;">📡 HW Print</button>
+        <button class="btn btn-ghost" onclick="window.print()" style="flex:1; padding:10px; font-weight:600;">🖨️ Browser Print</button>
+      </div>
+      <button class="btn btn-primary w-full" onclick="Modal.close('receiptModal')" style="padding:12px; font-size:14px; font-weight:800; background:linear-gradient(135deg, var(--cyan), var(--cyan2)); color:#000; display:flex; align-items:center; justify-content:center; gap:6px; border-radius:var(--r8);">
+        <span>← Back to POS (ආපසු විකුණුම් වෙත)</span>
+      </button>
     </div>
   </div>
 </div>
@@ -2176,6 +2183,10 @@ const Checkout={
       S.cart=[];S.cartDisc=0;Cart.render();await loadAll();
       if(!silent)toast('Sale completed! 🎉','success');
     }catch(e){toast('Sale error: '+e.message,'error');}
+  },
+  async runDirectCheckout(){
+    window._lastPaymentDetails = { payMethod: 'cash', cashReceived: Cart.total(), changeDue: 0 };
+    await this.run(false);
   }
 };
 
@@ -2211,6 +2222,20 @@ const Receipt={
     const btBtn=document.getElementById('btPrintBtn');
     if(btBtn)btBtn.style.display=(HW.devs.receipt.status==='connected' || HW.devs.bcPrint.status==='connected')?'':'none';
     Modal.open('receiptModal');
+    
+    // Auto-trigger print with a slight delay to allow overlay rendering
+    setTimeout(async () => {
+      if (HW.devs.receipt.status === 'connected' || HW.devs.bcPrint.status === 'connected') {
+        try {
+          await HW.printReceipt(sale);
+        } catch(e) {
+          console.error("Hardware print failed, falling back to browser print", e);
+          window.print();
+        }
+      } else {
+        window.print();
+      }
+    }, 450);
   }
 };
 
@@ -4357,7 +4382,7 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'F8') {
      const checkoutBtn = document.getElementById('checkoutBtn');
      if (checkoutBtn && !checkoutBtn.disabled) {
-       CheckoutPayment.open();
+       Checkout.runDirectCheckout();
        e.preventDefault();
      }
      return;
