@@ -3288,21 +3288,20 @@
     }
   </style>
 </head>
-
 <body>
 
   <div id="loader">
     <div class="loader-brand" style="display:flex;align-items:center;gap:12px;justify-content:center;">
       <svg width="48" height="48" viewBox="0 0 100 100">
         <defs>
-          <linearGradient id="rmcLoaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id="rcmLoaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#00f2fe" />
             <stop offset="100%" stop-color="#d946ef" />
           </linearGradient>
         </defs>
-        <rect width="100" height="100" rx="22" fill="#0b0e24" stroke="url(#rmcLoaderGrad)" stroke-width="5" />
+        <rect width="100" height="100" rx="22" fill="#0b0e24" stroke="url(#rcmLoaderGrad)" stroke-width="5" />
         <text x="50%" y="62%" font-family="'Exo 2', sans-serif" font-weight="900" font-size="34"
-          fill="url(#rmcLoaderGrad)" text-anchor="middle" letter-spacing="1">RCM</text>
+          fill="url(#rcmLoaderGrad)" text-anchor="middle" letter-spacing="1">RCM</text>
       </svg>
       රංගන කමියුනිකේට්ශන්
     </div>
@@ -3320,14 +3319,14 @@
       <div style="display:flex;align-items:center;gap:8px;">
         <svg width="28" height="28" viewBox="0 0 100 100">
           <defs>
-            <linearGradient id="rmcSideGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="rcmSideGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#00f2fe" />
               <stop offset="100%" stop-color="#d946ef" />
             </linearGradient>
           </defs>
-          <rect width="100" height="100" rx="20" fill="#0b0e24" stroke="url(#rmcSideGrad)" stroke-width="4" />
+          <rect width="100" height="100" rx="20" fill="#0b0e24" stroke="url(#rcmSideGrad)" stroke-width="4" />
           <text x="50%" y="60%" font-family="'Exo 2', sans-serif" font-weight="900" font-size="34"
-            fill="url(#rmcSideGrad)" text-anchor="middle" letter-spacing="1">RCM</text>
+            fill="url(#rcmSideGrad)" text-anchor="middle" letter-spacing="1">RCM</text>
         </svg>
         <span class="nav-brand" style="margin-right:0;font-size:14px;font-weight:900;">රංගන කමියුනිකේට්ශන්</span>
       </div>
@@ -3359,14 +3358,14 @@
         </button>
         <svg width="28" height="28" viewBox="0 0 100 100">
           <defs>
-            <linearGradient id="rmcNavGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="rcmNavGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#00f2fe" />
               <stop offset="100%" stop-color="#d946ef" />
             </linearGradient>
           </defs>
-          <rect width="100" height="100" rx="20" fill="#0b0e24" stroke="url(#rmcNavGrad)" stroke-width="4" />
+          <rect width="100" height="100" rx="20" fill="#0b0e24" stroke="url(#rcmNavGrad)" stroke-width="4" />
           <text x="50%" y="60%" font-family="'Exo 2', sans-serif" font-weight="900" font-size="34"
-            fill="url(#rmcNavGrad)" text-anchor="middle" letter-spacing="1">RCM</text>
+            fill="url(#rcmNavGrad)" text-anchor="middle" letter-spacing="1">RCM</text>
         </svg>
         රංගන කමියුනිකේට්ශන්
       </div>
@@ -3552,7 +3551,7 @@
               <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">⬆️ Import
                 JSON</button>
               <input type="file" id="importFile" accept=".json" style="display:none" onchange="Backup.import(event)">
-              <button class="btn btn-success btn-sm" onclick="Backup.seed()">🌱 Seed Data</button>
+              <button class="btn btn-danger btn-sm" onclick="Backup.factoryReset()">⚠️ Factory Reset</button>
               <button class="btn btn-danger btn-sm" onclick="Backup.clearSales()">🗑️ Clear Sales</button>
             </div>
           </div>
@@ -6725,7 +6724,7 @@ window.onload=function(){
 
       _buildReceiptText(sale) {
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === 'රංගන කමියුනිකේට්ශන්') ? 'RCM - Rangana Mobile Communication' : S.settings.shopName;
+        const shop = (S.settings.shopName === 'රංගන කමියුනිකේට්ශන්') ? 'RCM - Rangana Communication Mobile' : S.settings.shopName;
         const date = new Date(sale.date).toLocaleString();
         let text = `${shop}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
         (sale.items || []).forEach(si => {
@@ -6739,7 +6738,7 @@ window.onload=function(){
         let rawNote = S.settings.receiptNote || shop;
         if (rawNote.includes('රංගන කමියුනිකේට්ශන්')) {
           rawNote = rawNote
-            .replace(/රංගන කමියුනිකේට්ශන්/g, 'RCM - Rangana Mobile Communication')
+            .replace(/රංගන කමියුනිකේට්ශන්/g, 'RCM - Rangana Communication Mobile')
             .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
         }
         text += `${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n`;
@@ -6798,7 +6797,7 @@ window.onload=function(){
 
         if (type === 'pos') {
           const cur = S.settings.currency;
-          const shop = (S.settings.shopName === 'රංගන කමියුනිකේට්ශන්') ? 'RCM - Rangana Mobile Communication' : S.settings.shopName;
+          const shop = (S.settings.shopName === 'රංගන කමියුනිකේට්ශන්') ? 'RCM - Rangana Communication Mobile' : S.settings.shopName;
           const date = new Date(data.date).toLocaleString();
 
           centerText(shop, "4", y); y += 40;
@@ -6827,7 +6826,7 @@ window.onload=function(){
           let rawNote = S.settings.receiptNote || 'Thank You!';
           if (rawNote.includes('රංගන කමියුනිකේට්ශන්')) {
             rawNote = rawNote
-              .replace(/රංගන කමියුනිකේට්ශන්/g, 'RCM - Rangana Mobile Communication')
+              .replace(/රංගන කමියුනිකේට්ශන්/g, 'RCM - Rangana Communication Mobile')
               .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
           }
           centerText(rawNote.replace(/[^\x00-\x7F\n]/g, ''), "2", y); y += 30;
@@ -6866,9 +6865,9 @@ window.onload=function(){
 
             const c1 = codes[i];
             if (c1) {
-              const rmcName = 'RCM';
-              const rmcX = Math.round(144 - ((rmcName.length * 14) / 2));
-              tspl += `TEXT ${rmcX},10,"4",0,1,1,"${rmcName}"\r\n`;
+              const rcmName = 'RCM';
+              const rcmX = Math.round(144 - ((rcmName.length * 14) / 2));
+              tspl += `TEXT ${rcmX},10,"4",0,1,1,"${rcmName}"\r\n`;
 
               let bcY = 45;
               if (c1.price) {
@@ -6891,9 +6890,9 @@ window.onload=function(){
 
             const c2 = codes[i + 1];
             if (c2) {
-              const rmcName2 = 'RCM';
-              const rmcX2 = Math.round(464 - ((rmcName2.length * 14) / 2));
-              tspl += `TEXT ${rmcX2},10,"4",0,1,1,"${rmcName2}"\r\n`;
+              const rcmName2 = 'RCM';
+              const rcmX2 = Math.round(464 - ((rcmName2.length * 14) / 2));
+              tspl += `TEXT ${rcmX2},10,"4",0,1,1,"${rcmName2}"\r\n`;
 
               let bcY = 45;
               if (c2.price) {
@@ -7133,9 +7132,32 @@ window.onload=function(){
 
     // ── BACKUP ──────────────────────────────
     const Backup = {
-      export() { const data = { categories: S.categories, items: S.items, sales: S.sales, settings: S.settings, exportDate: new Date().toISOString() }; const b = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `rmc-pos-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); toast('Exported ⬇️', 'success'); },
+      export() { const data = { categories: S.categories, items: S.items, sales: S.sales, settings: S.settings, exportDate: new Date().toISOString() }; const b = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `rcm-pos-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); toast('Exported ⬇️', 'success'); },
       async import(event) { const file = event.target.files[0]; if (!file) return; const text = await file.text(); const data = JSON.parse(text); if (!confirm(`Import ${data.items?.length || 0} products?`)) return; if (data.categories) await DB.set('categories', Object.fromEntries(data.categories.map(c => { const { id, ...r } = c; return [id, r]; }))); if (data.items) await DB.set('items', Object.fromEntries(data.items.map(i => { const { id, ...r } = i; return [id, r]; }))); if (data.sales) await DB.set('sales', Object.fromEntries(data.sales.map(s => { const { id, ...r } = s; return [id, r]; }))); await loadAll(); toast('Imported ✅', 'success'); },
-      async seed() { if (!confirm('Add sample phone shop data?')) return; const cats = ['Phones', 'Cases & Covers', 'Chargers & Cables', 'Earphones', 'Screen Protectors', 'Power Banks', 'Memory Cards']; const cids = {}; for (const n of cats) { cids[n] = await DB.push('categories', { name: n, createdAt: new Date().toISOString() }); } const si = [{ name: 'Samsung Galaxy A55 Case', categoryId: cids['Cases & Covers'], price: 350, wholesalePrice: 280, costPrice: 200, unit: 'pcs', type: 'unit', stockBatches: [{ batchId: 'b1', quantity: 30, costPrice: 200, dateAdded: '2025-01-01' }] }, { name: 'iPhone 15 Tempered Glass', categoryId: cids['Screen Protectors'], price: 250, wholesalePrice: 180, costPrice: 100, unit: 'pcs', type: 'unit', stockBatches: [{ batchId: 'b1', quantity: 50, costPrice: 100, dateAdded: '2025-01-01' }] }, { name: 'USB-C Fast Charger 20W', categoryId: cids['Chargers & Cables'], price: 900, wholesalePrice: 750, costPrice: 550, unit: 'pcs', type: 'unit', stockBatches: [{ batchId: 'b1', quantity: 20, costPrice: 550, dateAdded: '2025-01-01' }] }, { name: 'Type-C Cable 1m', categoryId: cids['Chargers & Cables'], price: 200, wholesalePrice: 150, costPrice: 80, unit: 'pcs', type: 'unit', stockBatches: [{ batchId: 'b1', quantity: 100, costPrice: 80, dateAdded: '2025-01-01' }] }, { name: 'Wireless Earbuds Pro', categoryId: cids['Earphones'], price: 2500, wholesalePrice: 2000, costPrice: 1500, unit: 'pcs', type: 'unit', stockBatches: [{ batchId: 'b1', quantity: 15, costPrice: 1500, dateAdded: '2025-01-01' }] }, { name: '10000mAh Power Bank', categoryId: cids['Power Banks'], price: 2200, wholesalePrice: 1800, costPrice: 1300, unit: 'pcs', type: 'unit', stockBatches: [{ batchId: 'b1', quantity: 12, costPrice: 1300, dateAdded: '2025-01-01' }] }, { name: '128GB MicroSD Card', categoryId: cids['Memory Cards'], price: 1200, wholesalePrice: 950, costPrice: 700, unit: 'pcs', type: 'unit', stockBatches: [{ batchId: 'b1', quantity: 25, costPrice: 700, dateAdded: '2025-01-01' }] }, { name: 'Coconut Oil 1L', categoryId: null, price: 650, wholesalePrice: 550, costPrice: 430, unit: 'L', type: 'liquid', liquidOptions: [{ label: 'Quarter', amount: 0.25, price: 170 }, { label: 'Half', amount: 0.5, price: 330 }, { label: 'Full', amount: 1, price: 650 }], stockBatches: [{ batchId: 'b1', quantity: 10, costPrice: 430, dateAdded: '2025-01-01' }] }, { name: 'Rice (Samba)', categoryId: null, price: 200, wholesalePrice: 180, costPrice: 155, unit: 'kg', type: 'weighted', stockBatches: [{ batchId: 'b1', quantity: 50, costPrice: 155, dateAdded: '2025-01-01' }] }]; for (const item of si) { await DB.push('items', { ...item, createdAt: new Date().toISOString(), lowStockThreshold: 5, defaultDiscount: 0 }); } await loadAll(); toast('Sample data added ✅', 'success'); },
+      async factoryReset() {
+        if (!confirm('⚠️ අවවාදයයි: මෙමගින් පද්ධතියේ ඇති සියලුම දත්ත (භාණ්ඩ, කාණ්ඩ, විකුණුම්, ණය සහ සැකසුම්) සම්පූර්ණයෙන්ම මකා දමනු ඇත! (Warning: This will permanently delete ALL data!)')) return;
+        const pin = prompt('තහවුරු කිරීම සඳහා පරිපාලක PIN අංකය (Admin PIN) ඇතුළත් කරන්න:');
+        if (pin !== S.settings.adminPin) {
+          toast('PIN අංකය වැරදියි! ක්‍රියාව අවලංගු කරන ලදී. (Incorrect PIN!)', 'error');
+          return;
+        }
+        try {
+          toast('පද්ධතිය නැවත සකසමින් පවතී... (Resetting...)', 'info');
+          const db = await IDB.open();
+          const tx = db.transaction(['cache', 'queue'], 'readwrite');
+          tx.objectStore('cache').clear();
+          tx.objectStore('queue').clear();
+          tx.oncomplete = () => {
+            toast('පද්ධතිය සාර්ථකව යළි සකසන ලදී! (Reset Complete!)', 'success');
+            setTimeout(() => window.location.reload(), 1500);
+          };
+          tx.onerror = (e) => {
+            throw new Error('Database write error: ' + e.target.error);
+          };
+        } catch (e) {
+          toast('Reset failed: ' + e.message, 'error');
+        }
+      },
       async clearSales() { if (!confirm('Delete ALL sales? Cannot be undone.')) return; await DB.del('sales'); await loadAll(); toast('Cleared', 'info'); }
     };
 
@@ -7288,7 +7310,7 @@ window.onload=function(){
 
     // ── PWA ─────────────────────────────────
     function setupPWA() {
-      try { const c = document.createElement('canvas'); c.width = c.height = 192; const ctx = c.getContext('2d'); ctx.fillStyle = '#06080f'; ctx.fillRect(0, 0, 192, 192); const g = ctx.createLinearGradient(0, 0, 192, 192); g.addColorStop(0, '#00d4ff'); g.addColorStop(1, '#8b5cf6'); ctx.fillStyle = g; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(23, 23, 146, 146, 35) : ctx.arc(96, 96, 80, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#000'; ctx.font = 'bold 36px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('RCM', 96, 88); ctx.font = '600 20px sans-serif'; ctx.fillText('POS', 96, 118); const icon = c.toDataURL(); const m = { name: 'Rangana Communication POS', short_name: 'RCM POS', start_url: './', display: 'standalone', background_color: '#06080f', theme_color: '#00d4ff', icons: [{ src: icon, sizes: '192x192', type: 'image/png', purpose: 'any maskable' }] }; const bl = new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }); const lk = document.createElement('link'); lk.rel = 'manifest'; lk.href = URL.createObjectURL(bl); document.head.appendChild(lk); } catch (e) { }
+      try { const m = { name: 'Rangana Communication POS', short_name: 'RCM POS', start_url: './', display: 'standalone', background_color: '#06080f', theme_color: '#00d4ff', icons: [{ src: 'logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] }; const bl = new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }); const lk = document.createElement('link'); lk.rel = 'manifest'; lk.href = URL.createObjectURL(bl); document.head.appendChild(lk); } catch (e) { }
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').catch(err => console.error('Service Worker registration failed', err));
       }

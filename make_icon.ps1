@@ -1,8 +1,8 @@
 Add-Type -AssemblyName System.Drawing
 
-$src = 'C:\Users\User\Desktop\Rangana_Communication_POS\logo.png'
-$icoPath = 'C:\Users\User\Desktop\Rangana_Communication_POS\logo.ico'
-$lnkPath = 'C:\Users\User\Desktop\රංගන කමියුනිකේට්ශන් POS.lnk'
+$src = Join-Path $PSScriptRoot 'logo.png'
+$icoPath = Join-Path $PSScriptRoot 'logo.ico'
+$lnkPath = Join-Path ([Environment]::GetFolderPath("Desktop")) 'RCM POS.lnk'
 
 # Convert PNG to ICO (256x256)
 $bmp = New-Object System.Drawing.Bitmap($src)
@@ -32,8 +32,10 @@ if (Test-Path $chromePath) {
     $browserPath = $edgePath
 } else {
     # Try to find chrome in other locations
-    $browserPath = (Get-Command chrome -ErrorAction SilentlyContinue)?.Source
-    if (-not $browserPath) {
+    $chromeCmd = Get-Command chrome -ErrorAction SilentlyContinue
+    if ($chromeCmd) {
+        $browserPath = $chromeCmd.Source
+    } else {
         $browserPath = $edgePath
     }
 }
@@ -44,10 +46,11 @@ Write-Host "Using browser: $browserPath"
 $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($lnkPath)
 $shortcut.TargetPath  = $browserPath
-$shortcut.Arguments   = '--app="file:///C:/Users/User/Desktop/Rangana_Communication_POS/index.html" --start-maximized --disable-extensions'
+$indexPath = (Join-Path $PSScriptRoot 'index.html').Replace('\', '/')
+$shortcut.Arguments   = '--app="file:///' + $indexPath + '" --start-maximized --disable-extensions'
 $shortcut.IconLocation = "$icoPath,0"
-$shortcut.Description  = 'රංගන කමියුනිකේට්ශන් POS System'
-$shortcut.WorkingDirectory = 'C:\Users\User\Desktop\Rangana_Communication_POS'
+$shortcut.Description  = 'RCM POS System'
+$shortcut.WorkingDirectory = $PSScriptRoot
 $shortcut.Save()
 
 Write-Host "Desktop shortcut created: $lnkPath"

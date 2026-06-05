@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rmc-pos-v1';
+const CACHE_NAME = 'rcm-pos-v1';
 const STATIC = [
   './',
   './index.html',
