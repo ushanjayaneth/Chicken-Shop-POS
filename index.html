@@ -3290,6 +3290,43 @@
 </head>
 <body>
 
+  <!-- SUSPENSION OVERLAY -->
+  <div id="suspensionOverlay" style="display:none; position:fixed; inset:0; z-index:99999; background:#060814; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+    <div style="background:rgba(255, 255, 255, 0.035); backdrop-filter:blur(25px); -webkit-backdrop-filter:blur(25px); border:1px solid rgba(255, 255, 255, 0.08); border-radius:24px; padding:40px 30px; max-width:480px; width:100%; text-align:center; box-shadow:0 20px 50px rgba(0, 0, 0, 0.6); position:relative; overflow:hidden;">
+      <div style="position:absolute; top:-50px; left:50%; transform:translateX(-50%); width:180px; height:180px; background:radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%); pointer-events:none; z-index:0;"></div>
+      <div style="width:76px; height:76px; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.35); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px auto; box-shadow:0 0 25px rgba(239, 68, 68, 0.25); color:#ef4444; position:relative; z-index:1; animation: pulseGlow 2s infinite ease-in-out;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h1 style="font-family:'Exo 2', sans-serif; font-size:24px; font-weight:900; letter-spacing:1px; background:linear-gradient(135deg, #ff4e50, #f9d423); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:12px; position:relative; z-index:1;">SYSTEM SUSPENDED</h1>
+      <p style="font-family:'Exo 2', sans-serif; font-size:14px; color:#cbd5e1; font-weight:500; margin-bottom:24px; line-height:1.6; position:relative; z-index:1;">
+        Access to this Point of Sale (POS) system has been temporarily disabled due to an outstanding licensing payment.
+      </p>
+      <div style="background:rgba(0, 0, 0, 0.2); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:16px 20px; margin-bottom:28px; text-align:left; position:relative; z-index:1;">
+        <h3 style="font-size:12px; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; font-weight:700;">Instructions</h3>
+        <p style="font-size:13px; color:#cbd5e1; line-height:1.5; margin:0 0 8px 0;">Please settle the invoice to restore full access to your software and database immediately.</p>
+        <span style="font-size:11px; color:#f59e0b; display:flex; align-items:center; gap:6px; font-weight:600;">
+          ⚠️ Note: All local database records are safe.
+        </span>
+      </div>
+      <div style="border-top:1px solid rgba(255, 255, 255, 0.08); padding-top:20px; font-family:'Exo 2', sans-serif; position:relative; z-index:1;">
+        <p style="font-size:11px; color:#64748b; margin-bottom:12px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">Contact System Administrator</p>
+        <div style="display:flex; flex-direction:column; gap:6px; font-size:13px; color:#cbd5e1;">
+          <div>📧 Email: <span style="color:#00f2fe; font-weight:600;">info@rcmpos.com</span></div>
+          <div>📞 Phone: <span style="color:#00f2fe; font-weight:600;">+94 76 777 1517</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <style>
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
+      50% { transform: scale(1.05); box-shadow: 0 0 35px rgba(239, 68, 68, 0.45); }
+    }
+  </style>
+
+
   <div id="loader">
     <div class="loader-brand" style="display:flex;align-items:center;gap:12px;justify-content:center;">
       <svg width="48" height="48" viewBox="0 0 100 100">
@@ -4344,11 +4381,33 @@
       obj2arr(o) { if (!o) return []; return Object.entries(o).map(([id, v]) => ({ id, ...v })); }
     };
 
+    async function checkSystemStatus() {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch('/api/status', { cache: 'no-store', signal: controller.signal });
+        clearTimeout(timeoutId);
+        const data = await res.json();
+        if (data && data.blocked) {
+          const overlay = document.getElementById('suspensionOverlay');
+          if (overlay) overlay.style.setProperty('display', 'flex', 'important');
+          const appEl = document.getElementById('app');
+          if (appEl) appEl.style.pointerEvents = 'none';
+          document.body.style.overflow = 'hidden';
+          throw new Error('System suspended');
+        }
+      } catch (e) {
+        if (e.message === 'System suspended') throw e;
+        console.warn('System status check failed/offline:', e.message);
+      }
+    }
+
     // ── INIT ────────────────────────────────
     async function init() {
       await IDB.open();
 
       try {
+        await checkSystemStatus();
         let st = await DB.get('settings/main');
         if (!st || !Object.keys(st).length) {
           st = {
@@ -5947,117 +6006,7 @@ window.onload=function(){
           <button class="btn btn-primary btn-sm" onclick="LoanMgr.openNewLoan('${cust.id}')">➕ New Loan</button>
           <button class="btn btn-ghost btn-sm" onclick="LoanMgr.openCustomerForm('${cust.id}')">✏️ Edit</button>
           <button class="btn btn-danger btn-sm" onclick="LoanMgr.deleteCustomer('${cust.id}')">🗑️</button>
-        </div>
-      </div>
-      <!-- Loans -->
-      <div style="font-size:12px;font-weight:700;color:var(--t2);padding:4px 0 2px;">LOANS (${loans.length})</div>
-      ${loans.length ? loans.map(l => this._loanCard(l, cur)).join('')
-            : `<div style="text-align:center;color:var(--t3);padding:30px;font-size:12px;">No loans yet for this customer.</div>`}`;
-      },
-
-      _loanCard(loan, cur) {
-        const pct = loan.totalAmount > 0 ? Math.min(100, (loan.paidAmount / loan.totalAmount) * 100) : 0;
-        const remaining = loan.totalAmount - loan.paidAmount;
-        const isCleared = loan.status === 'cleared' || remaining <= 0;
-        const overdue = this._isOverdue(loan);
-        const borderColor = isCleared ? 'rgba(16,185,129,0.3)' : overdue ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.1)';
-        const instHTML = loan.installments?.length ? `
-      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
-        <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px;">📅 Installment Schedule</div>
-        ${loan.installments.map((inst, i) => {
-          const due = new Date(inst.dueDate); const now = new Date();
-          const daysLeft = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
-          let cls = 'upcoming', dotCls = 'upcoming', info = '';
-          if (inst.paid) { cls = 'paid-inst'; dotCls = 'paid-inst'; info = `✓ Paid ${inst.paidDate ? new Date(inst.paidDate).toLocaleDateString() : ''}`; }
-          else if (daysLeft < 0) { cls = 'overdue'; dotCls = 'overdue'; info = `⚠ ${Math.abs(daysLeft)}d overdue`; }
-          else if (daysLeft <= 7) { cls = 'due'; dotCls = 'due'; info = `⏰ Due in ${daysLeft}d`; }
-          else info = `${due.toLocaleDateString()}`;
-          return `<div class="loan-installment-row ${cls}">
-            <div class="inst-dot ${dotCls}"></div>
-            <div style="flex:1;font-size:11px;">Installment ${i + 1} — ${cur} ${(inst.amount || 0).toFixed(2)}</div>
-            <div style="font-size:10px;color:var(--t2);">${info}</div>
-            ${!inst.paid ? `<button class="btn btn-success btn-xs" onclick="LoanMgr.markInstallmentPaid('${loan.id}',${i})">✓</button>` : ''}
-          </div>`;
-        }).join('')}
-      </div>`: '';
-        return `<div class="loan-card" style="border-color:${borderColor};">
-      <div class="loan-card-head">
-        <div>
-          <div class="loan-card-title">${esc(loan.description || 'Loan')} ${isCleared ? '<span class="badge badge-green">Cleared ✓</span>' : overdue ? '<span class="badge badge-red">⚠ Overdue</span>' : ''}</div>
-          <div class="loan-card-date">📅 ${new Date(loan.createdAt).toLocaleDateString()} &nbsp;|&nbsp; ${loan.installments?.length ? `${loan.installments.length} installments` : 'No installment plan'}</div>
-          ${loan.items ? `<div style="font-size:11px;color:var(--t2);margin-top:3px;">🛍 ${esc(loan.items)}</div>` : ''}
-        </div>
-        <div style="display:flex;gap:5px;align-items:flex-start;flex-shrink:0;">
-          ${!isCleared ? `<button class="btn btn-primary btn-xs" onclick="LoanMgr.openPayment('${loan.id}')">💰 Pay</button>` : ''}
-          ${isCleared ? `<button class="btn btn-danger btn-xs" onclick="LoanMgr.clearLoan('${loan.id}')">🗑 Remove</button>` : `<button class="btn btn-success btn-xs" onclick="LoanMgr.markCleared('${loan.id}')">✓ Clear</button>`}
-        </div>
-      </div>
-      <div class="loan-amounts">
-        <div class="loan-amt-block"><div class="loan-amt-lbl">Total</div><div class="loan-amt-val" style="color:var(--t1);">${cur} ${(loan.totalAmount || 0).toFixed(2)}</div></div>
-        <div class="loan-amt-block"><div class="loan-amt-lbl">Paid</div><div class="loan-amt-val" style="color:var(--green);">${cur} ${(loan.paidAmount || 0).toFixed(2)}</div></div>
-        <div class="loan-amt-block"><div class="loan-amt-lbl">Remaining</div><div class="loan-amt-val" style="color:${remaining > 0 ? 'var(--red)' : 'var(--green)'};">${cur} ${Math.max(0, remaining).toFixed(2)}</div></div>
-      </div>
-      <div class="loan-progress"><div class="loan-progress-fill" style="width:${pct.toFixed(1)}%"></div></div>
-      <div style="font-size:10px;color:var(--t3);text-align:right;">${pct.toFixed(0)}% paid</div>
-      ${loan.paymentHistory?.length ? `
-        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
-          <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:4px;">Payment History</div>
-          ${loan.paymentHistory.slice(-5).reverse().map(p => `
-            <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border);">
-              <span style="color:var(--t2);">${new Date(p.date).toLocaleDateString()} ${p.note ? `— ${esc(p.note)}` : ''}</span>
-              <span style="font-family:'JetBrains Mono',monospace;color:var(--green);font-weight:700;">+${cur} ${(p.amount || 0).toFixed(2)}</span>
-            </div>`).join('')}
-        </div>`: ''}
-      ${instHTML}
-    </div>`;
-      },
-
-      _isOverdue(loan) {
-        if (loan.status === 'cleared' || (loan.totalAmount - loan.paidAmount) <= 0) return false;
-        if (!loan.installments?.length) {
-          if (loan.dueDate && new Date(loan.dueDate) < new Date()) return true;
-          return false;
-        }
-        return loan.installments.some(i => !i.paid && new Date(i.dueDate) < new Date());
-      },
-
-      _checkDueNotifications() {
-        const cur = S.settings.currency;
-        const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-        const soonLoans = [];
-        this._loans.filter(l => l.status !== 'cleared').forEach(loan => {
-          const cust = this._customers.find(c => c.id === loan.customerId);
-          if (!cust) return;
-          (loan.installments || []).forEach((inst, i) => {
-            if (inst.paid) return;
-            const due = new Date(inst.dueDate);
-            const daysLeft = Math.ceil((due - new Date()) / (1000 * 60 * 60 * 24));
-            if (daysLeft >= 0 && daysLeft <= 3) {
-              soonLoans.push({ name: cust.name, amount: inst.amount, daysLeft, loanDesc: loan.description || 'Loan' });
-            } else if (daysLeft < 0) {
-              soonLoans.push({ name: cust.name, amount: inst.amount, daysLeft, loanDesc: loan.description || 'Loan', overdue: true });
-            }
-          });
-          // Simple due date (no installments)
-          if (!loan.installments?.length && loan.dueDate) {
-            const daysLeft = Math.ceil((new Date(loan.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
-            if (daysLeft >= 0 && daysLeft <= 3) soonLoans.push({ name: cust.name, amount: loan.totalAmount - loan.paidAmount, daysLeft, loanDesc: loan.description || 'Loan' });
-            else if (daysLeft < 0) soonLoans.push({ name: cust.name, amount: loan.totalAmount - loan.paidAmount, daysLeft, loanDesc: loan.description || 'Loan', overdue: true });
-          }
-        });
-        soonLoans.forEach(n => {
-          if (n.overdue) { toast(`⚠️ OVERDUE: ${n.name} — ${cur} ${(n.amount || 0).toFixed(2)} (${n.loanDesc})`, 'error'); }
-          else { toast(`⏰ Due in ${n.daysLeft}d: ${n.name} — ${cur} ${(n.amount || 0).toFixed(2)} (${n.loanDesc})`, 'info'); }
-        });
-      },
-
-      openCustomerForm(id = null) {
-        const cust = id ? this._customers.find(c => c.id === id) : null;
-        // Photos state (up to 2 base64 strings)
-        window._custPhotos = [cust?.photo1 || null, cust?.photo2 || null];
-        document.getElementById('loanCustTitle').textContent = cust ? '✏️ Edit Customer' : '👤 Add Customer';
-        document.getElementById('loanCustBody').innerHTML = `
-      <div class="cust-photo-zone">
+ ව්      <div class="cust-photo-zone">
         <div class="cust-photo-slot" id="cps0"
           ondragover="event.preventDefault();this.classList.add('drag-over')"
           ondragleave="this.classList.remove('drag-over')"
@@ -7313,6 +7262,9 @@ window.onload=function(){
       try { const m = { name: 'Rangana Communication POS', short_name: 'RCM POS', start_url: './', display: 'standalone', background_color: '#06080f', theme_color: '#00d4ff', icons: [{ src: 'logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] }; const bl = new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }); const lk = document.createElement('link'); lk.rel = 'manifest'; lk.href = URL.createObjectURL(bl); document.head.appendChild(lk); } catch (e) { }
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').catch(err => console.error('Service Worker registration failed', err));
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
+        });
       }
     }
 
