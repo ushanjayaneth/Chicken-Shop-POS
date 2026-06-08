@@ -3300,8 +3300,11 @@
         </svg>
       </div>
       <h1 style="font-family:'Exo 2', sans-serif; font-size:24px; font-weight:900; letter-spacing:1px; background:linear-gradient(135deg, #ff4e50, #f9d423); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:12px; position:relative; z-index:1;">SYSTEM SUSPENDED</h1>
-      <p style="font-family:'Exo 2', sans-serif; font-size:14px; color:#cbd5e1; font-weight:500; margin-bottom:24px; line-height:1.6; position:relative; z-index:1;">
-        Access to this Point of Sale (POS) system has been temporarily disabled due to an outstanding licensing payment.
+      <p style="font-family:'Exo 2', sans-serif; font-size:14px; color:#ff4e50; font-weight:700; margin-bottom:16px; line-height:1.6; position:relative; z-index:1; text-transform:uppercase; letter-spacing:0.5px;">
+        Settle Payment to Reactivate System
+      </p>
+      <p style="font-family:'Exo 2', sans-serif; font-size:13px; color:#cbd5e1; font-weight:500; margin-bottom:24px; line-height:1.6; position:relative; z-index:1;">
+        Access to this Point of Sale (POS) system has been temporarily disabled due to an outstanding licensing payment. Please make the payment to restore access to your application.
       </p>
       <div style="background:rgba(0, 0, 0, 0.2); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:16px 20px; margin-bottom:28px; text-align:left; position:relative; z-index:1;">
         <h3 style="font-size:12px; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; font-weight:700;">Instructions</h3>
@@ -4450,6 +4453,11 @@
 
         toast('රංගන කමියුනිකේට්ශන් POS සක්‍රීයයි ✅', 'success');
       } catch (e) {
+        if (e.message === 'System suspended') {
+          const loader = document.getElementById('loader');
+          if (loader) loader.classList.add('hide');
+          return;
+        }
         txt('❌ ' + e.message);
         toast('පද්ධතිය සක්‍රීය වීමේ දෝෂයක්: ' + e.message, 'error');
       }
@@ -7261,7 +7269,12 @@ window.onload=function(){
     function setupPWA() {
       try { const m = { name: 'Rangana Communication POS', short_name: 'RCM POS', start_url: './', display: 'standalone', background_color: '#06080f', theme_color: '#00d4ff', icons: [{ src: 'logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] }; const bl = new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }); const lk = document.createElement('link'); lk.rel = 'manifest'; lk.href = URL.createObjectURL(bl); document.head.appendChild(lk); } catch (e) { }
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.error('Service Worker registration failed', err));
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+          reg.update();
+          setInterval(() => {
+            reg.update().catch(() => {});
+          }, 10 * 60 * 1000);
+        }).catch(err => console.error('Service Worker registration failed', err));
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           window.location.reload();
         });
