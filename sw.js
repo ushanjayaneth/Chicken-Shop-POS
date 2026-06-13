@@ -32,8 +32,8 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = event.request.url;
   
-  // Ignore any hot-reloads or external telemetry if any
-  if (url.includes('googleapis.com/v1beta') || url.includes('generativelanguage')) return;
+  // Ignore any hot-reloads, external telemetry, or local API requests
+  if (url.includes('googleapis.com/v1beta') || url.includes('generativelanguage') || url.includes('/api/')) return;
   
   // Cache-first for static CDN assets; network-first for everything else
   if (url.includes('cdn.jsdelivr.net') || url.includes('fonts.googleapis') || url.includes('fonts.gstatic') || url.includes('unpkg.com')) {

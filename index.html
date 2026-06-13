@@ -3385,6 +3385,7 @@
         <div class="sync-dot" id="syncDot" title="Firebase sync"></div>
         <div class="clock-display" id="clock">00:00:00</div>
         <button class="btn btn-ghost btn-icon" onclick="Settings.open()" title="Settings">⚙️</button>
+        <button class="btn btn-ghost btn-icon" onclick="Login.lock()" title="Lock System" style="color:var(--red);">🔒</button>
       </div>
 
     </nav>
@@ -3747,6 +3748,33 @@
   </div>
 
   <!-- ══ MODALS ══ -->
+  <div class="overlay" id="loginModal" style="display: none; align-items: center; justify-content: center; background: rgba(6, 8, 15, 0.97); z-index: 10000; backdrop-filter: blur(20px);">
+    <div class="modal modal-sm" style="background: var(--bg2); border: 1px solid var(--border2); box-shadow: var(--glow-cyan); padding: 24px; text-align: center;">
+      <div style="font-size: 44px; margin-bottom: 10px;">🔐</div>
+      <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 6px; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">රංගන කමියුනිකේට්ශන්</h3>
+      <p style="color: var(--t2); font-size: 12px; margin-bottom: 16px;">පද්ධතියට ඇතුළු වීමට PIN අංකය ඇතුළත් කරන්න</p>
+      <input type="password" id="loginPinInput" style="font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 700; text-align: center; letter-spacing: 6px; padding: 10px; margin-bottom: 16px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--r8); color: var(--t1); width: 100%; outline: none;" maxlength="6" placeholder="••••" onkeypress="if(event.key==='Enter')Login.submit()">
+      
+      <!-- Numeric Pad for Login -->
+      <div class="calc-grid" style="grid-template-columns: repeat(3, 1fr); max-width: 220px; margin: 0 auto 16px auto;">
+        <button class="calc-btn" onclick="Login.press('1')">1</button>
+        <button class="calc-btn" onclick="Login.press('2')">2</button>
+        <button class="calc-btn" onclick="Login.press('3')">3</button>
+        <button class="calc-btn" onclick="Login.press('4')">4</button>
+        <button class="calc-btn" onclick="Login.press('5')">5</button>
+        <button class="calc-btn" onclick="Login.press('6')">6</button>
+        <button class="calc-btn" onclick="Login.press('7')">7</button>
+        <button class="calc-btn" onclick="Login.press('8')">8</button>
+        <button class="calc-btn" onclick="Login.press('9')">9</button>
+        <button class="calc-btn op" style="color: var(--red); background: var(--red2); border-color: rgba(239,68,68,0.2);" onclick="Login.press('C')">C</button>
+        <button class="calc-btn" onclick="Login.press('0')">0</button>
+        <button class="calc-btn op" onclick="Login.press('backspace')">⌫</button>
+      </div>
+      
+      <button class="btn btn-primary w-full" style="padding: 12px; font-size: 13px; font-weight: 800;" onclick="Login.submit()">🔑 Login</button>
+    </div>
+  </div>
+
   <div class="overlay" id="saleTypeModal">
     <div class="modal modal-sm" id="saleTypeContent"></div>
   </div>
@@ -3957,11 +3985,59 @@
     // 100% Offline-only POS Config
     const S = {
       categories: [], items: [], sales: [],
-      settings: { shopName: 'රංගන කමියුනිකේට්ශන්', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nස්තූතියි! නැවත පැමිණෙන්න.' },
+      settings: { shopName: 'රංගන කමියුනිකේට්ශන්', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nස්තූතියි! නැවත පැමිණෙන්න.', apiServerUrl: '' },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
       activeCat: 'all', adminUnlocked: false, pollTimer: null,
       isOnline: false,
       lang: localStorage.getItem('jm_lang') || 'si'
+    };
+
+    function getApiUrl(path) {
+      const base = (S.settings.apiServerUrl || '').trim();
+      const suffix = base ? (base.endsWith('/') ? base : base + '/') : '/api/';
+      return suffix + 'data/' + path;
+    }
+
+    const Login = {
+      press(key) {
+        const el = document.getElementById('loginPinInput');
+        if (!el) return;
+        if (key === 'C') {
+          el.value = '';
+        } else if (key === 'backspace') {
+          el.value = el.value.slice(0, -1);
+        } else {
+          if (el.value.length < 6) el.value += key;
+        }
+      },
+      submit() {
+        const pin = document.getElementById('loginPinInput').value;
+        if (pin === S.settings.adminPin) {
+          sessionStorage.setItem('pos_unlocked', 'true');
+          document.getElementById('loginModal').style.display = 'none';
+          toast('පද්ධතිය සාර්ථකව අගුළු හැරියා 🔓', 'success');
+        } else {
+          toast('PIN අංකය වැරදියි! ❌', 'error');
+          document.getElementById('loginPinInput').value = '';
+        }
+      },
+      lock() {
+        sessionStorage.removeItem('pos_unlocked');
+        document.getElementById('loginModal').style.display = 'flex';
+        document.getElementById('loginPinInput').value = '';
+        setTimeout(() => document.getElementById('loginPinInput').focus(), 150);
+        toast('පද්ධතිය අගුළු දැමුවා 🔒', 'info');
+      },
+      check() {
+        if (sessionStorage.getItem('pos_unlocked') === 'true') {
+          document.getElementById('loginModal').style.display = 'none';
+          return true;
+        } else {
+          document.getElementById('loginModal').style.display = 'flex';
+          setTimeout(() => document.getElementById('loginPinInput').focus(), 150);
+          return false;
+        }
+      }
     };
 
     const L = {
@@ -4302,20 +4378,154 @@
       }
     };
 
-    // ── SYNC ENGINE (REMOVED - 100% SECURE OFFLINE) ─────────────────────────
+    // ── SYNC ENGINE (NODE.JS & FIREBASE PROXY) ─────────────────────────
     const Sync = {
       _running: false,
       _pendingCount: 0,
-      flush() { },
-      _updateBadge(count) { },
-      start() { }
+      
+      async flush() {
+        if (this._running) return;
+        if (!navigator.onLine) {
+          this._updateBadge('offline');
+          return;
+        }
+
+        const queue = await IDB.queueGetAll();
+        if (queue.length === 0) {
+          this._updateBadge('synced');
+          return;
+        }
+
+        this._running = true;
+        this._updateBadge('syncing');
+
+        try {
+          for (const op of queue) {
+            const url = getApiUrl(op.path);
+            const headers = { 'Content-Type': 'application/json' };
+            const options = {
+              method: op.type === 'del' ? 'DELETE' : (op.type === 'patch' ? 'PATCH' : 'PUT'),
+              headers
+            };
+            if (op.type !== 'del') {
+              options.body = JSON.stringify(op.data);
+            }
+
+            const res = await fetch(url, options);
+            if (!res.ok) {
+              throw new Error(`Sync failed for ${op.path}: HTTP ${res.status}`);
+            }
+            await IDB.queueDelete(op.id);
+          }
+          this._updateBadge('synced');
+          toast('සියලුම දත්ත සාර්ථකව remote database එකට sync කරන ලදී! 🔄', 'success');
+        } catch (e) {
+          console.error('Sync flush error:', e);
+          this._updateBadge('error');
+        } finally {
+          this._running = false;
+        }
+      },
+
+      async pull() {
+        if (!navigator.onLine) return;
+        
+        const pending = await IDB.queueCount();
+        if (pending > 0) {
+          await this.flush();
+        }
+
+        this._updateBadge('syncing');
+        try {
+          const url = getApiUrl('');
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`Pull failed: HTTP ${res.status}`);
+          
+          const remoteDb = await res.json();
+          if (remoteDb && typeof remoteDb === 'object') {
+            const db = await IDB.open();
+            const tx = db.transaction('cache', 'readwrite');
+            const store = tx.objectStore('cache');
+
+            const keys = ['categories', 'items', 'sales', 'loan_customers', 'loans'];
+            for (const key of keys) {
+              if (remoteDb[key] !== undefined) {
+                store.put({ path: key, data: remoteDb[key] || {}, ts: Date.now() });
+              }
+            }
+
+            if (remoteDb['settings'] && remoteDb['settings']['main']) {
+              const remoteSettings = remoteDb['settings']['main'];
+              const localSettings = await IDB.cacheGet('settings/main') || {};
+              const merged = { ...localSettings, ...remoteSettings };
+              store.put({ path: 'settings/main', data: merged, ts: Date.now() });
+              Object.assign(S.settings, merged);
+            }
+
+            await new Promise((resolve, reject) => {
+              tx.oncomplete = resolve;
+              tx.onerror = () => reject(tx.error);
+            });
+
+            console.log('[Sync Engine] Remote DB pulled and cached successfully.');
+            this._updateBadge('synced');
+          }
+        } catch (e) {
+          console.error('Sync pull error:', e);
+          this._updateBadge('error');
+        }
+      },
+
+      _updateBadge(state) {
+        const d = document.getElementById('syncDot'); 
+        if (!d) return;
+        d.className = 'sync-dot';
+        if (state === 'synced') {
+          d.className = 'sync-dot';
+          d.style.background = 'var(--green)';
+          d.style.boxShadow = 'var(--glow-cyan)';
+          d.title = 'Online: database synced';
+        } else if (state === 'offline') {
+          d.className = 'sync-dot offline';
+          d.style.background = 'var(--red)';
+          d.style.boxShadow = '0 0 6px var(--red)';
+          d.title = 'Offline mode';
+        } else if (state === 'syncing') {
+          d.className = 'sync-dot syncing';
+          d.style.background = 'var(--orange)';
+          d.style.boxShadow = '0 0 6px var(--orange)';
+          d.title = 'Syncing data...';
+        } else if (state === 'error') {
+          d.className = 'sync-dot';
+          d.style.background = 'var(--orange)';
+          d.style.boxShadow = '0 0 6px var(--orange)';
+          d.title = 'Sync error, retrying...';
+        }
+      },
+
+      start() {
+        this.pull().then(() => loadAll());
+
+        window.addEventListener('online', () => {
+          this._updateBadge('syncing');
+          this.pull().then(() => loadAll());
+        });
+        window.addEventListener('offline', () => {
+          this._updateBadge('offline');
+        });
+
+        setInterval(() => {
+          if (navigator.onLine) {
+            this.flush();
+          }
+        }, 15000);
+      }
     };
 
-    // ── 100% OFFLINE-ONLY DB ─────────────────────
+    // ── SYNC-CAPABLE DATABASE ─────────────────────
     const DB = {
       _sync(s) {
-        const d = document.getElementById('syncDot'); if (!d) return;
-        d.className = 'sync-dot';
+        Sync._updateBadge(navigator.onLine ? 'synced' : 'offline');
       },
 
       async get(path) {
@@ -4327,19 +4537,27 @@
       async push(path, data) {
         const localId = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
         await IDB.cachePush(path, data, localId);
+        await IDB.queueAdd({ type: 'set', path: path + '/' + localId, data });
+        Sync.flush();
         return localId;
       },
 
       async set(path, data) {
         await IDB.cacheSet(path, data);
+        await IDB.queueAdd({ type: 'set', path, data });
+        Sync.flush();
       },
 
       async patch(path, data) {
         await IDB.cachePatch(path, data);
+        await IDB.queueAdd({ type: 'patch', path, data });
+        Sync.flush();
       },
 
       async del(path) {
         await IDB.cacheDel(path);
+        await IDB.queueAdd({ type: 'del', path });
+        Sync.flush();
       },
 
       obj2arr(o) { if (!o) return []; return Object.entries(o).map(([id, v]) => ({ id, ...v })); }
@@ -4368,8 +4586,14 @@
 
         await loadAll();
         updateUILanguage();
-        document.getElementById('loader').classList.add('hide');
+        
+        const unlocked = Login.check();
+        if (unlocked) {
+          document.getElementById('loader').classList.add('hide');
+        }
+        
         startClock(); startPoll(); setupPWA();
+        Sync.start();
 
         // Allow horizontal mouse wheel scroll on tabs
         const navTabs = document.querySelector('.nav-tabs');
@@ -4382,14 +4606,7 @@
           }, { passive: false });
         }
 
-        const dot = document.getElementById('syncDot');
-        if (dot) {
-          dot.className = 'sync-dot';
-          dot.style.background = 'var(--cyan)';
-          dot.style.boxShadow = 'var(--glow-cyan)';
-          dot.title = 'Local DB Secure & Hack-Proof';
-        }
-
+        // Sync dot controlled by Sync engine
         toast('රංගන කමියුනිකේට්ශන් POS සක්‍රීයයි ✅', 'success');
       } catch (e) {
         txt('❌ ' + e.message);
@@ -7133,6 +7350,7 @@ window.onload=function(){
         <div class="form-group"><label>Low Stock Alert</label><input id="setLow" type="number" value="${S.settings.lowStockAlert || 5}" min="0"></div>
       </div>
       <div class="form-group"><label>Receipt Footer Note</label><input id="setNote" type="text" value="${esc(S.settings.receiptNote || '')}"></div>
+      <div class="form-group"><label>API Server URL (leave empty for Vercel default proxy)</label><input id="setApiUrl" type="text" value="${esc(S.settings.apiServerUrl || '')}" placeholder="e.g. http://localhost:8080"></div>
       <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
       <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px">🔑 Change Admin PIN</div>
       <div class="grid-3">
@@ -7189,8 +7407,11 @@ window.onload=function(){
         S.settings.currency = document.getElementById('setCur').value;
         S.settings.lowStockAlert = parseInt(document.getElementById('setLow').value) || 5;
         S.settings.receiptNote = document.getElementById('setNote').value;
+        S.settings.apiServerUrl = (document.getElementById('setApiUrl').value || '').trim();
         await DB.set('settings/main', S.settings);
         Modal.close('settingsModal'); toast('Settings saved ✅', 'success');
+        // Trigger pull with the new API URL
+        Sync.pull().then(() => loadAll());
       }
     };
 
@@ -7342,6 +7563,26 @@ window.onload=function(){
     let _barcodeStr = "";
     let _barcodeTimer = null;
     window.addEventListener('keydown', (e) => {
+      // If locked, block all hotkeys
+      if (sessionStorage.getItem('pos_unlocked') !== 'true') {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          return;
+        }
+        if (document.activeElement?.id === 'loginPinInput') {
+          if (e.key === 'Enter') {
+            Login.submit();
+            e.preventDefault();
+          }
+          return;
+        }
+        if (['F2', 'F4', 'F8', 'F9'].includes(e.key)) {
+          e.preventDefault();
+          return;
+        }
+        return;
+      }
+
       // Global Shortcut Keys (work regardless of active element focus)
       if (e.key === 'Escape') {
         document.querySelectorAll('.overlay.open').forEach(el => el.classList.remove('open'));
