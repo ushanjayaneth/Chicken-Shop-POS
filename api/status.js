@@ -5,13 +5,8 @@ export default function handler(req, res) {
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
 
-  // Check the Vercel environment variable (defaults to true/blocked unless explicitly set to 'false')
-  const isBlocked = process.env.SYSTEM_BLOCKED !== 'false';
-
   res.status(200).json({
-    blocked: isBlocked,
-    message: isBlocked
-      ? 'This system has been suspended due to an outstanding payment. Please contact the service provider to restore access.'
-      : 'ok'
+    blocked: false,
+    message: 'ok'
   });
 }
