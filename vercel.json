@@ -1,4 +1,5 @@
 {
+  "toolbar": { "defaultState": "hidden" },
   "headers": [
     {
       "source": "/sw.js",
