@@ -3965,9 +3965,7 @@
     };
 
     function getApiUrl(path) {
-      const base = (S.settings.apiServerUrl || '').trim();
-      const suffix = base ? (base.endsWith('/') ? base : base + '/') : '/api/';
-      return suffix + 'data/' + path;
+      return '/api/data/' + path;
     }
 
 
@@ -7283,7 +7281,6 @@ window.onload=function(){
         <div class="form-group"><label>Low Stock Alert</label><input id="setLow" type="number" value="${S.settings.lowStockAlert || 5}" min="0"></div>
       </div>
       <div class="form-group"><label>Receipt Footer Note</label><input id="setNote" type="text" value="${esc(S.settings.receiptNote || '')}"></div>
-      <div class="form-group"><label>API Server URL (leave empty for Vercel default proxy)</label><input id="setApiUrl" type="text" value="${esc(S.settings.apiServerUrl || '')}" placeholder="e.g. http://localhost:8080"></div>
       <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
       <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px">🔑 Change Admin PIN</div>
       <div class="grid-3">
@@ -7340,10 +7337,8 @@ window.onload=function(){
         S.settings.currency = document.getElementById('setCur').value;
         S.settings.lowStockAlert = parseInt(document.getElementById('setLow').value) || 5;
         S.settings.receiptNote = document.getElementById('setNote').value;
-        S.settings.apiServerUrl = (document.getElementById('setApiUrl').value || '').trim();
         await DB.set('settings/main', S.settings);
         Modal.close('settingsModal'); toast('Settings saved ✅', 'success');
-        // Trigger pull with the new API URL
         Sync.pull().then(() => loadAll());
       }
     };
