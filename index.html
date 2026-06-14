@@ -3710,6 +3710,10 @@
                 <h3>📋 දින විස්තර</h3>
                 <div id="ccSumHusk"></div>
               </div>
+              <div class="admin-section" style="grid-column: span 2;">
+                <h3>💵 පොල් මුදල් ලාච්චුව (Coconut Drawer Cash Balance)</h3>
+                <div id="ccCashRegister"></div>
+              </div>
             </div>
           </div>
 
@@ -5195,6 +5199,138 @@
           hHtml += `<div class="total-row"><span>විකුණුම් වාර ගණන:</span><span class="mono">${daySales.length}</span></div>`;
           sumHuskEl.innerHTML = hHtml;
         }
+
+        // --- Coconut Drawer Reconciliation ---
+        const dayPurchasesDraw = dayPurchases.reduce((a, p) => a + (p.paidDrawer || 0), 0);
+        const dayHuskingDraw = dayHusking.reduce((a, h) => a + (h.paidDrawer || 0), 0);
+        const daySalesDraw = daySales.filter(s => s.payMethod === 'cash').reduce((a, s) => a + (s.recDrawer || 0), 0);
+
+        const savedFloat = S.settings.coconutOpeningFloats?.[sel] || 0;
+        const expectedCash = savedFloat + daySalesDraw - (dayPurchasesDraw + dayHuskingDraw);
+
+        const registerEl = document.getElementById('ccCashRegister');
+        if (registerEl) {
+          registerEl.innerHTML = `
+            <div class="total-row">
+              <span>ආරම්භක මුදල (Opening Float)</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="number" id="ccOpeningFloatInput" value="${savedFloat}" style="width:100px;text-align:right;padding:3px;font-size:12px;background:var(--bg3);border:1px solid var(--border);" onchange="CoconutMgr.saveOpeningFloat(this.value)">
+              </div>
+            </div>
+            <div class="total-row"><span>+ පොල් විකුණුම් (Sales Income)</span><span class="mono text-green">+ Rs. ${daySalesDraw.toFixed(2)}</span></div>
+            <div style="border-top: 1px dashed var(--border); margin: 4px 0;"></div>
+            <div class="total-row"><span>- පොල් මිලදී ගැනීම් (Purchases)</span><span class="mono text-red">- Rs. ${dayPurchasesDraw.toFixed(2)}</span></div>
+            <div class="total-row"><span>- ලෙලිගෑමේ කුලී (Husking Cost)</span><span class="mono text-red">- Rs. ${dayHuskingDraw.toFixed(2)}</span></div>
+            <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+              <span>Expected in Coconut Drawer</span><span class="mono" style="color:var(--cyan);font-size:17px;">Rs. ${expectedCash.toFixed(2)}</span>
+            </div>
+            
+            <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
+            <div class="form-group" style="margin-bottom:8px;">
+              <label style="font-weight:bold;font-size:12px;">ලාච්චුවේ ඇති සැබෑ මුදල (Actual Cash Counted)</label>
+              <input type="number" id="ccActualCash" placeholder="0.00" style="font-size:18px;font-weight:900;color:var(--cyan);background:var(--bg2);border:1px solid var(--cyan);padding:8px;width:100%;border-radius:var(--r8);" oninput="CoconutMgr.calcDiff(${expectedCash})">
+            </div>
+            <div id="ccDiffRow" style="display:flex;justify-content:space-between;align-items:center;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:8px 12px;margin-top:10px;display:none;">
+              <span>පරතරය (Difference):</span>
+              <span id="ccDiffVal" class="mono" style="font-size:16px;font-weight:bold;">Rs. 0.00</span>
+            </div>
+
+            <div class="form-group" style="margin-top:10px;margin-bottom:8px;">
+              <label>දින අවසාන සටහන (Day End Note)</label>
+              <input type="text" id="ccDayEndNote" placeholder="සටහනක් ඇතුළත් කරන්න..." style="font-size:12px;">
+            </div>
+            <button class="btn btn-primary w-full" style="margin-top:10px;" onclick="CoconutMgr.saveDayEnd(${expectedCash})">💾 පොල් දින අවසානය සුරකින්න</button>
+          `;
+
+          // Prefill actual cash and note if saved
+          const savedCcDayEnd = S.day_ends.find(d => d.date === sel && d.type === 'coconut');
+          if (savedCcDayEnd) {
+            const actualInput = document.getElementById('ccActualCash');
+            const noteInput = document.getElementById('ccDayEndNote');
+            if (actualInput) {
+              actualInput.value = savedCcDayEnd.actualCash;
+              this.calcDiff(expectedCash);
+            }
+            if (noteInput) {
+              noteInput.value = savedCcDayEnd.note || '';
+            }
+          }
+        }
+      },
+
+      calcDiff(expected) {
+        const actualInput = document.getElementById('ccActualCash');
+        const diffRow = document.getElementById('ccDiffRow');
+        const diffVal = document.getElementById('ccDiffVal');
+        if (!actualInput || !diffRow || !diffVal) return;
+
+        const val = parseFloat(actualInput.value);
+        if (isNaN(val)) {
+          diffRow.style.display = 'none';
+          return;
+        }
+
+        const diff = val - expected;
+        diffRow.style.display = 'flex';
+        
+        const cur = S.settings.currency || 'Rs.';
+        if (diff === 0) {
+          diffVal.textContent = 'Rs. 0.00 (හරියටම බැලන්ස්)';
+          diffVal.style.color = 'var(--green)';
+        } else if (diff > 0) {
+          diffVal.textContent = `+${cur} ${diff.toFixed(2)} (වැඩි)`;
+          diffVal.style.color = 'var(--cyan)';
+        } else {
+          diffVal.textContent = `-${cur} ${Math.abs(diff).toFixed(2)} (අඩු)`;
+          diffVal.style.color = 'var(--red)';
+        }
+      },
+
+      async saveOpeningFloat(val) {
+        const dateEl = document.getElementById('coconutDate');
+        if (!dateEl) return;
+        const sel = dateEl.value;
+        const num = parseFloat(val) || 0;
+        
+        S.settings.coconutOpeningFloats = S.settings.coconutOpeningFloats || {};
+        S.settings.coconutOpeningFloats[sel] = num;
+
+        await DB.set('settings/main', S.settings);
+        toast('පොල් ආරම්භක මුදල (Opening Float) සුරකින ලදී.', 'success');
+        await loadAll();
+      },
+
+      async saveDayEnd(expected) {
+        const dateEl = document.getElementById('coconutDate');
+        if (!dateEl) return;
+        const sel = dateEl.value;
+        const actualCash = parseFloat(document.getElementById('ccActualCash').value);
+        const note = document.getElementById('ccDayEndNote').value.trim();
+
+        if (isNaN(actualCash)) {
+          toast('පොල් ලාච්චුවේ ඇති සැබෑ මුදල ඇතුළත් කරන්න', 'error');
+          return;
+        }
+
+        const data = {
+          date: sel,
+          type: 'coconut',
+          expectedCash,
+          actualCash,
+          diff: actualCash - expected,
+          note,
+          updatedAt: new Date().toISOString()
+        };
+
+        const existing = S.day_ends.find(d => d.date === sel && d.type === 'coconut');
+        if (existing) {
+          await DB.patch('day_ends/' + existing.id, data);
+        } else {
+          await DB.push('day_ends', data);
+        }
+
+        toast('💾 පොල් දින අවසාන වාර්තාව සාර්ථකව සුරකින ලදී!', 'success');
+        await loadAll();
       },
 
       renderBuyList() {
@@ -5347,10 +5483,6 @@
           }
         });
 
-        const dayBuyDraw = S.coconut_purchases.filter(p => p.date === sel).reduce((a, p) => a + (p.paidDrawer || 0), 0);
-        const dayHuskDraw = S.coconut_husking.filter(h => h.date === sel).reduce((a, h) => a + (h.paidDrawer || 0), 0);
-        const daySaleDraw = S.coconut_sales.filter(s => s.date === sel && s.payMethod === 'cash').reduce((a, s) => a + (s.recDrawer || 0), 0);
-
         const dayMovements = S.cash_movements.filter(m => m.date && m.date.startsWith(sel));
         const manualCashIn = dayMovements.filter(m => m.type === 'in' && m.source === 'manual').reduce((a, m) => a + (m.amount || 0), 0);
         const manualCashOut = dayMovements.filter(m => m.type === 'out' && m.source === 'manual').reduce((a, m) => a + (m.amount || 0), 0);
@@ -5358,15 +5490,15 @@
         const statsEl = document.getElementById('dayendStats');
         if (statsEl) {
           statsEl.innerHTML = `
-            <div class="stat-card"><div class="stat-lbl">मुළු විකුණුම් (POS)</div><div class="stat-val text-cyan">${fmt(totalRev)}</div><div class="stat-sub">${totalTxns} බිල්පත්</div></div>
+            <div class="stat-card"><div class="stat-lbl">මුළු විකුණුම් (POS)</div><div class="stat-val text-cyan">${fmt(totalRev)}</div><div class="stat-sub">${totalTxns} බිල්පත්</div></div>
             <div class="stat-card"><div class="stat-lbl">ලැබුණු ණය වාරික (Loans)</div><div class="stat-val text-green">${fmt(loanPaymentsIn)}</div><div class="stat-sub">ණය පියවීම්</div></div>
-            <div class="stat-card"><div class="stat-lbl">ලාච්චුවට පොල් විකුණුම්</div><div class="stat-val text-orange">${fmt(daySaleDraw)}</div><div class="stat-sub">පොල් ආදායම</div></div>
-            <div class="stat-card"><div class="stat-lbl">ලාච්චුවෙන් පොල් වියදම්</div><div class="stat-val text-red">${fmt(dayBuyDraw + dayHuskDraw)}</div><div class="stat-sub">මිලදී ගැනීම් + ලෙලිගෑම්</div></div>
+            <div class="stat-card"><div class="stat-lbl">ලාච්චුවට දැමූ මුදල්</div><div class="stat-val text-cyan">${fmt(manualCashIn)}</div><div class="stat-sub">Manual Cash In</div></div>
+            <div class="stat-card"><div class="stat-lbl">ලාච්චුවෙන් ගත් මුදල්</div><div class="stat-val text-red">${fmt(manualCashOut)}</div><div class="stat-sub">Manual Cash Out</div></div>
           `;
         }
 
         const savedFloat = S.settings.openingFloats?.[sel] || 0;
-        const expectedCash = savedFloat + posCashIn + loanPaymentsIn + daySaleDraw + manualCashIn - (dayBuyDraw + dayHuskDraw + manualCashOut);
+        const expectedCash = savedFloat + posCashIn + loanPaymentsIn + manualCashIn - manualCashOut;
 
         const cashEl = document.getElementById('dayendCash');
         if (cashEl) {
@@ -5379,11 +5511,8 @@
             </div>
             <div class="total-row"><span>+ POS විකුණුම් (Cash Sales)</span><span class="mono text-green">+ ${fmt(posCashIn)}</span></div>
             <div class="total-row"><span>+ ණය පියවීම් (Loan Repayments)</span><span class="mono text-green">+ ${fmt(loanPaymentsIn)}</span></div>
-            <div class="total-row"><span>+ පොල් විකුණුම් (Coconut Sales)</span><span class="mono text-green">+ ${fmt(daySaleDraw)}</span></div>
             <div class="total-row"><span>+ ලාච්චුවට දැමූ මුදල් (Manual In)</span><span class="mono text-green">+ ${fmt(manualCashIn)}</span></div>
             <div style="border-top: 1px dashed var(--border); margin: 4px 0;"></div>
-            <div class="total-row"><span>- පොල් මිලදී ගැනීම් (Purchases)</span><span class="mono text-red">- ${fmt(dayBuyDraw)}</span></div>
-            <div class="total-row"><span>- පොල් ලෙලිගෑමේ කුලී (Husking Cost)</span><span class="mono text-red">- ${fmt(dayHuskDraw)}</span></div>
             <div class="total-row"><span>- ලාච්චුවෙන් ගත් මුදල් (Manual Out)</span><span class="mono text-red">- ${fmt(manualCashOut)}</span></div>
             <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
               <span>Expected in Drawer</span><span class="mono" style="color:var(--cyan);font-size:17px;" id="expectedCashVal">${fmt(expectedCash)}</span>
@@ -5500,7 +5629,7 @@
           }
         }
 
-        const savedDayEnd = S.day_ends.find(d => d.date === sel);
+        const savedDayEnd = S.day_ends.find(d => d.date === sel && (!d.type || d.type === 'pos'));
         if (savedDayEnd) {
           const actualInput = document.getElementById('dayendActualCash');
           const noteInput = document.getElementById('dayendNote');
@@ -5570,6 +5699,7 @@
 
         const data = {
           date: sel,
+          type: 'pos',
           expectedCash,
           actualCash,
           diff: actualCash - expected,
@@ -5577,7 +5707,7 @@
           updatedAt: new Date().toISOString()
         };
 
-        const existing = S.day_ends.find(d => d.date === sel);
+        const existing = S.day_ends.find(d => d.date === sel && (!d.type || d.type === 'pos'));
         if (existing) {
           await DB.patch('day_ends/' + existing.id, data);
         } else {
