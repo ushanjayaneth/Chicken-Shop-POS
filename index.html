@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="RCM POS">
   <meta name="theme-color" content="#060814">
-  <title>චිකන් ෂොප් - POS</title>
+  <title>RMC POS</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="logo.png">
   <link
@@ -3309,10 +3309,10 @@
           <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
         </g>
       </svg>
-      චිකන් ෂොප්
+      RMC POS
     </div>
     <div class="spinner"></div>
-    <div class="loader-text" id="loaderText">පද්ධතිය සක්‍රීය වෙමින් පවතී...</div>
+    <div class="loader-text" id="loaderText">Initializing System...</div>
   </div>
   <div id="toasts"></div>
 
@@ -3339,7 +3339,7 @@
             <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
           </g>
         </svg>
-        <span class="nav-brand" style="margin-right:0;font-size:14px;font-weight:900;"> චිකන් ෂොප්</span>
+        <span class="nav-brand" style="margin-right:0;font-size:14px;font-weight:900;"> RMC POS</span>
       </div>
       <button class="btn btn-ghost btn-icon" onclick="Nav.closeMenu()" style="padding:4px; font-size:16px;">✕</button>
     </div>
@@ -3352,7 +3352,7 @@
       <div class="nav-tab" data-tab="loans" onclick="Nav.go('loans'); Nav.closeMenu()" data-lang="loans">💳 Loans</div>
       <div class="nav-tab" data-tab="returns" onclick="Nav.go('returns'); Nav.closeMenu()" data-lang="returns">🔄
         Returns</div>
-      <div class="nav-tab" data-tab="coconut" onclick="Nav.go('coconut'); Nav.closeMenu()">🥥 පොල්</div>
+      <div class="nav-tab" data-tab="coconut" onclick="Nav.go('coconut'); Nav.closeMenu()">🥥 Coconut</div>
       <div class="nav-tab" data-tab="dayend" onclick="Nav.go('dayend'); Nav.closeMenu()" data-lang="dayend">📊 Day End
       </div>
       <div class="nav-tab" data-tab="admin" onclick="Nav.go('admin'); Nav.closeMenu()" data-lang="admin">🔐 Admin</div>
@@ -3384,7 +3384,7 @@
             <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
           </g>
         </svg>
-        රංගන චිකන් ෂොප්
+        Rangana Chicken Shop
       </div>
       <div class="nav-tabs">
         <div class="nav-tab active" data-tab="pos" onclick="Nav.go('pos')" data-lang="pos">🛒 POS</div>
@@ -3392,12 +3392,12 @@
         <div class="nav-tab" data-tab="barcodes" onclick="Nav.go('barcodes')" data-lang="barcodes">🔲 Barcodes</div>
         <div class="nav-tab" data-tab="loans" onclick="Nav.go('loans')" data-lang="loans">💳 Loans</div>
         <div class="nav-tab" data-tab="returns" onclick="Nav.go('returns')" data-lang="returns">🔄 Returns</div>
-        <div class="nav-tab" data-tab="coconut" onclick="Nav.go('coconut')">🥥 පොල්</div>
+        <div class="nav-tab" data-tab="coconut" onclick="Nav.go('coconut')">🥥 Coconut</div>
         <div class="nav-tab" data-tab="dayend" onclick="Nav.go('dayend')" data-lang="dayend">📊 Day End</div>
         <div class="nav-tab" data-tab="admin" onclick="Nav.go('admin')" data-lang="admin">🔐 Admin</div>
       </div>
       <div class="nav-right">
-        <button class="lang-toggle" id="langToggleBtn" onclick="toggleLanguage()">English</button>
+        
         <div class="bt-dot" id="btDot" title="Bluetooth Printer"></div>
         <div class="sync-dot" id="syncDot" title="Firebase sync"></div>
         <div class="clock-display" id="clock">00:00:00</div>
@@ -3598,10 +3598,10 @@
             <div class="bc-left-head" style="flex-direction:column;align-items:stretch;gap:10px;padding:14px;">
               <div style="font-size:13px;font-weight:700;color:var(--t1)">🔲 Blank Barcode Stickers</div>
               <div style="font-size:11px;color:var(--t2);line-height:1.6;">
-                1. <strong style="color:var(--cyan)">Generate</strong> කරන්න → 40 unique barcodes<br>
-                2. <strong style="color:var(--cyan)">Print</strong> කරන්න → A4 sticker sheet<br>
-                3. Sticker item එකේ ගහන්න<br>
-                4. Item add කරනකොට barcode field scan කරන්න
+                1. Click <strong style="color:var(--cyan)">Generate</strong> → 40 unique barcodes<br>
+                2. Click <strong style="color:var(--cyan)">Print</strong> → A4 sticker sheet<br>
+                3. Paste stickers on items<br>
+                4. Scan barcode field when adding items
               </div>
               <div style="display:flex;gap:6px;align-items:center;">
                 <div class="form-group" style="margin:0;flex:1;">
@@ -3632,7 +3632,7 @@
             </div>
             <div class="bc-list" id="bcList">
               <div style="text-align:center;color:var(--t3);padding:40px 16px;font-size:12px;">
-                👆 "Generate" click කරන්න<br>barcodes generate වෙනවා
+                👆 Click "Generate" to generate barcodes
               </div>
             </div>
           </div>
@@ -3682,7 +3682,7 @@
       <!-- COCONUT BUSINESS TAB -->
       <div class="tab-panel" id="coconutTab">
         <div class="inv-bar">
-          <h2>🥥 පොල් ව්‍යාපාරය (Coconut Business)</h2>
+          <h2>🥥 Coconut Business</h2>
           <div style="display:flex;gap:6px;align-items:center;margin-left:auto;">
             <input type="date" id="coconutDate" style="padding:5px 10px;font-size:12px;max-width:160px;" onchange="CoconutMgr.switchTab(CoconutMgr._tab)">
             <button class="btn btn-primary btn-sm" onclick="CoconutMgr.switchTab(CoconutMgr._tab)">🔄 Refresh</button>
@@ -3692,10 +3692,10 @@
 
           <!-- Sub tabs -->
           <div class="opt-tabs" style="margin-bottom:4px;">
-            <div class="opt-tab active" id="ccTab_summary" onclick="CoconutMgr.switchTab('summary')">📊 තොග සහ වාර්තා</div>
-            <div class="opt-tab" id="ccTab_buy" onclick="CoconutMgr.switchTab('buy')">🛒 මිලදී ගැනීම් (Purchases)</div>
-            <div class="opt-tab" id="ccTab_husk" onclick="CoconutMgr.switchTab('husk')">⚒️ ලෙලිගෑම (Husking)</div>
-            <div class="opt-tab" id="ccTab_sale" onclick="CoconutMgr.switchTab('sale')">💰 විකිණීම (Sales)</div>
+            <div class="opt-tab active" id="ccTab_summary" onclick="CoconutMgr.switchTab('summary')">📊 Stock & Reports</div>
+            <div class="opt-tab" id="ccTab_buy" onclick="CoconutMgr.switchTab('buy')">🛒 Purchases</div>
+            <div class="opt-tab" id="ccTab_husk" onclick="CoconutMgr.switchTab('husk')">⚒️ Husking</div>
+            <div class="opt-tab" id="ccTab_sale" onclick="CoconutMgr.switchTab('sale')">💰 Sales</div>
           </div>
 
           <!-- SUMMARY SECTION -->
@@ -3703,15 +3703,15 @@
             <div class="stats-row" id="ccSummaryStats"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
               <div class="admin-section">
-                <h3>📊 දින මුදල් සාරාංශය</h3>
+                <h3>📊 Daily Cash Summary</h3>
                 <div id="ccSumBuy"></div>
               </div>
               <div class="admin-section">
-                <h3>📋 දින විස්තර</h3>
+                <h3>📋 Daily Details</h3>
                 <div id="ccSumHusk"></div>
               </div>
               <div class="admin-section" style="grid-column: span 2;">
-                <h3>💵 පොල් මුදල් ලාච්චුව (Coconut Drawer Cash Balance)</h3>
+                <h3>💵 Coconut Drawer Cash Balance</h3>
                 <div id="ccCashRegister"></div>
               </div>
             </div>
@@ -3720,51 +3720,51 @@
           <!-- PURCHASE SECTION -->
           <div id="ccSection_buy" style="display:none;">
             <div class="admin-section" style="margin-bottom:12px;">
-              <h3>🛒 වතුවලින් මිලදී ගැනීම් ලියාපදිංචිය</h3>
+              <h3>🛒 Purchase from Estates Registry</h3>
               <div class="grid-2" style="margin-top:10px;">
                 <div class="form-group">
-                  <label>දිනය (Date)</label>
+                  <label>Date</label>
                   <input type="date" id="ccBuyDate">
                 </div>
                 <div class="form-group">
-                  <label>වත්ත / සැපයුම්කරු (Estate / Supplier)</label>
+                  <label>Estate / Supplier</label>
                   <input type="text" id="ccBuyEstate" placeholder="Estate/Supplier name">
                 </div>
                 <div class="form-group">
-                  <label>ලොකු ගෙඩි ගණන (Large Count)</label>
+                  <label>Large Count</label>
                   <input type="number" id="ccBuyLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()">
                 </div>
                 <div class="form-group">
-                  <label>ලොකු ගෙඩිය මිල (Large Price)</label>
+                  <label>Large Price</label>
                   <input type="number" id="ccBuyLargePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()">
                 </div>
                 <div class="form-group">
-                  <label>පොඩි ගෙඩි ගණන (Small Count)</label>
+                  <label>Small Count</label>
                   <input type="number" id="ccBuySmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()">
                 </div>
                 <div class="form-group">
-                  <label>පොඩි ගෙඩිය මිල (Small Price)</label>
+                  <label>Small Price</label>
                   <input type="number" id="ccBuySmallPrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()">
                 </div>
               </div>
               <div class="form-group">
-                <label>සටහන (Optional Note)</label>
-                <input type="text" id="ccBuyNotes" placeholder="පොල් ගැන විශේෂ සටහනක්...">
+                <label>Optional Note</label>
+                <input type="text" id="ccBuyNotes" placeholder="Special notes about purchase...">
               </div>
               <div class="grid-2">
                 <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
-                  <span style="font-size:13px;color:var(--t2);">සම්පූර්ණ පිරිවැය</span>
+                  <span style="font-size:13px;color:var(--t2);">Total Cost</span>
                   <span class="mono" style="font-size:18px;font-weight:700;color:var(--orange);" id="ccBuyTotal">Rs. 0.00</span>
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
-                  <label>ලාච්චුවෙන් ගෙවූ මුදල (Paid from Drawer)</label>
+                  <label>Paid from Drawer</label>
                   <input type="number" id="ccBuyPaidDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--red);">
                 </div>
               </div>
-              <button class="btn btn-primary w-full" onclick="CoconutMgr.savePurchase()">💾 ගෙනයාම සුරකින්න</button>
+              <button class="btn btn-primary w-full" onclick="CoconutMgr.savePurchase()">💾 Save Purchase</button>
             </div>
             <div class="admin-section">
-              <h3>📋 අදාළ දින මිලදී ගැනීම් ලැයිස්තුව</h3>
+              <h3>📋 Purchases List for Selected Date</h3>
               <div id="ccBuyList" style="margin-top:10px;"></div>
             </div>
           </div>
@@ -3772,39 +3772,39 @@
           <!-- HUSKING SECTION -->
           <div id="ccSection_husk" style="display:none;">
             <div class="admin-section" style="margin-bottom:12px;">
-              <h3>⚒️ ශ්‍රමිකයන් ලෙලිගෑමේ ගෙවීම්</h3>
+              <h3>⚒️ Worker Husking Payments</h3>
               <div class="grid-2" style="margin-top:10px;">
                 <div class="form-group">
-                  <label>දිනය (Date)</label>
+                  <label>Date</label>
                   <input type="date" id="ccHuskDate">
                 </div>
                 <div class="form-group">
-                  <label>ශ්‍රමිකයාගේ නම (Worker Name)</label>
+                  <label>Worker Name</label>
                   <input type="text" id="ccHuskWorker" placeholder="Worker name">
                 </div>
                 <div class="form-group">
-                  <label>ලෙලිගෑ ගෙඩි ගණන (Count Husked)</label>
+                  <label>Count Husked</label>
                   <input type="number" id="ccHuskCount" placeholder="0" min="0" oninput="CoconutMgr.calcHuskTotal()">
                 </div>
                 <div class="form-group">
-                  <label>ගෙඩියකට ගෙවීම (Rate per nut)</label>
+                  <label>Rate per nut</label>
                   <input type="number" id="ccHuskRate" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcHuskTotal()">
                 </div>
               </div>
               <div class="grid-2">
                 <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
-                  <span style="font-size:13px;color:var(--t2);">සම්පූර්ණ ගෙවීම</span>
+                  <span style="font-size:13px;color:var(--t2);">Total Payment</span>
                   <span class="mono" style="font-size:18px;font-weight:700;color:var(--red);" id="ccHuskTotal">Rs. 0.00</span>
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
-                  <label>ලාච්චුවෙන් ගෙවූ මුදල (Paid from Drawer)</label>
+                  <label>Paid from Drawer</label>
                   <input type="number" id="ccHuskPaidDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--red);">
                 </div>
               </div>
-              <button class="btn btn-primary w-full" onclick="CoconutMgr.saveHusking()">💾 ගෙවීම සුරකින්න</button>
+              <button class="btn btn-primary w-full" onclick="CoconutMgr.saveHusking()">💾 Save Payment</button>
             </div>
             <div class="admin-section">
-              <h3>📋 අදාළ දින ලෙලිගෑමේ ලැයිස්තුව</h3>
+              <h3>📋 Husking List for Selected Date</h3>
               <div id="ccHuskList" style="margin-top:10px;"></div>
             </div>
           </div>
@@ -3812,54 +3812,54 @@
           <!-- SALES SECTION -->
           <div id="ccSection_sale" style="display:none;">
             <div class="admin-section" style="margin-bottom:12px;">
-              <h3>💰 පොල් තොග විකිණීම ලියාපදිංචිය</h3>
+              <h3>💰 Coconut Wholesale Sales Registry</h3>
               <div class="grid-2" style="margin-top:10px;">
                 <div class="form-group">
-                  <label>දිනය (Date)</label>
+                  <label>Date</label>
                   <input type="date" id="ccSaleDate">
                 </div>
                 <div class="form-group">
-                  <label>ගැනුම්කරු (Customer / Buyer Name)</label>
+                  <label>Customer / Buyer Name</label>
                   <input type="text" id="ccSaleBuyer" placeholder="e.g. wholesale buyer, customer">
                 </div>
                 <div class="form-group">
-                  <label>පොල් වර්ගය (Coconut Type)</label>
+                  <label>Coconut Type</label>
                   <select id="ccSaleType">
-                    <option value="husked">ලෙලි ගැසූ පොල් (Husked)</option>
-                    <option value="unhusked">ලෙලි නොගැසූ පොල් (Unhusked)</option>
+                    <option value="husked">Husked Coconuts</option>
+                    <option value="unhusked">Unhusked Coconuts</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>ගෙඩි ගණන (Quantity)</label>
+                  <label>Quantity</label>
                   <input type="number" id="ccSaleCount" placeholder="0" min="0" oninput="CoconutMgr.calcSaleTotal()">
                 </div>
                 <div class="form-group">
-                  <label>ගෙඩියක විකුණුම් මිල (Price per nut)</label>
+                  <label>Price per nut</label>
                   <input type="number" id="ccSalePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()">
                 </div>
                 <div class="form-group">
-                  <label>ගෙවීම් ක්‍රමය (Payment Method)</label>
+                  <label>Payment Method</label>
                   <select id="ccSalePayMethod">
-                    <option value="cash">මුදල් (Cash)</option>
-                    <option value="card">කාඩ්පත් (Card)</option>
-                    <option value="online">ඔන්ලයින් (Online Transfer)</option>
+                    <option value="cash">Cash</option>
+                    <option value="card">Card</option>
+                    <option value="online">Online Transfer</option>
                   </select>
                 </div>
               </div>
               <div class="grid-2">
                 <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
-                  <span style="font-size:13px;color:var(--t2);">සම්පූර්ණ ආදායම</span>
+                  <span style="font-size:13px;color:var(--t2);">Total Income</span>
                   <span class="mono" style="font-size:18px;font-weight:700;color:var(--green);" id="ccSaleTotal">Rs. 0.00</span>
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
-                  <label>ලාච්චුවට ලැබුණු මුදල (Received to Drawer)</label>
+                  <label>Received to Drawer</label>
                   <input type="number" id="ccSaleRecDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--green);">
                 </div>
               </div>
-              <button class="btn btn-primary w-full" onclick="CoconutMgr.saveSale()">💾 විකුණුම සුරකින්න</button>
+              <button class="btn btn-primary w-full" onclick="CoconutMgr.saveSale()">💾 Save Sale</button>
             </div>
             <div class="admin-section">
-              <h3>📋 අදාළ දින විකුණුම් ලැයිස්තුව</h3>
+              <h3>📋 Sales List for Selected Date</h3>
               <div id="ccSaleList" style="margin-top:10px;"></div>
             </div>
           </div>
@@ -3882,7 +3882,7 @@
           <div class="stats-row" id="dayendStats"></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
             <div class="admin-section" id="dayendCashSection">
-              <h3>💵 ලාච්චු ශේෂය (Cash Register)</h3>
+              <h3>💵 Cash Register Balance</h3>
               <div id="dayendCash"></div>
             </div>
             <div class="admin-section">
@@ -3893,18 +3893,18 @@
 
           <!-- CASH MOVEMENTS PANEL -->
           <div class="admin-section">
-            <h3>💸 ලාච්චු ගනුදෙනු (Cash Movements)</h3>
+            <h3>💸 Cash Drawer Movements</h3>
             <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:end;margin-top:10px;margin-bottom:10px;">
               <div class="form-group" style="margin-bottom:0;">
-                <label>හේතුව / Reason</label>
-                <input type="text" id="cashMoveReason" placeholder="e.g. දවසේ ගෙදර, supplier payment...">
+                <label>Reason</label>
+                <input type="text" id="cashMoveReason" placeholder="e.g. Daily expense, supplier payment...">
               </div>
               <div class="form-group" style="margin-bottom:0;">
-                <label>මුදල (Rs.)</label>
+                <label>Amount (Rs.)</label>
                 <input type="number" id="cashMoveAmount" placeholder="0.00" step="0.01" style="width:130px;">
               </div>
-              <button class="btn btn-success btn-sm" onclick="DayEnd.addCashMove('in')" style="align-self:flex-end;white-space:nowrap;">+ ලාච්චුවට</button>
-              <button class="btn btn-danger btn-sm" onclick="DayEnd.addCashMove('out')" style="align-self:flex-end;white-space:nowrap;">- ලාච්චුවෙන්</button>
+              <button class="btn btn-success btn-sm" onclick="DayEnd.addCashMove('in')" style="align-self:flex-end;white-space:nowrap;">+ Add to Drawer</button>
+              <button class="btn btn-danger btn-sm" onclick="DayEnd.addCashMove('out')" style="align-self:flex-end;white-space:nowrap;">- Draw from Drawer</button>
             </div>
             <div id="cashMoveList"></div>
           </div>
@@ -4026,7 +4026,7 @@
   <div class="overlay" id="receiptModal">
     <div class="modal modal-sm" style="max-width: 350px;">
       <div class="modal-head">
-        <div class="modal-title" style="font-weight: 800; font-size: 15px;">🧾 Receipt Preview (බිල්පත)</div><button
+        <div class="modal-title" style="font-weight: 800; font-size: 15px;">🧾 Receipt Preview</div><button
           class="modal-x" onclick="Modal.close('receiptModal')">✕</button>
       </div>
       <div id="receiptBody"></div>
@@ -4040,7 +4040,7 @@
         </div>
         <button class="btn btn-primary w-full" onclick="Modal.close('receiptModal')"
           style="padding:12px; font-size:14px; font-weight:800; background:linear-gradient(135deg, var(--cyan), var(--cyan2)); color:#000; display:flex; align-items:center; justify-content:center; gap:6px; border-radius:var(--r8);">
-          <span>← Back to POS (ආපසු විකුණුම් වෙත)</span>
+          <span>← Back to POS</span>
         </button>
       </div>
     </div>
@@ -4183,11 +4183,11 @@
       categories: [], items: [], sales: [],
       coconut_purchases: [], coconut_husking: [], coconut_sales: [], cash_movements: [], day_ends: [],
       loans: [], loan_customers: [],
-      settings: { shopName: 'රංගන චිකන් ෂොප්', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nස්තූතියි! නැවත පැමිණෙන්න.', apiServerUrl: '' },
+      settings: { shopName: 'Rangana Chicken Shop', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.', apiServerUrl: '' },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
       activeCat: 'all', adminUnlocked: false, pollTimer: null,
       isOnline: false,
-      lang: localStorage.getItem('jm_lang') || 'si'
+      lang: 'en'
     };
 
     function getApiUrl(path) {
@@ -4195,166 +4195,9 @@
     }
 
 
-    const L = {
-      en: {
-        pos: "🛒 POS",
-        inventory: "📦 Inventory",
-        barcodes: "🔲 Barcodes",
-        loans: "💳 Loans",
-        dayend: "📊 Day End",
-        admin: "🔐 Admin",
-        returns: "🔄 Returns",
-        searchProducts: "Search products... (fuzzy)",
-        scanBarcode: "Scan barcode...",
-        cart: "🛒 Cart",
-        clear: "Clear",
-        retail: "🏪 Retail",
-        wholesale: "📦 Wholesale",
-        loan: "💳 Loan",
-        cartDiscount: "💰 Cart Discount",
-        itemDisc: "🏷️ Item Disc",
-        subtotal: "Subtotal",
-        discount: "Discount",
-        loanItems: "💳 Loan items",
-        total: "Total",
-        completeSale: "💳 Complete Sale (F8)",
-        sendLoans: "💳 Send Loan Items to Loans Page →",
-        addCustomItem: "➕ Custom Item",
-        cash: "Cash",
-        card: "Card",
-        online: "Online",
-        changeDue: "Change Due",
-        cashReceived: "Cash Received",
-        paymentMethod: "Payment Method",
-        confirmPrint: "Confirm & Print",
-        cancel: "Cancel",
-        exact: "Exact",
-        openDrawer: "Open Drawer",
-        loadingProducts: "Loading products...",
-        search: "Search...",
-        categories: "🗂️ Categories",
-        addProduct: "+ Add Product",
-        product: "Product",
-        category: "Category",
-        type: "Type",
-        retailPrice: "Retail Price",
-        cost: "Cost",
-        stock: "Stock",
-        status: "Status",
-        actions: "Actions",
-        noProducts: "No products found",
-        adminPanel: "Admin Panel",
-        enterPin: "Enter PIN to unlock",
-        unlock: "Unlock",
-        lock: "Lock",
-        revenue: "Revenue",
-        profit: "Profit",
-        stockValue: "Stock Value",
-        lowStock: "Low Stock",
-        avgSale: "Avg Sale",
-        recentSales: "Recent Sales",
-        importJson: "Import JSON",
-        exportJson: "Export JSON",
-        seedData: "Seed Data",
-        clearSales: "Clear Sales",
-        cartEmpty: "Cart is empty",
-        clickToAdd: "Click items to add",
-      },
-      si: {
-        pos: "🛒 විකුණුම් (POS)",
-        inventory: "📦 තොගය (Inventory)",
-        barcodes: "🔲 බාර්කෝඩ් (Barcodes)",
-        loans: "💳 ණය (Loans)",
-        dayend: "📊 දින අවසානය (Day End)",
-        admin: "🔐 පරිපාලන (Admin)",
-        returns: "🔄 භාණ්ඩ ආපසු (Returns)",
-        searchProducts: "භාණ්ඩ සොයන්න... (Fuzzy Search)",
-        scanBarcode: "බාර්කෝඩ් එක ස්කෑන් කරන්න...",
-        cart: "🛒 කරත්තය",
-        clear: "හිස් කරන්න",
-        retail: "🏪 සිල්ලර මිල",
-        wholesale: "📦 තොග මිල",
-        loan: "💳 ණයට",
-        cartDiscount: "💰 කරත්ත වට්ටම",
-        itemDisc: "🏷️ භාණ්ඩ වට්ටම",
-        subtotal: "එකතුව",
-        discount: "වට්ටම",
-        loanItems: "💳 ණය අයිතම",
-        total: "මුළු එකතුව",
-        completeSale: "💳 ගෙවීම් කරන්න (F8)",
-        sendLoans: "💳 ණය අයිතම ණය පිටුවට යවන්න →",
-        addCustomItem: "➕ කඩිනම් අයිතම",
-        cash: "මුදල් (Cash)",
-        card: "කාඩ්පත් (Card)",
-        online: "ඔන්ලයින් (Online)",
-        changeDue: "ඉතිරි මුදල (Change)",
-        cashReceived: "භාරගත් මුදල්",
-        paymentMethod: "ගෙවීම් ක්‍රමය",
-        confirmPrint: "තහවුරු කර ප්‍රින්ට් කරන්න",
-        cancel: "අවලංගු කරන්න",
-        exact: "හරියටම",
-        openDrawer: "ලාච්චුව අරින්න (Drawer)",
-        loadingProducts: "භාණ්ඩ පූරණය වෙමින් පවතී...",
-        search: "සොයන්න...",
-        categories: "🗂️ කාණ්ඩ (Categories)",
-        addProduct: "අලුත් භාණ්ඩයක් +",
-        product: "භාණ්ඩය",
-        category: "කාණ්ඩය",
-        type: "වර්ගය",
-        retailPrice: "විකුණුම් මිල",
-        cost: "ගැනුම් මිල",
-        stock: "තොගය",
-        status: "තත්ත්වය",
-        actions: "ක්‍රියාකාරකම්",
-        noProducts: "භාණ්ඩ කිසිවක් හමු නොවීය",
-        adminPanel: "පරිපාලක පිවිසුම",
-        enterPin: "පරිපාලක PIN අංකය ඇතුළත් කරන්න",
-        unlock: "අගුළු හරින්න",
-        lock: "අගුළු දමන්න",
-        revenue: "මුළු ආදායම",
-        profit: "ලාභය",
-        stockValue: "තොග වටිනාකම",
-        lowStock: "අඩු තොග",
-        avgSale: "සාමාන්‍ය බිල",
-        recentSales: "මෑතකාලීන විකුණුම්",
-        importJson: "දත්ත ඇතුළත් කරන්න (Import)",
-        exportJson: "දත්ත බාගන්න (Export)",
-        seedData: "ආදර්ශ දත්ත ඇතුළත් කරන්න",
-        clearSales: "විකුණුම් දත්ත මකන්න",
-        cartEmpty: "කරත්තය හිස් ය",
-        clickToAdd: "භාණ්ඩ එකතු කිරීමට ක්ලික් කරන්න",
-      }
-    };
-
-    function updateUILanguage() {
-      const lang = S.lang || 'si';
-      document.querySelectorAll('[data-lang]').forEach(el => {
-        const key = el.dataset.lang;
-        if (L[lang][key]) {
-          if (el.tagName === 'INPUT' && el.placeholder) {
-            el.placeholder = L[lang][key];
-          } else {
-            el.textContent = L[lang][key];
-          }
-        }
-      });
-
-      const posSearch = document.getElementById('posSearch');
-      if (posSearch) posSearch.placeholder = L[lang].searchProducts;
-      const barcodeInput = document.getElementById('barcodeInput');
-      if (barcodeInput) barcodeInput.placeholder = L[lang].scanBarcode;
-
-      const btn = document.getElementById('langToggleBtn');
-      if (btn) btn.textContent = S.lang === 'si' ? 'English' : 'සිංහල';
-    }
-
-    function toggleLanguage() {
-      S.lang = S.lang === 'si' ? 'en' : 'si';
-      localStorage.setItem('jm_lang', S.lang);
-      updateUILanguage();
-      toast(S.lang === 'si' ? 'සිංහල භාෂාව සක්‍රිය කරන ලදී' : 'English language activated', 'success');
-    }
-
+    const L = {};
+    function updateUILanguage() {}
+    function toggleLanguage() {}
     const BackupMgr = {
       async download() {
         try {
@@ -4393,7 +4236,7 @@
       },
 
       async restore(file) {
-        if (!confirm('⚠️ අවවාදයයි: මෙමගින් වත්මන් දත්ත සියල්ලම මකාදමා බැකප් එකෙහි ඇති දත්ත ඇතුළත් කරනු ඇත! ඔබට විශ්වාසද? (This will overwrite ALL current data!)')) return;
+        if (!confirm('⚠️ Warning: This will overwrite ALL current data! Are you sure?')) return;
         try {
           toast('Reading backup file...', 'info');
           const text = await file.text();
@@ -4573,7 +4416,7 @@
             await IDB.queueDelete(op.id);
           }
           this._updateBadge('synced');
-          toast('සියලුම දත්ත සාර්ථකව remote database එකට sync කරන ලදී! 🔄', 'success');
+          toast('All data successfully synced to remote database! 🔄', 'success');
         } catch (e) {
           console.error('Sync flush error:', e);
           this._updateBadge('error');
@@ -4731,21 +4574,21 @@
         let st = await DB.get('settings/main');
         if (!st || !Object.keys(st).length) {
           st = {
-            shopName: 'රංගන චිකන් ෂොප්',
+            shopName: 'Rangana Chicken Shop',
             adminPin: '1234',
             currency: 'Rs.',
             lowStockAlert: 5,
-            receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nස්තූතියි! නැවත පැමිණෙන්න.'
+            receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.'
           };
           await DB.set('settings/main', st);
-        } else if (st && st.receiptNote && st.receiptNote.startsWith('රංගන චිකන් ෂොප්\n')) {
-          st.receiptNote = st.receiptNote.replace('රංගන චිකන් ෂොප්\n', '');
+        } else if (st && st.receiptNote && st.receiptNote.startsWith('Rangana Chicken Shop\n')) {
+          st.receiptNote = st.receiptNote.replace('Rangana Chicken Shop\n', '');
           await DB.set('settings/main', st);
         }
         Object.assign(S.settings, st);
 
         await loadAll();
-        updateUILanguage();
+        // updateUILanguage();
         
         document.getElementById('loader').classList.add('hide');
         
@@ -4765,10 +4608,10 @@
         }
 
         // Sync dot controlled by Sync engine
-        toast('රංගන චිකන් ෂොප් POS සක්‍රීයයි ✅', 'success');
+        toast('Rangana Chicken Shop POS Active ✅', 'success');
       } catch (e) {
         txt('❌ ' + e.message);
-        toast('පද්ධතිය සක්‍රීය වීමේ දෝෂයක්: ' + e.message, 'error');
+        toast('System initialization error: ' + e.message, 'error');
       }
     }
 
@@ -4844,7 +4687,7 @@
           LoanMgr.render();
         }
         
-        if (typeof updateUILanguage === 'function') updateUILanguage();
+        
       }
     }
     function startPoll() { }
@@ -4965,8 +4808,8 @@
         const notes = document.getElementById('ccBuyNotes').value.trim();
         const paidDrawer = parseFloat(document.getElementById('ccBuyPaidDrawer').value) || 0;
 
-        if (!estate) { toast('වත්ත / සැපයුම්කරු ඇතුළත් කරන්න', 'error'); return; }
-        if (largeCount <= 0 && smallCount <= 0) { toast('ගෙඩි ගණන ඇතුළත් කරන්න', 'error'); return; }
+        if (!estate) { toast('Please enter Estate / Supplier', 'error'); return; }
+        if (largeCount <= 0 && smallCount <= 0) { toast('Please enter large or small count', 'error'); return; }
 
         const total = (largeCount * largePrice) + (smallCount * smallPrice);
 
@@ -4982,7 +4825,7 @@
             date: date + 'T12:00:00.000Z',
             type: 'out',
             amount: paidDrawer,
-            reason: `🥥 පොල් මිලදී ගැනීම (${estate})`,
+            reason: `🥥 Coconut Purchase (${estate})`,
             source: 'coconut_buy',
             refId: id,
             createdAt: new Date().toISOString()
@@ -4990,7 +4833,7 @@
           await DB.push('cash_movements', move);
         }
 
-        toast('🥥 පොල් මිලදී ගැනීම සාර්ථකව සුරකින ලදී!', 'success');
+        toast('🥥 Coconut purchase saved successfully!', 'success');
         
         document.getElementById('ccBuyEstate').value = '';
         document.getElementById('ccBuyLargeCount').value = '';
@@ -5006,7 +4849,7 @@
       },
 
       async deletePurchase(id) {
-        if (!confirm('මෙම මිලදී ගැනීමේ වාර්තාව මකාදැමීමට අවශ්‍යද?')) return;
+        if (!confirm('Are you sure you want to delete this purchase record?')) return;
         await DB.del('coconut_purchases/' + id);
         
         const move = S.cash_movements.find(m => m.refId === id && m.source === 'coconut_buy');
@@ -5014,7 +4857,7 @@
           await DB.del('cash_movements/' + move.id);
         }
 
-        toast('මිලදී ගැනීම් වාර්තාව මකාදමන ලදී.', 'info');
+        toast('Purchase record deleted.', 'info');
         await loadAll();
         this.renderBuyList();
       },
@@ -5026,9 +4869,9 @@
         const rate = parseFloat(document.getElementById('ccHuskRate').value) || 0;
         const paidDrawer = parseFloat(document.getElementById('ccHuskPaidDrawer').value) || 0;
 
-        if (!worker) { toast('ශ්‍රමිකයාගේ නම ඇතුළත් කරන්න', 'error'); return; }
-        if (count <= 0) { toast('ලෙලිගෑ ගෙඩි ගාන ඇතුළත් කරන්න', 'error'); return; }
-        if (rate <= 0) { toast('ගෙඩියකට ගෙවීම ඇතුළත් කරන්න', 'error'); return; }
+        if (!worker) { toast('Please enter worker name', 'error'); return; }
+        if (count <= 0) { toast('Please enter husked count', 'error'); return; }
+        if (rate <= 0) { toast('Please enter husking rate', 'error'); return; }
 
         const total = count * rate;
 
@@ -5044,7 +4887,7 @@
             date: date + 'T12:00:00.000Z',
             type: 'out',
             amount: paidDrawer,
-            reason: `⚒️ පොල් ලෙලිගෑමේ කුලිය (${worker})`,
+            reason: `⚒️ Coconut Husking (${worker})`,
             source: 'coconut_husk',
             refId: id,
             createdAt: new Date().toISOString()
@@ -5052,7 +4895,7 @@
           await DB.push('cash_movements', move);
         }
 
-        toast('⚒️ ලෙලිගෑමේ වාර්තාව සාර්ථකව සුරකින ලදී!', 'success');
+        toast('⚒️ Husking record saved successfully!', 'success');
         
         document.getElementById('ccHuskWorker').value = '';
         document.getElementById('ccHuskCount').value = '';
@@ -5065,7 +4908,7 @@
       },
 
       async deleteHusking(id) {
-        if (!confirm('මෙම ලෙලිගෑමේ වාර්තාව මකාදැමීමට අවශ්‍යද?')) return;
+        if (!confirm('Are you sure you want to delete this husking record?')) return;
         await DB.del('coconut_husking/' + id);
         
         const move = S.cash_movements.find(m => m.refId === id && m.source === 'coconut_husk');
@@ -5073,22 +4916,22 @@
           await DB.del('cash_movements/' + move.id);
         }
 
-        toast('ලෙලිගෑමේ වාර්තාව මකාදමන ලදී.', 'info');
+        toast('Husking record deleted.', 'info');
         await loadAll();
         this.renderHuskList();
       },
 
       async saveSale() {
         const date = document.getElementById('ccSaleDate').value;
-        const buyer = document.getElementById('ccSaleBuyer').value.trim() || 'තොග ගැනුම්කරු';
+        const buyer = document.getElementById('ccSaleBuyer').value.trim() || 'Wholesale Buyer';
         const type = document.getElementById('ccSaleType').value;
         const qty = parseInt(document.getElementById('ccSaleCount').value) || 0;
         const price = parseFloat(document.getElementById('ccSalePrice').value) || 0;
         const recDrawer = parseFloat(document.getElementById('ccSaleRecDrawer').value) || 0;
         const payMethod = document.getElementById('ccSalePayMethod').value;
 
-        if (qty <= 0) { toast('විකිණූ ගෙඩි ගාන ඇතුළත් කරන්න', 'error'); return; }
-        if (price <= 0) { toast('විකුණුම් මිල ඇතුළත් කරන්න', 'error'); return; }
+        if (qty <= 0) { toast('Please enter sold quantity', 'error'); return; }
+        if (price <= 0) { toast('Please enter selling price', 'error'); return; }
 
         const total = qty * price;
 
@@ -5104,7 +4947,7 @@
             date: date + 'T12:00:00.000Z',
             type: 'in',
             amount: recDrawer,
-            reason: `💰 පොල් විකිණීම (${buyer} - ${type === 'husked' ? 'ලෙලි ගැසූ' : 'ලෙලි නොගැසූ'})`,
+            reason: `💰 Coconut Sale (${buyer} - ${type === 'husked' ? 'Husked' : 'Unhusked'})`,
             source: 'coconut_sale',
             refId: id,
             createdAt: new Date().toISOString()
@@ -5112,7 +4955,7 @@
           await DB.push('cash_movements', move);
         }
 
-        toast('💰 පොල් විකුණුම් වාර්තාව සාර්ථකව සුරකින ලදී!', 'success');
+        toast('💰 Coconut sales saved successfully!', 'success');
         
         document.getElementById('ccSaleBuyer').value = '';
         document.getElementById('ccSaleCount').value = '';
@@ -5125,7 +4968,7 @@
       },
 
       async deleteSale(id) {
-        if (!confirm('මෙම විකුණුම් වාර්තාව මකාදැමීමට අවශ්‍යද?')) return;
+        if (!confirm('Are you sure you want to delete this sales record?')) return;
         await DB.del('coconut_sales/' + id);
         
         const move = S.cash_movements.find(m => m.refId === id && m.source === 'coconut_sale');
@@ -5133,7 +4976,7 @@
           await DB.del('cash_movements/' + move.id);
         }
 
-        toast('විකුණුම් වාර්තාව මකාදමන ලදී.', 'info');
+        toast('Sales record deleted.', 'info');
         await loadAll();
         this.renderSaleList();
       },
@@ -5151,19 +4994,19 @@
         if (statsEl) {
           statsEl.innerHTML = `
             <div class="stat-card">
-              <div class="stat-lbl">ලෙලි නොගැසූ තොගය</div>
+              <div class="stat-lbl">Unhusked Stock</div>
               <div class="stat-val text-orange">${stock.unhuskedStock.toLocaleString()}</div>
-              <div class="stat-sub">ගෙඩි (Unhusked)</div>
+              <div class="stat-sub">Nuts (Unhusked)</div>
             </div>
             <div class="stat-card">
-              <div class="stat-lbl">ලෙලි ගැසූ තොගය</div>
+              <div class="stat-lbl">Husked Stock</div>
               <div class="stat-val text-green">${stock.huskedStock.toLocaleString()}</div>
-              <div class="stat-sub">ගෙඩි (Husked)</div>
+              <div class="stat-sub">Nuts (Husked)</div>
             </div>
             <div class="stat-card">
-              <div class="stat-lbl">මුළු පොල් මිලදී ගැනීම්</div>
+              <div class="stat-lbl">Total Coconut Purchased</div>
               <div class="stat-val text-cyan">${stock.purchased.toLocaleString()}</div>
-              <div class="stat-sub">මුළු ගෙඩි ගණන</div>
+              <div class="stat-sub">Total Nuts Count</div>
             </div>
           `;
         }
@@ -5179,11 +5022,11 @@
         const sumBuyEl = document.getElementById('ccSumBuy');
         if (sumBuyEl) {
           sumBuyEl.innerHTML = `
-            <div class="total-row"><span>ගෙනයාම මිල (Purchases):</span><span class="mono text-orange">Rs. ${buyCost.toFixed(2)}</span></div>
-            <div class="total-row"><span>ලෙලිගෑමේ කුලී (Husking Cost):</span><span class="mono text-red">Rs. ${huskCost.toFixed(2)}</span></div>
-            <div class="total-row"><span>විකුණුම් ආදායම (Sales Income):</span><span class="mono text-green">Rs. ${saleIncome.toFixed(2)}</span></div>
+            <div class="total-row"><span>Purchases:</span><span class="mono text-orange">Rs. ${buyCost.toFixed(2)}</span></div>
+            <div class="total-row"><span>Husking Cost:</span><span class="mono text-red">Rs. ${huskCost.toFixed(2)}</span></div>
+            <div class="total-row"><span>Sales Income:</span><span class="mono text-green">Rs. ${saleIncome.toFixed(2)}</span></div>
             <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
-              <span>දින ලාභය / පාඩුව:</span>
+              <span>Daily Profit / Loss:</span>
               <span class="mono ${saleIncome - (buyCost + huskCost) >= 0 ? 'text-green' : 'text-red'}" style="font-size:16px;font-weight:bold;">
                 Rs. ${(saleIncome - (buyCost + huskCost)).toFixed(2)}
               </span>
@@ -5193,10 +5036,10 @@
 
         const sumHuskEl = document.getElementById('ccSumHusk');
         if (sumHuskEl) {
-          let hHtml = `<div style="font-size:11px;color:var(--t2);margin-bottom:8px;">අද දවසේ ගනුදෙනු සාරාංශය:</div>`;
-          hHtml += `<div class="total-row"><span>මිලදී ගැනීම් වාර ගණන:</span><span class="mono">${dayPurchases.length}</span></div>`;
-          hHtml += `<div class="total-row"><span>ලෙලිගැසීම් වාර ගණන:</span><span class="mono">${dayHusking.length}</span></div>`;
-          hHtml += `<div class="total-row"><span>විකුණුම් වාර ගණන:</span><span class="mono">${daySales.length}</span></div>`;
+          let hHtml = `<div style="font-size:11px;color:var(--t2);margin-bottom:8px;">Daily Transactions Summary:</div>`;
+          hHtml += `<div class="total-row"><span>Purchases Count:</span><span class="mono">${dayPurchases.length}</span></div>`;
+          hHtml += `<div class="total-row"><span>Husking Sessions:</span><span class="mono">${dayHusking.length}</span></div>`;
+          hHtml += `<div class="total-row"><span>Sales Count:</span><span class="mono">${daySales.length}</span></div>`;
           sumHuskEl.innerHTML = hHtml;
         }
 
@@ -5212,34 +5055,34 @@
         if (registerEl) {
           registerEl.innerHTML = `
             <div class="total-row">
-              <span>ආරම්භක මුදල (Opening Float)</span>
+              <span>Opening Float</span>
               <div style="display:flex;align-items:center;gap:6px;">
                 <input type="number" id="ccOpeningFloatInput" value="${savedFloat}" style="width:100px;text-align:right;padding:3px;font-size:12px;background:var(--bg3);border:1px solid var(--border);" onchange="CoconutMgr.saveOpeningFloat(this.value)">
               </div>
             </div>
-            <div class="total-row"><span>+ පොල් විකුණුම් (Sales Income)</span><span class="mono text-green">+ Rs. ${daySalesDraw.toFixed(2)}</span></div>
+            <div class="total-row"><span>+ Sales Income</span><span class="mono text-green">+ Rs. ${daySalesDraw.toFixed(2)}</span></div>
             <div style="border-top: 1px dashed var(--border); margin: 4px 0;"></div>
-            <div class="total-row"><span>- පොල් මිලදී ගැනීම් (Purchases)</span><span class="mono text-red">- Rs. ${dayPurchasesDraw.toFixed(2)}</span></div>
-            <div class="total-row"><span>- ලෙලිගෑමේ කුලී (Husking Cost)</span><span class="mono text-red">- Rs. ${dayHuskingDraw.toFixed(2)}</span></div>
+            <div class="total-row"><span>- Purchases</span><span class="mono text-red">- Rs. ${dayPurchasesDraw.toFixed(2)}</span></div>
+            <div class="total-row"><span>- Husking Cost</span><span class="mono text-red">- Rs. ${dayHuskingDraw.toFixed(2)}</span></div>
             <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
               <span>Expected in Coconut Drawer</span><span class="mono" style="color:var(--cyan);font-size:17px;">Rs. ${expectedCash.toFixed(2)}</span>
             </div>
             
             <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
             <div class="form-group" style="margin-bottom:8px;">
-              <label style="font-weight:bold;font-size:12px;">ලාච්චුවේ ඇති සැබෑ මුදල (Actual Cash Counted)</label>
+              <label style="font-weight:bold;font-size:12px;">Actual Cash Counted</label>
               <input type="number" id="ccActualCash" placeholder="0.00" style="font-size:18px;font-weight:900;color:var(--cyan);background:var(--bg2);border:1px solid var(--cyan);padding:8px;width:100%;border-radius:var(--r8);" oninput="CoconutMgr.calcDiff(${expectedCash})">
             </div>
             <div id="ccDiffRow" style="display:flex;justify-content:space-between;align-items:center;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:8px 12px;margin-top:10px;display:none;">
-              <span>පරතරය (Difference):</span>
+              <span>Difference:</span>
               <span id="ccDiffVal" class="mono" style="font-size:16px;font-weight:bold;">Rs. 0.00</span>
             </div>
 
             <div class="form-group" style="margin-top:10px;margin-bottom:8px;">
-              <label>දින අවසාන සටහන (Day End Note)</label>
-              <input type="text" id="ccDayEndNote" placeholder="සටහනක් ඇතුළත් කරන්න..." style="font-size:12px;">
+              <label>Day End Note</label>
+              <input type="text" id="ccDayEndNote" placeholder="Enter a note..." style="font-size:12px;">
             </div>
-            <button class="btn btn-primary w-full" style="margin-top:10px;" onclick="CoconutMgr.saveDayEnd(${expectedCash})">💾 පොල් දින අවසානය සුරකින්න</button>
+            <button class="btn btn-primary w-full" style="margin-top:10px;" onclick="CoconutMgr.saveDayEnd(${expectedCash})">💾 Save Coconut Day End</button>
           `;
 
           // Prefill actual cash and note if saved
@@ -5275,13 +5118,13 @@
         
         const cur = S.settings.currency || 'Rs.';
         if (diff === 0) {
-          diffVal.textContent = 'Rs. 0.00 (හරියටම බැලන්ස්)';
+          diffVal.textContent = 'Rs. 0.00 (Balanced)';
           diffVal.style.color = 'var(--green)';
         } else if (diff > 0) {
-          diffVal.textContent = `+${cur} ${diff.toFixed(2)} (වැඩි)`;
+          diffVal.textContent = `+${cur} ${diff.toFixed(2)} (Over)`;
           diffVal.style.color = 'var(--cyan)';
         } else {
-          diffVal.textContent = `-${cur} ${Math.abs(diff).toFixed(2)} (අඩු)`;
+          diffVal.textContent = `-${cur} ${Math.abs(diff).toFixed(2)} (Short)`;
           diffVal.style.color = 'var(--red)';
         }
       },
@@ -5296,7 +5139,7 @@
         S.settings.coconutOpeningFloats[sel] = num;
 
         await DB.set('settings/main', S.settings);
-        toast('පොල් ආරම්භක මුදල (Opening Float) සුරකින ලදී.', 'success');
+        toast('Coconut Opening Float saved.', 'success');
         await loadAll();
       },
 
@@ -5308,7 +5151,7 @@
         const note = document.getElementById('ccDayEndNote').value.trim();
 
         if (isNaN(actualCash)) {
-          toast('පොල් ලාච්චුවේ ඇති සැබෑ මුදල ඇතුළත් කරන්න', 'error');
+          toast('Please enter actual cash in drawer', 'error');
           return;
         }
 
@@ -5329,7 +5172,7 @@
           await DB.push('day_ends', data);
         }
 
-        toast('💾 පොල් දින අවසාන වාර්තාව සාර්ථකව සුරකින ලදී!', 'success');
+        toast('💾 Coconut Day End Report saved successfully!', 'success');
         await loadAll();
       },
 
@@ -5340,19 +5183,19 @@
 
         const dayPurchases = S.coconut_purchases.filter(p => p.date === sel);
         if (!dayPurchases.length) {
-          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">මෙම දිනයේ මිලදී ගැනීම් වාර්තා කර නොමැත.</div>`;
+          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">No purchases recorded on this date.</div>`;
           return;
         }
 
         listEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
           <thead>
             <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
-              <th style="padding:6px 0;">වත්ත / සැපයුම්කරු</th>
-              <th style="padding:6px 0;text-align:right;">ලොකු</th>
-              <th style="padding:6px 0;text-align:right;">පොඩි</th>
-              <th style="padding:6px 0;text-align:right;">මුළු පිරිවැය</th>
-              <th style="padding:6px 0;text-align:right;">ලාච්චුවෙන්</th>
-              <th style="padding:6px 0;text-align:center;width:40px;">ක්‍රියා</th>
+              <th style="padding:6px 0;">Estate / Supplier</th>
+              <th style="padding:6px 0;text-align:right;">Large</th>
+              <th style="padding:6px 0;text-align:right;">Small</th>
+              <th style="padding:6px 0;text-align:right;">Total Cost</th>
+              <th style="padding:6px 0;text-align:right;">From Drawer</th>
+              <th style="padding:6px 0;text-align:center;width:40px;">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -5379,19 +5222,19 @@
 
         const dayHusking = S.coconut_husking.filter(h => h.date === sel);
         if (!dayHusking.length) {
-          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">මෙම දිනයේ ලෙලිගෑමේ වාර්තා කර නොමැත.</div>`;
+          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">No husking records found for this date.</div>`;
           return;
         }
 
         listEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
           <thead>
             <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
-              <th style="padding:6px 0;">ශ්‍රමිකයා</th>
-              <th style="padding:6px 0;text-align:right;">ලෙලිගෑ ගණන</th>
-              <th style="padding:6px 0;text-align:right;">ගෙඩියකට මිල</th>
-              <th style="padding:6px 0;text-align:right;">මුළු ගෙවීම</th>
-              <th style="padding:6px 0;text-align:right;">ලාච්චුවෙන්</th>
-              <th style="padding:6px 0;text-align:center;width:40px;">ක්‍රියා</th>
+              <th style="padding:6px 0;">Worker</th>
+              <th style="padding:6px 0;text-align:right;">Qty Husked</th>
+              <th style="padding:6px 0;text-align:right;">Rate</th>
+              <th style="padding:6px 0;text-align:right;">Total</th>
+              <th style="padding:6px 0;text-align:right;">From Drawer</th>
+              <th style="padding:6px 0;text-align:center;width:40px;">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -5418,27 +5261,27 @@
 
         const daySales = S.coconut_sales.filter(s => s.date === sel);
         if (!daySales.length) {
-          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">මෙම දිනයේ විකුණුම් වාර්තා කර නොමැත.</div>`;
+          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">No sales recorded on this date.</div>`;
           return;
         }
 
         listEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
           <thead>
             <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
-              <th style="padding:6px 0;">ගැනුම්කරු</th>
-              <th style="padding:6px 0;">වර්ගය</th>
-              <th style="padding:6px 0;text-align:right;">ගෙඩි ගාන</th>
-              <th style="padding:6px 0;text-align:right;">ගෙඩියක මිල</th>
-              <th style="padding:6px 0;text-align:right;">මුළු විකුණුම</th>
-              <th style="padding:6px 0;text-align:right;">ලාච්චුවට</th>
-              <th style="padding:6px 0;text-align:center;width:40px;">ක්‍රියා</th>
+              <th style="padding:6px 0;">Buyer</th>
+              <th style="padding:6px 0;">Type</th>
+              <th style="padding:6px 0;text-align:right;">Qty</th>
+              <th style="padding:6px 0;text-align:right;">Rate</th>
+              <th style="padding:6px 0;text-align:right;">Total</th>
+              <th style="padding:6px 0;text-align:right;">To Drawer</th>
+              <th style="padding:6px 0;text-align:center;width:40px;">Action</th>
             </tr>
           </thead>
           <tbody>
             ${daySales.map(s => `
               <tr style="border-bottom:1px solid var(--border2);">
                 <td style="padding:8px 0;font-weight:600;">${esc(s.buyer)}</td>
-                <td style="padding:8px 0;"><span class="badge ${s.type === 'husked' ? 'badge-green' : 'badge-cyan'}">${s.type === 'husked' ? 'ලෙලි ගැසූ' : 'ලෙලි නොගැසූ'}</span></td>
+                <td style="padding:8px 0;"><span class="badge ${s.type === 'husked' ? 'badge-green' : 'badge-cyan'}">${s.type === 'husked' ? 'Husked' : 'Unhusked'}</span></td>
                 <td style="padding:8px 0;text-align:right;" class="mono">${s.qty}</td>
                 <td style="padding:8px 0;text-align:right;" class="mono">Rs. ${s.price.toFixed(2)}</td>
                 <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${s.total.toFixed(2)}</td>
@@ -5490,10 +5333,10 @@
         const statsEl = document.getElementById('dayendStats');
         if (statsEl) {
           statsEl.innerHTML = `
-            <div class="stat-card"><div class="stat-lbl">මුළු විකුණුම් (POS)</div><div class="stat-val text-cyan">${fmt(totalRev)}</div><div class="stat-sub">${totalTxns} බිල්පත්</div></div>
-            <div class="stat-card"><div class="stat-lbl">ලැබුණු ණය වාරික (Loans)</div><div class="stat-val text-green">${fmt(loanPaymentsIn)}</div><div class="stat-sub">ණය පියවීම්</div></div>
-            <div class="stat-card"><div class="stat-lbl">ලාච්චුවට දැමූ මුදල්</div><div class="stat-val text-cyan">${fmt(manualCashIn)}</div><div class="stat-sub">Manual Cash In</div></div>
-            <div class="stat-card"><div class="stat-lbl">ලාච්චුවෙන් ගත් මුදල්</div><div class="stat-val text-red">${fmt(manualCashOut)}</div><div class="stat-sub">Manual Cash Out</div></div>
+            <div class="stat-card"><div class="stat-lbl">Total Sales (POS)</div><div class="stat-val text-cyan">${fmt(totalRev)}</div><div class="stat-sub">${totalTxns} Bills</div></div>
+            <div class="stat-card"><div class="stat-lbl">Loan Payments Received</div><div class="stat-val text-green">${fmt(loanPaymentsIn)}</div><div class="stat-sub">Settlements</div></div>
+            <div class="stat-card"><div class="stat-lbl">Cash Added to Drawer</div><div class="stat-val text-cyan">${fmt(manualCashIn)}</div><div class="stat-sub">Manual Cash In</div></div>
+            <div class="stat-card"><div class="stat-lbl">Cash Taken from Drawer</div><div class="stat-val text-red">${fmt(manualCashOut)}</div><div class="stat-sub">Manual Cash Out</div></div>
           `;
         }
 
@@ -5504,35 +5347,35 @@
         if (cashEl) {
           cashEl.innerHTML = `
             <div class="total-row">
-              <span>ආරම්භක මුදල (Opening Float)</span>
+              <span>Opening Float</span>
               <div style="display:flex;align-items:center;gap:6px;">
                 <input type="number" id="openingFloatInput" value="${savedFloat}" style="width:100px;text-align:right;padding:3px;font-size:12px;background:var(--bg3);border:1px solid var(--border);" onchange="DayEnd.saveOpeningFloat(this.value)">
               </div>
             </div>
-            <div class="total-row"><span>+ POS විකුණුම් (Cash Sales)</span><span class="mono text-green">+ ${fmt(posCashIn)}</span></div>
-            <div class="total-row"><span>+ ණය පියවීම් (Loan Repayments)</span><span class="mono text-green">+ ${fmt(loanPaymentsIn)}</span></div>
-            <div class="total-row"><span>+ ලාච්චුවට දැමූ මුදල් (Manual In)</span><span class="mono text-green">+ ${fmt(manualCashIn)}</span></div>
+            <div class="total-row"><span>+ POS Cash Sales</span><span class="mono text-green">+ ${fmt(posCashIn)}</span></div>
+            <div class="total-row"><span>+ Loan Repayments</span><span class="mono text-green">+ ${fmt(loanPaymentsIn)}</span></div>
+            <div class="total-row"><span>+ Manual Cash In</span><span class="mono text-green">+ ${fmt(manualCashIn)}</span></div>
             <div style="border-top: 1px dashed var(--border); margin: 4px 0;"></div>
-            <div class="total-row"><span>- ලාච්චුවෙන් ගත් මුදල් (Manual Out)</span><span class="mono text-red">- ${fmt(manualCashOut)}</span></div>
+            <div class="total-row"><span>- Manual Cash Out</span><span class="mono text-red">- ${fmt(manualCashOut)}</span></div>
             <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
               <span>Expected in Drawer</span><span class="mono" style="color:var(--cyan);font-size:17px;" id="expectedCashVal">${fmt(expectedCash)}</span>
             </div>
             
             <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
             <div class="form-group" style="margin-bottom:8px;">
-              <label style="font-weight:bold;font-size:12px;">ලාච්චුවේ ඇති සැබෑ මුදල (Actual Cash Counted)</label>
+              <label style="font-weight:bold;font-size:12px;">Actual Cash Counted</label>
               <input type="number" id="dayendActualCash" placeholder="0.00" style="font-size:18px;font-weight:900;color:var(--cyan);background:var(--bg2);border:1px solid var(--cyan);padding:8px;width:100%;border-radius:var(--r8);" oninput="DayEnd.calcDiff(${expectedCash})">
             </div>
             <div id="dayendDiffRow" style="display:flex;justify-content:space-between;align-items:center;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:8px 12px;margin-top:10px;display:none;">
-              <span>පරතරය (Difference):</span>
+              <span>Difference:</span>
               <span id="dayendDiffVal" class="mono" style="font-size:16px;font-weight:bold;">Rs. 0.00</span>
             </div>
 
             <div class="form-group" style="margin-top:10px;margin-bottom:8px;">
-              <label>දින අවසාන සටහන (Day End Note)</label>
-              <input type="text" id="dayendNote" placeholder="සටහනක් ඇතුළත් කරන්න..." style="font-size:12px;">
+              <label>Day End Note</label>
+              <input type="text" id="dayendNote" placeholder="Enter a note..." style="font-size:12px;">
             </div>
-            <button class="btn btn-primary w-full" style="margin-top:10px;" onclick="DayEnd.saveDayEnd(${expectedCash})">💾 දින අවසානය සුරකින්න</button>
+            <button class="btn btn-primary w-full" style="margin-top:10px;" onclick="DayEnd.saveDayEnd(${expectedCash})">💾 Save Day End</button>
           `;
         }
 
@@ -5597,15 +5440,15 @@
         const moveListEl = document.getElementById('cashMoveList');
         if (moveListEl) {
           if (!dayMovements.length) {
-            moveListEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:15px;font-size:12px;">අද දින කිසිදු ලාච්චු ගනුදෙනුවක් සිදු වී නොමැත.</div>`;
+            moveListEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:15px;font-size:12px;">No drawer movements recorded today.</div>`;
           } else {
             moveListEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
               <thead>
                 <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
-                  <th style="padding:6px 0;">හේතුව / විස්තරය</th>
-                  <th style="padding:6px 0;text-align:right;">ආදායම් (+)</th>
-                  <th style="padding:6px 0;text-align:right;">වියදම් (-)</th>
-                  <th style="padding:6px 0;text-align:center;width:40px;">ක්‍රියා</th>
+                  <th style="padding:6px 0;">Reason / Description</th>
+                  <th style="padding:6px 0;text-align:right;">Income (+)</th>
+                  <th style="padding:6px 0;text-align:right;">Expense (-)</th>
+                  <th style="padding:6px 0;text-align:center;width:40px;">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -5653,7 +5496,7 @@
         S.settings.openingFloats[sel] = num;
 
         await DB.set('settings/main', S.settings);
-        toast('ආරම්භක මුදල (Opening Float) සුරකින ලදී.', 'success');
+        toast('Opening Float saved.', 'success');
         this.render();
       },
 
@@ -5674,13 +5517,13 @@
         
         const cur = S.settings.currency || 'Rs.';
         if (diff === 0) {
-          diffVal.textContent = 'Rs. 0.00 (හරියටම බැලන්ස්)';
+          diffVal.textContent = 'Rs. 0.00 (Balanced)';
           diffVal.style.color = 'var(--green)';
         } else if (diff > 0) {
-          diffVal.textContent = `+${cur} ${diff.toFixed(2)} (වැඩි)`;
+          diffVal.textContent = `+${cur} ${diff.toFixed(2)} (Over)`;
           diffVal.style.color = 'var(--cyan)';
         } else {
-          diffVal.textContent = `-${cur} ${Math.abs(diff).toFixed(2)} (අඩු)`;
+          diffVal.textContent = `-${cur} ${Math.abs(diff).toFixed(2)} (Short)`;
           diffVal.style.color = 'var(--red)';
         }
       },
@@ -5693,7 +5536,7 @@
         const note = document.getElementById('dayendNote').value.trim();
 
         if (isNaN(actualCash)) {
-          toast('ලාච්චුවේ ඇති සැබෑ මුදල ඇතුළත් කරන්න (Actual cash is required)', 'error');
+          toast('Actual cash is required', 'error');
           return;
         }
 
@@ -5714,7 +5557,7 @@
           await DB.push('day_ends', data);
         }
 
-        toast('💾 දින අවසාන වාර්තාව සාර්ථකව සුරකින ලදී!', 'success');
+        toast('💾 Day End Report saved successfully!', 'success');
         await loadAll();
         this.render();
       },
@@ -5726,8 +5569,8 @@
         const reason = document.getElementById('cashMoveReason').value.trim();
         const amount = parseFloat(document.getElementById('cashMoveAmount').value) || 0;
 
-        if (!reason) { toast('හේතුව ඇතුළත් කරන්න (Reason is required)', 'error'); return; }
-        if (amount <= 0) { toast('වලංගು මුදලක් ඇතුළත් කරන්න', 'error'); return; }
+        if (!reason) { toast('Reason is required', 'error'); return; }
+        if (amount <= 0) { toast('Please enter a valid amount', 'error'); return; }
 
         const move = {
           date: date + 'T12:00:00.000Z',
@@ -5739,7 +5582,7 @@
         };
 
         await DB.push('cash_movements', move);
-        toast(type === 'in' ? 'ලාච්චුවට මුදල් ඇතුළත් කිරීම සුරකින ලදී' : 'ලාච්චුවෙන් මුදල් ගැනීම සුරකින ලදී', 'success');
+        toast(type === 'in' ? 'Cash added to drawer saved' : 'Cash drawn from drawer saved', 'success');
 
         document.getElementById('cashMoveReason').value = '';
         document.getElementById('cashMoveAmount').value = '';
@@ -5748,9 +5591,9 @@
       },
 
       async deleteCashMove(id) {
-        if (!confirm('මෙම මුදල් ගනුදෙනුව මකාදැමීමට අවශ්‍යද?')) return;
+        if (!confirm('Are you sure you want to delete this cash movement?')) return;
         await DB.del('cash_movements/' + id);
-        toast('මකාදමන ලදී', 'info');
+        toast('Deleted', 'info');
         await loadAll();
         this.render();
       },
@@ -5884,29 +5727,22 @@
         } else toast('Barcode not found: ' + code, 'error');
       },
       addCustomItemPrompt() {
-        const isSi = S.lang === 'si';
-        const title = isSi ? 'කඩිනම් අයිතමය (Custom Item)' : 'Quick Custom Item';
-        const nameLabel = isSi ? 'අයිතමයේ නම (Item Name)' : 'Item Name';
-        const priceLabel = isSi ? 'මිල (Price)' : 'Price';
-        const cancelText = isSi ? 'අවලංගු කරන්න' : 'Cancel';
-        const addText = isSi ? 'එකතු කරන්න' : 'Add';
-
         document.getElementById('optContent').innerHTML = `
       <div class="modal-head">
-        <div class="modal-title">➕ ${title}</div>
+        <div class="modal-title">➕ Quick Custom Item</div>
         <button class="modal-x" onclick="Modal.close('optModal')">✕</button>
       </div>
       <div class="form-group">
-        <label>${nameLabel} *</label>
+        <label>Item Name *</label>
         <input id="customItemName" type="text" placeholder="e.g. Loose Vegetables, Extra Bags" autofocus style="background:var(--bg3); border:1px solid var(--border2); color:var(--t1); border-radius:var(--r8);">
       </div>
       <div class="form-group">
-        <label>${priceLabel} *</label>
+        <label>Price *</label>
         <input id="customItemPrice" type="number" placeholder="100.00" min="0" step="0.5" style="background:var(--bg3); border:1px solid var(--border2); color:var(--t1); border-radius:var(--r8);">
       </div>
       <div class="modal-foot">
-        <button class="btn btn-ghost" onclick="Modal.close('optModal')">${cancelText}</button>
-        <button class="btn btn-primary" onclick="POS.confirmCustomItem()">${addText}</button>
+        <button class="btn btn-ghost" onclick="Modal.close('optModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="POS.confirmCustomItem()">Add</button>
       </div>
     `;
         Modal.open('optModal');
@@ -5919,11 +5755,11 @@
         const name = document.getElementById('customItemName').value.trim();
         const price = parseFloat(document.getElementById('customItemPrice').value) || 0;
         if (!name) {
-          toast(S.lang === 'si' ? 'නම අවශ්‍ය වේ!' : 'Name is required!', 'error');
+          toast('Name is required!', 'error');
           return;
         }
         if (price <= 0) {
-          toast(S.lang === 'si' ? 'මිල 0 ට වඩා වැඩි විය යුතුය!' : 'Price must be greater than 0!', 'error');
+          toast('Price must be greater than 0!', 'error');
           return;
         }
         const item = {
@@ -6823,7 +6659,7 @@
       _renderList() {
         const list = document.getElementById('bcList'); if (!list) return;
         if (!this._codes.length) {
-          list.innerHTML = `<div style="text-align:center;color:var(--t3);padding:40px 16px;font-size:12px;">👆 "Generate" click කරන්න<br>barcodes generate වෙනවා</div>`;
+          list.innerHTML = `<div style="text-align:center;color:var(--t3);padding:40px 16px;font-size:12px;">👆 Click "Generate" to generate barcodes</div>`;
           return;
         }
         const cur = S.settings.currency;
@@ -7176,7 +7012,7 @@ window.onload=function(){
           <button class="btn btn-primary btn-sm" onclick="LoanMgr.openNewLoan('${cust.id}')">➕ New Loan</button>
           <button class="btn btn-ghost btn-sm" onclick="LoanMgr.openCustomerForm('${cust.id}')">✏️ Edit</button>
           <button class="btn btn-danger btn-sm" onclick="LoanMgr.deleteCustomer('${cust.id}')">🗑️</button>
- ව්      <div class="cust-photo-zone">
+      <div class="cust-photo-zone">
         <div class="cust-photo-slot" id="cps0"
           ondragover="event.preventDefault();this.classList.add('drag-over')"
           ondragleave="this.classList.remove('drag-over')"
@@ -7759,7 +7595,7 @@ window.onload=function(){
           return;
         }
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === 'රංගන චිකන් ෂොප්') ? 'Rangana Chicken Shop' : S.settings.shopName;
+        const shop = (S.settings.shopName === 'Rangana Chicken Shop') ? 'Rangana Chicken Shop' : S.settings.shopName;
         const date = new Date(sale.date).toLocaleString();
         const ESC = 0x1B; const LF = 0x0A; const GS = 0x1D;
 
@@ -7791,10 +7627,10 @@ window.onload=function(){
 
         // Footer & Note (Centered)
         let rawNote = S.settings.receiptNote || '';
-        if (rawNote.includes('රංගන චිකන් ෂොප්')) {
+        if (rawNote.includes('Rangana Chicken Shop')) {
           rawNote = rawNote
-            .replace(/රංගන චිකන් ෂොප්/g, 'Rangana Chicken Shop')
-            .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
+            .replace(/Rangana Chicken Shop/g, 'Rangana Chicken Shop')
+            .replace(/Thank You!\s*Come\s*Again\./g, 'Thank You! Come Again.');
         }
         let foot = `${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n\n`;
         const footBytes = enc.encode(foot);
@@ -7843,7 +7679,7 @@ window.onload=function(){
 
       _buildReceiptText(sale) {
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === 'රංගන චිකන් ෂොප්') ? 'Rangana Chicken Shop' : S.settings.shopName;
+        const shop = (S.settings.shopName === 'Rangana Chicken Shop') ? 'Rangana Chicken Shop' : S.settings.shopName;
         const date = new Date(sale.date).toLocaleString();
         let text = `${shop}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
         (sale.items || []).forEach(si => {
@@ -7855,10 +7691,10 @@ window.onload=function(){
         text += `TOTAL: ${cur} ${(sale.total || 0).toFixed(2)}\n\n`;
 
         let rawNote = S.settings.receiptNote || shop;
-        if (rawNote.includes('රංගන චිකන් ෂොප්')) {
+        if (rawNote.includes('Rangana Chicken Shop')) {
           rawNote = rawNote
-            .replace(/රංගන චිකන් ෂොප්/g, 'Rangana Chicken Shop')
-            .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
+            .replace(/Rangana Chicken Shop/g, 'Rangana Chicken Shop')
+            .replace(/Thank You!\s*Come\s*Again\./g, 'Thank You! Come Again.');
         }
         text += `${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n`;
         return text;
@@ -7916,7 +7752,7 @@ window.onload=function(){
 
         if (type === 'pos') {
           const cur = S.settings.currency;
-          const shop = (S.settings.shopName === 'රංගන චිකන් ෂොප්') ? 'Rangana Chicken Shop' : S.settings.shopName;
+          const shop = (S.settings.shopName === 'Rangana Chicken Shop') ? 'Rangana Chicken Shop' : S.settings.shopName;
           const date = new Date(data.date).toLocaleString();
 
           centerText(shop, "4", y); y += 40;
@@ -7943,10 +7779,10 @@ window.onload=function(){
           drawLine(y); y += 15;
 
           let rawNote = S.settings.receiptNote || 'Thank You!';
-          if (rawNote.includes('රංගන චිකන් ෂොප්')) {
+          if (rawNote.includes('Rangana Chicken Shop')) {
             rawNote = rawNote
-              .replace(/රංගන චිකන් ෂොප්/g, 'Rangana Chicken Shop')
-              .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
+              .replace(/Rangana Chicken Shop/g, 'Rangana Chicken Shop')
+              .replace(/Thank You!\s*Come\s*Again\./g, 'Thank You! Come Again.');
           }
           centerText(rawNote.replace(/[^\x00-\x7F\n]/g, ''), "2", y); y += 30;
 
@@ -8254,20 +8090,20 @@ window.onload=function(){
       export() { const data = { categories: S.categories, items: S.items, sales: S.sales, settings: S.settings, exportDate: new Date().toISOString() }; const b = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `rcm-pos-backup-${new Date().toISOString().split('T')[0]}.json`; a.click(); toast('Exported ⬇️', 'success'); },
       async import(event) { const file = event.target.files[0]; if (!file) return; const text = await file.text(); const data = JSON.parse(text); if (!confirm(`Import ${data.items?.length || 0} products?`)) return; if (data.categories) await DB.set('categories', Object.fromEntries(data.categories.map(c => { const { id, ...r } = c; return [id, r]; }))); if (data.items) await DB.set('items', Object.fromEntries(data.items.map(i => { const { id, ...r } = i; return [id, r]; }))); if (data.sales) await DB.set('sales', Object.fromEntries(data.sales.map(s => { const { id, ...r } = s; return [id, r]; }))); await loadAll(); toast('Imported ✅', 'success'); },
       async factoryReset() {
-        if (!confirm('⚠️ අවවාදයයි: මෙමගින් පද්ධතියේ ඇති සියලුම දත්ත (භාණ්ඩ, කාණ්ඩ, විකුණුම්, ණය සහ සැකසුම්) සම්පූර්ණයෙන්ම මකා දමනු ඇත! (Warning: This will permanently delete ALL data!)')) return;
-        const pin = prompt('තහවුරු කිරීම සඳහා පරිපාලක PIN අංකය (Admin PIN) ඇතුළත් කරන්න:');
+        if (!confirm('⚠️ Warning: This will permanently delete ALL data (items, categories, sales, loans, and settings)! Are you sure?')) return;
+        const pin = prompt('Enter Admin PIN to confirm:');
         if (pin !== S.settings.adminPin) {
-          toast('PIN අංකය වැරදියි! ක්‍රියාව අවලංගු කරන ලදී. (Incorrect PIN!)', 'error');
+          toast('Incorrect PIN! Action cancelled.', 'error');
           return;
         }
         try {
-          toast('පද්ධතිය නැවත සකසමින් පවතී... (Resetting...)', 'info');
+          toast('Resetting system...', 'info');
           const db = await IDB.open();
           const tx = db.transaction(['cache', 'queue'], 'readwrite');
           tx.objectStore('cache').clear();
           tx.objectStore('queue').clear();
           tx.oncomplete = () => {
-            toast('පද්ධතිය සාර්ථකව යළි සකසන ලදී! (Reset Complete!)', 'success');
+            toast('System reset completed successfully!', 'success');
             setTimeout(() => window.location.reload(), 1500);
           };
           tx.onerror = (e) => {
