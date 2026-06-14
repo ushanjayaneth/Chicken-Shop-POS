@@ -3384,7 +3384,7 @@
             <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
           </g>
         </svg>
-        Rangana Chicken Shop
+          Chicken Shop
       </div>
       <div class="nav-tabs">
         <div class="nav-tab active" data-tab="pos" onclick="Nav.go('pos')" data-lang="pos">🛒 POS</div>
@@ -4183,7 +4183,7 @@
       categories: [], items: [], sales: [],
       coconut_purchases: [], coconut_husking: [], coconut_sales: [], cash_movements: [], day_ends: [],
       loans: [], loan_customers: [],
-      settings: { shopName: 'Rangana Chicken Shop', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.', apiServerUrl: '' },
+      settings: { shopName: '  Chicken Shop', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.', apiServerUrl: '' },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
       activeCat: 'all', adminUnlocked: false, pollTimer: null,
       isOnline: false,
@@ -4279,7 +4279,7 @@
       async open() {
         if (this._db) return this._db;
         return new Promise((res, rej) => {
-          const req = indexedDB.open('RanganaCommPOS_DB', 2);
+          const req = indexedDB.open(' CommPOS_DB', 2);
           req.onupgradeneeded = e => {
             const db = e.target.result;
             // cache: stores full Firebase path → data snapshots
@@ -4574,15 +4574,15 @@
         let st = await DB.get('settings/main');
         if (!st || !Object.keys(st).length) {
           st = {
-            shopName: 'Rangana Chicken Shop',
+            shopName: '  Chicken Shop',
             adminPin: '1234',
             currency: 'Rs.',
             lowStockAlert: 5,
             receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.'
           };
           await DB.set('settings/main', st);
-        } else if (st && st.receiptNote && st.receiptNote.startsWith('Rangana Chicken Shop\n')) {
-          st.receiptNote = st.receiptNote.replace('Rangana Chicken Shop\n', '');
+        } else if (st && st.receiptNote && st.receiptNote.startsWith('  Chicken Shop\n')) {
+          st.receiptNote = st.receiptNote.replace('  Chicken Shop\n', '');
           await DB.set('settings/main', st);
         }
         Object.assign(S.settings, st);
@@ -4608,7 +4608,7 @@
         }
 
         // Sync dot controlled by Sync engine
-        toast('Rangana Chicken Shop POS Active ✅', 'success');
+        toast('  Chicken Shop POS Active ✅', 'success');
       } catch (e) {
         txt('❌ ' + e.message);
         toast('System initialization error: ' + e.message, 'error');
@@ -5874,7 +5874,7 @@
       width: 42,
       shopName() {
         const raw = String(S.settings.shopName || '').trim();
-        if (!raw || /[^\x00-\x7F]/.test(raw)) return 'Rangana Chicken Shop';
+        if (!raw || /[^\x00-\x7F]/.test(raw)) return '  Chicken Shop';
         return raw;
       },
       footerNote() {
@@ -7595,7 +7595,7 @@ window.onload=function(){
           return;
         }
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === 'Rangana Chicken Shop') ? 'Rangana Chicken Shop' : S.settings.shopName;
+        const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
         const date = new Date(sale.date).toLocaleString();
         const ESC = 0x1B; const LF = 0x0A; const GS = 0x1D;
 
@@ -7627,9 +7627,9 @@ window.onload=function(){
 
         // Footer & Note (Centered)
         let rawNote = S.settings.receiptNote || '';
-        if (rawNote.includes('Rangana Chicken Shop')) {
+        if (rawNote.includes('  Chicken Shop')) {
           rawNote = rawNote
-            .replace(/Rangana Chicken Shop/g, 'Rangana Chicken Shop')
+            .replace(/  Chicken Shop/g, '  Chicken Shop')
             .replace(/Thank You!\s*Come\s*Again\./g, 'Thank You! Come Again.');
         }
         let foot = `${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n\n`;
@@ -7679,7 +7679,7 @@ window.onload=function(){
 
       _buildReceiptText(sale) {
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === 'Rangana Chicken Shop') ? 'Rangana Chicken Shop' : S.settings.shopName;
+        const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
         const date = new Date(sale.date).toLocaleString();
         let text = `${shop}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
         (sale.items || []).forEach(si => {
@@ -7691,9 +7691,9 @@ window.onload=function(){
         text += `TOTAL: ${cur} ${(sale.total || 0).toFixed(2)}\n\n`;
 
         let rawNote = S.settings.receiptNote || shop;
-        if (rawNote.includes('Rangana Chicken Shop')) {
+        if (rawNote.includes('  Chicken Shop')) {
           rawNote = rawNote
-            .replace(/Rangana Chicken Shop/g, 'Rangana Chicken Shop')
+            .replace(/  Chicken Shop/g, '  Chicken Shop')
             .replace(/Thank You!\s*Come\s*Again\./g, 'Thank You! Come Again.');
         }
         text += `${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n`;
@@ -7752,7 +7752,7 @@ window.onload=function(){
 
         if (type === 'pos') {
           const cur = S.settings.currency;
-          const shop = (S.settings.shopName === 'Rangana Chicken Shop') ? 'Rangana Chicken Shop' : S.settings.shopName;
+          const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
           const date = new Date(data.date).toLocaleString();
 
           centerText(shop, "4", y); y += 40;
@@ -7779,9 +7779,9 @@ window.onload=function(){
           drawLine(y); y += 15;
 
           let rawNote = S.settings.receiptNote || 'Thank You!';
-          if (rawNote.includes('Rangana Chicken Shop')) {
+          if (rawNote.includes('  Chicken Shop')) {
             rawNote = rawNote
-              .replace(/Rangana Chicken Shop/g, 'Rangana Chicken Shop')
+              .replace(/  Chicken Shop/g, '  Chicken Shop')
               .replace(/Thank You!\s*Come\s*Again\./g, 'Thank You! Come Again.');
           }
           centerText(rawNote.replace(/[^\x00-\x7F\n]/g, ''), "2", y); y += 30;
@@ -8266,7 +8266,7 @@ window.onload=function(){
 
     // ── PWA ─────────────────────────────────
     function setupPWA() {
-      try { const m = { name: 'Rangana Chicken Shop POS', short_name: 'Chicken Shop POS', start_url: './', display: 'standalone', background_color: '#06080f', theme_color: '#00d4ff', icons: [{ src: 'logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] }; const bl = new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }); const lk = document.createElement('link'); lk.rel = 'manifest'; lk.href = URL.createObjectURL(bl); document.head.appendChild(lk); } catch (e) { }
+      try { const m = { name: '  Chicken Shop POS', short_name: 'Chicken Shop POS', start_url: './', display: 'standalone', background_color: '#06080f', theme_color: '#00d4ff', icons: [{ src: 'logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] }; const bl = new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }); const lk = document.createElement('link'); lk.rel = 'manifest'; lk.href = URL.createObjectURL(bl); document.head.appendChild(lk); } catch (e) { }
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').then(reg => {
           reg.update();
