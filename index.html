@@ -3352,6 +3352,7 @@
       <div class="nav-tab" data-tab="loans" onclick="Nav.go('loans'); Nav.closeMenu()" data-lang="loans">💳 Loans</div>
       <div class="nav-tab" data-tab="returns" onclick="Nav.go('returns'); Nav.closeMenu()" data-lang="returns">🔄
         Returns</div>
+      <div class="nav-tab" data-tab="coconut" onclick="Nav.go('coconut'); Nav.closeMenu()">🥥 පොල්</div>
       <div class="nav-tab" data-tab="dayend" onclick="Nav.go('dayend'); Nav.closeMenu()" data-lang="dayend">📊 Day End
       </div>
       <div class="nav-tab" data-tab="admin" onclick="Nav.go('admin'); Nav.closeMenu()" data-lang="admin">🔐 Admin</div>
@@ -3391,6 +3392,7 @@
         <div class="nav-tab" data-tab="barcodes" onclick="Nav.go('barcodes')" data-lang="barcodes">🔲 Barcodes</div>
         <div class="nav-tab" data-tab="loans" onclick="Nav.go('loans')" data-lang="loans">💳 Loans</div>
         <div class="nav-tab" data-tab="returns" onclick="Nav.go('returns')" data-lang="returns">🔄 Returns</div>
+        <div class="nav-tab" data-tab="coconut" onclick="Nav.go('coconut')">🥥 පොල්</div>
         <div class="nav-tab" data-tab="dayend" onclick="Nav.go('dayend')" data-lang="dayend">📊 Day End</div>
         <div class="nav-tab" data-tab="admin" onclick="Nav.go('admin')" data-lang="admin">🔐 Admin</div>
       </div>
@@ -3677,6 +3679,190 @@
         </div>
       </div>
 
+      <!-- COCONUT BUSINESS TAB -->
+      <div class="tab-panel" id="coconutTab">
+        <div class="inv-bar">
+          <h2>🥥 පොල් ව්‍යාපාරය (Coconut Business)</h2>
+          <div style="display:flex;gap:6px;align-items:center;margin-left:auto;">
+            <input type="date" id="coconutDate" style="padding:5px 10px;font-size:12px;max-width:160px;" onchange="CoconutMgr.switchTab(CoconutMgr._tab)">
+            <button class="btn btn-primary btn-sm" onclick="CoconutMgr.switchTab(CoconutMgr._tab)">🔄 Refresh</button>
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px;">
+
+          <!-- Sub tabs -->
+          <div class="opt-tabs" style="margin-bottom:4px;">
+            <div class="opt-tab active" id="ccTab_summary" onclick="CoconutMgr.switchTab('summary')">📊 තොග සහ වාර්තා</div>
+            <div class="opt-tab" id="ccTab_buy" onclick="CoconutMgr.switchTab('buy')">🛒 මිලදී ගැනීම් (Purchases)</div>
+            <div class="opt-tab" id="ccTab_husk" onclick="CoconutMgr.switchTab('husk')">⚒️ ලෙලිගෑම (Husking)</div>
+            <div class="opt-tab" id="ccTab_sale" onclick="CoconutMgr.switchTab('sale')">💰 විකිණීම (Sales)</div>
+          </div>
+
+          <!-- SUMMARY SECTION -->
+          <div id="ccSection_summary">
+            <div class="stats-row" id="ccSummaryStats"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+              <div class="admin-section">
+                <h3>📊 දින මුදල් සාරාංශය</h3>
+                <div id="ccSumBuy"></div>
+              </div>
+              <div class="admin-section">
+                <h3>📋 දින විස්තර</h3>
+                <div id="ccSumHusk"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PURCHASE SECTION -->
+          <div id="ccSection_buy" style="display:none;">
+            <div class="admin-section" style="margin-bottom:12px;">
+              <h3>🛒 වතුවලින් මිලදී ගැනීම් ලියාපදිංචිය</h3>
+              <div class="grid-2" style="margin-top:10px;">
+                <div class="form-group">
+                  <label>දිනය (Date)</label>
+                  <input type="date" id="ccBuyDate">
+                </div>
+                <div class="form-group">
+                  <label>වත්ත / සැපයුම්කරු (Estate / Supplier)</label>
+                  <input type="text" id="ccBuyEstate" placeholder="Estate/Supplier name">
+                </div>
+                <div class="form-group">
+                  <label>ලොකු ගෙඩි ගණන (Large Count)</label>
+                  <input type="number" id="ccBuyLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()">
+                </div>
+                <div class="form-group">
+                  <label>ලොකු ගෙඩිය මිල (Large Price)</label>
+                  <input type="number" id="ccBuyLargePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()">
+                </div>
+                <div class="form-group">
+                  <label>පොඩි ගෙඩි ගණන (Small Count)</label>
+                  <input type="number" id="ccBuySmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()">
+                </div>
+                <div class="form-group">
+                  <label>පොඩි ගෙඩිය මිල (Small Price)</label>
+                  <input type="number" id="ccBuySmallPrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>සටහන (Optional Note)</label>
+                <input type="text" id="ccBuyNotes" placeholder="පොල් ගැන විශේෂ සටහනක්...">
+              </div>
+              <div class="grid-2">
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
+                  <span style="font-size:13px;color:var(--t2);">සම්පූර්ණ පිරිවැය</span>
+                  <span class="mono" style="font-size:18px;font-weight:700;color:var(--orange);" id="ccBuyTotal">Rs. 0.00</span>
+                </div>
+                <div class="form-group" style="margin-bottom:10px;">
+                  <label>ලාච්චුවෙන් ගෙවූ මුදල (Paid from Drawer)</label>
+                  <input type="number" id="ccBuyPaidDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--red);">
+                </div>
+              </div>
+              <button class="btn btn-primary w-full" onclick="CoconutMgr.savePurchase()">💾 ගෙනයාම සුරකින්න</button>
+            </div>
+            <div class="admin-section">
+              <h3>📋 අදාළ දින මිලදී ගැනීම් ලැයිස්තුව</h3>
+              <div id="ccBuyList" style="margin-top:10px;"></div>
+            </div>
+          </div>
+
+          <!-- HUSKING SECTION -->
+          <div id="ccSection_husk" style="display:none;">
+            <div class="admin-section" style="margin-bottom:12px;">
+              <h3>⚒️ ශ්‍රමිකයන් ලෙලිගෑමේ ගෙවීම්</h3>
+              <div class="grid-2" style="margin-top:10px;">
+                <div class="form-group">
+                  <label>දිනය (Date)</label>
+                  <input type="date" id="ccHuskDate">
+                </div>
+                <div class="form-group">
+                  <label>ශ්‍රමිකයාගේ නම (Worker Name)</label>
+                  <input type="text" id="ccHuskWorker" placeholder="Worker name">
+                </div>
+                <div class="form-group">
+                  <label>ලෙලිගෑ ගෙඩි ගණන (Count Husked)</label>
+                  <input type="number" id="ccHuskCount" placeholder="0" min="0" oninput="CoconutMgr.calcHuskTotal()">
+                </div>
+                <div class="form-group">
+                  <label>ගෙඩියකට ගෙවීම (Rate per nut)</label>
+                  <input type="number" id="ccHuskRate" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcHuskTotal()">
+                </div>
+              </div>
+              <div class="grid-2">
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
+                  <span style="font-size:13px;color:var(--t2);">සම්පූර්ණ ගෙවීම</span>
+                  <span class="mono" style="font-size:18px;font-weight:700;color:var(--red);" id="ccHuskTotal">Rs. 0.00</span>
+                </div>
+                <div class="form-group" style="margin-bottom:10px;">
+                  <label>ලාච්චුවෙන් ගෙවූ මුදල (Paid from Drawer)</label>
+                  <input type="number" id="ccHuskPaidDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--red);">
+                </div>
+              </div>
+              <button class="btn btn-primary w-full" onclick="CoconutMgr.saveHusking()">💾 ගෙවීම සුරකින්න</button>
+            </div>
+            <div class="admin-section">
+              <h3>📋 අදාළ දින ලෙලිගෑමේ ලැයිස්තුව</h3>
+              <div id="ccHuskList" style="margin-top:10px;"></div>
+            </div>
+          </div>
+
+          <!-- SALES SECTION -->
+          <div id="ccSection_sale" style="display:none;">
+            <div class="admin-section" style="margin-bottom:12px;">
+              <h3>💰 පොල් තොග විකිණීම ලියාපදිංචිය</h3>
+              <div class="grid-2" style="margin-top:10px;">
+                <div class="form-group">
+                  <label>දිනය (Date)</label>
+                  <input type="date" id="ccSaleDate">
+                </div>
+                <div class="form-group">
+                  <label>ගැනුම්කරු (Customer / Buyer Name)</label>
+                  <input type="text" id="ccSaleBuyer" placeholder="e.g. wholesale buyer, customer">
+                </div>
+                <div class="form-group">
+                  <label>පොල් වර්ගය (Coconut Type)</label>
+                  <select id="ccSaleType">
+                    <option value="husked">ලෙලි ගැසූ පොල් (Husked)</option>
+                    <option value="unhusked">ලෙලි නොගැසූ පොල් (Unhusked)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>ගෙඩි ගණන (Quantity)</label>
+                  <input type="number" id="ccSaleCount" placeholder="0" min="0" oninput="CoconutMgr.calcSaleTotal()">
+                </div>
+                <div class="form-group">
+                  <label>ගෙඩියක විකුණුම් මිල (Price per nut)</label>
+                  <input type="number" id="ccSalePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()">
+                </div>
+                <div class="form-group">
+                  <label>ගෙවීම් ක්‍රමය (Payment Method)</label>
+                  <select id="ccSalePayMethod">
+                    <option value="cash">මුදල් (Cash)</option>
+                    <option value="card">කාඩ්පත් (Card)</option>
+                    <option value="online">ඔන්ලයින් (Online Transfer)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid-2">
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
+                  <span style="font-size:13px;color:var(--t2);">සම්පූර්ණ ආදායම</span>
+                  <span class="mono" style="font-size:18px;font-weight:700;color:var(--green);" id="ccSaleTotal">Rs. 0.00</span>
+                </div>
+                <div class="form-group" style="margin-bottom:10px;">
+                  <label>ලාච්චුවට ලැබුණු මුදල (Received to Drawer)</label>
+                  <input type="number" id="ccSaleRecDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--green);">
+                </div>
+              </div>
+              <button class="btn btn-primary w-full" onclick="CoconutMgr.saveSale()">💾 විකුණුම සුරකින්න</button>
+            </div>
+            <div class="admin-section">
+              <h3>📋 අදාළ දින විකුණුම් ලැයිස්තුව</h3>
+              <div id="ccSaleList" style="margin-top:10px;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       <!-- DAY-END SUMMARY TAB -->
       <div class="tab-panel" id="dayendTab">
         <div class="inv-bar">
@@ -3692,7 +3878,7 @@
           <div class="stats-row" id="dayendStats"></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
             <div class="admin-section" id="dayendCashSection">
-              <h3>💵 Cash Register Balance</h3>
+              <h3>💵 ලාච්චු ශේෂය (Cash Register)</h3>
               <div id="dayendCash"></div>
             </div>
             <div class="admin-section">
@@ -3700,6 +3886,25 @@
               <div id="dayendPayBreak"></div>
             </div>
           </div>
+
+          <!-- CASH MOVEMENTS PANEL -->
+          <div class="admin-section">
+            <h3>💸 ලාච්චු ගනුදෙනු (Cash Movements)</h3>
+            <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:end;margin-top:10px;margin-bottom:10px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label>හේතුව / Reason</label>
+                <input type="text" id="cashMoveReason" placeholder="e.g. දවසේ ගෙදර, supplier payment...">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label>මුදල (Rs.)</label>
+                <input type="number" id="cashMoveAmount" placeholder="0.00" step="0.01" style="width:130px;">
+              </div>
+              <button class="btn btn-success btn-sm" onclick="DayEnd.addCashMove('in')" style="align-self:flex-end;white-space:nowrap;">+ ලාච්චුවට</button>
+              <button class="btn btn-danger btn-sm" onclick="DayEnd.addCashMove('out')" style="align-self:flex-end;white-space:nowrap;">- ලාච්චුවෙන්</button>
+            </div>
+            <div id="cashMoveList"></div>
+          </div>
+
           <div class="admin-section">
             <h3>⏰ Hourly Sales Chart</h3>
             <div id="dayendHourly" style="display:flex;gap:3px;align-items:flex-end;height:90px;padding:4px 0;"></div>
@@ -3715,8 +3920,8 @@
         </div>
       </div>
 
-
       <!-- RETURNS TAB -->
+
       <div class="tab-panel" id="returnsTab">
         <div class="inv-bar">
           <h2>🔄 Returns Management</h2>
@@ -3972,6 +4177,8 @@
     // 100% Offline-only POS Config
     const S = {
       categories: [], items: [], sales: [],
+      coconut_purchases: [], coconut_husking: [], coconut_sales: [], cash_movements: [], day_ends: [],
+      loans: [], loan_customers: [],
       settings: { shopName: 'රංගන චිකන් ෂොප්', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nස්තූතියි! නැවත පැමිණෙන්න.', apiServerUrl: '' },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
       activeCat: 'all', adminUnlocked: false, pollTimer: null,
@@ -4397,7 +4604,7 @@
             const tx = db.transaction('cache', 'readwrite');
             const store = tx.objectStore('cache');
 
-            const keys = ['categories', 'items', 'sales', 'loan_customers', 'loans'];
+            const keys = ['categories', 'items', 'sales', 'loan_customers', 'loans', 'coconut_purchases', 'coconut_husking', 'coconut_sales', 'cash_movements', 'day_ends'];
             for (const key of keys) {
               if (remoteDb[key] !== undefined) {
                 store.put({ path: key, data: remoteDb[key] || {}, ts: Date.now() });
@@ -4540,6 +4747,7 @@
         
         startClock(); startPoll(); setupPWA();
         Sync.start();
+        CoconutMgr.init();
 
         // Allow horizontal mouse wheel scroll on tabs
         const navTabs = document.querySelector('.nav-tabs');
@@ -4562,17 +4770,41 @@
 
     let _lastDataStr = "";
     async function loadAll() {
-      const [cats, items, sales] = await Promise.all([DB.get('categories'), DB.get('items'), DB.get('sales')]);
+      const [cats, items, sales, cp, ch, cs, cm, de, loans, custs] = await Promise.all([
+        DB.get('categories'),
+        DB.get('items'),
+        DB.get('sales'),
+        DB.get('coconut_purchases'),
+        DB.get('coconut_husking'),
+        DB.get('coconut_sales'),
+        DB.get('cash_movements'),
+        DB.get('day_ends'),
+        DB.get('loans'),
+        DB.get('loan_customers')
+      ]);
 
       // Create a fast, lightweight structural change check
       const currentStr = JSON.stringify({
         cLen: Object.keys(cats || {}).length,
         iLen: Object.keys(items || {}).length,
         sLen: Object.keys(sales || {}).length,
-        // also compare modified timestamps or full values for exact matches
+        cpLen: Object.keys(cp || {}).length,
+        chLen: Object.keys(ch || {}).length,
+        csLen: Object.keys(cs || {}).length,
+        cmLen: Object.keys(cm || {}).length,
+        deLen: Object.keys(de || {}).length,
+        lnLen: Object.keys(loans || {}).length,
+        lcLen: Object.keys(custs || {}).length,
         cVal: cats,
         iVal: items,
-        sVal: sales
+        sVal: sales,
+        cpVal: cp,
+        chVal: ch,
+        csVal: cs,
+        cmVal: cm,
+        deVal: de,
+        lnVal: loans,
+        lcVal: custs
       });
 
       const isUnchanged = (currentStr === _lastDataStr);
@@ -4581,6 +4813,13 @@
       S.categories = DB.obj2arr(cats).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
       S.items = DB.obj2arr(items);
       S.sales = DB.obj2arr(sales).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 100);
+      S.coconut_purchases = DB.obj2arr(cp).sort((a, b) => new Date(b.date) - new Date(a.date));
+      S.coconut_husking = DB.obj2arr(ch).sort((a, b) => new Date(b.date) - new Date(a.date));
+      S.coconut_sales = DB.obj2arr(cs).sort((a, b) => new Date(b.date) - new Date(a.date));
+      S.cash_movements = DB.obj2arr(cm).sort((a, b) => new Date(b.date) - new Date(a.date));
+      S.day_ends = DB.obj2arr(de);
+      S.loans = DB.obj2arr(loans);
+      S.loan_customers = DB.obj2arr(custs);
 
       // Console logging to satisfy "confirm if the database is loading"
       console.log(`[Database Telemetry] Sync complete. Categories: ${S.categories.length}, Products: ${S.items.length}, Sales: ${S.sales.length}. Changed since last poll: ${!isUnchanged}`);
@@ -4590,6 +4829,17 @@
         if (S.adminUnlocked) Admin.render();
         if (document.getElementById('barcodesTab')?.classList.contains('active')) { BarcodeTab.render(); }
         try { await ReturnMgr.load(); } catch (e) { }
+        
+        if (document.getElementById('coconutTab')?.classList.contains('active')) {
+          CoconutMgr.switchTab(CoconutMgr._tab);
+        }
+        if (document.getElementById('dayendTab')?.classList.contains('active')) {
+          DayEnd.render();
+        }
+        if (document.getElementById('loansTab')?.classList.contains('active')) {
+          LoanMgr.render();
+        }
+        
         if (typeof updateUILanguage === 'function') updateUILanguage();
       }
     }
@@ -4599,8 +4849,473 @@
     function toast(msg, type = 'info') { const d = document.createElement('div'); d.className = `toast toast-${type}`; d.textContent = msg; document.getElementById('toasts').appendChild(d); setTimeout(() => d.remove(), 3500); }
 
     // ── NAV / MODAL ─────────────────────────
-    const Nav = { go(tab) { document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab)); document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tab + 'Tab')); if (tab === 'admin') Admin.render(); if (tab === 'inventory') InvTable.render(); if (tab === 'barcodes') BarcodeTab.render(); if (tab === 'loans') LoanMgr.render(); if (tab === 'returns') ReturnMgr.switchTab('customer'); if (tab === 'dayend') DayEnd.render(); }, toggleMenu() { const sb = document.getElementById('sidebar'); const ol = document.getElementById('sidebarOverlay'); if (sb.classList.contains('show')) { sb.classList.remove('show'); ol.classList.remove('show'); } else { sb.classList.add('show'); ol.classList.add('show'); } }, closeMenu() { document.getElementById('sidebar').classList.remove('show'); document.getElementById('sidebarOverlay').classList.remove('show'); } };
+    const Nav = { go(tab) { document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab)); document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tab + 'Tab')); if (tab === 'admin') Admin.render(); if (tab === 'inventory') InvTable.render(); if (tab === 'barcodes') BarcodeTab.render(); if (tab === 'loans') LoanMgr.render(); if (tab === 'returns') ReturnMgr.switchTab('customer'); if (tab === 'coconut') CoconutMgr.switchTab('summary'); if (tab === 'dayend') DayEnd.render(); }, toggleMenu() { const sb = document.getElementById('sidebar'); const ol = document.getElementById('sidebarOverlay'); if (sb.classList.contains('show')) { sb.classList.remove('show'); ol.classList.remove('show'); } else { sb.classList.add('show'); ol.classList.add('show'); } }, closeMenu() { document.getElementById('sidebar').classList.remove('show'); document.getElementById('sidebarOverlay').classList.remove('show'); } };
     const Modal = { open(id) { document.getElementById(id).classList.add('open'); }, close(id) { document.getElementById(id).classList.remove('open'); } };
+
+    // ── DAY-END SUMMARY ─────────────────────
+    // ── COCONUT BUSINESS ─────────────────────────
+    const CoconutMgr = {
+      _tab: 'summary',
+
+      init() {
+        const dateEl = document.getElementById('coconutDate');
+        if (dateEl && !dateEl.value) {
+          dateEl.value = new Date().toISOString().split('T')[0];
+        }
+      },
+
+      switchTab(tab) {
+        this._tab = tab;
+        ['buy','husk','sale','summary'].forEach(t => {
+          const btn = document.getElementById('ccTab_' + t);
+          if (btn) btn.classList.toggle('active', t === tab);
+          const sec = document.getElementById('ccSection_' + t);
+          if (sec) sec.style.display = t === tab ? 'block' : 'none';
+        });
+        
+        // Refresh appropriate lists
+        const selDate = document.getElementById('coconutDate')?.value || new Date().toISOString().split('T')[0];
+        document.getElementById('ccBuyDate').value = selDate;
+        document.getElementById('ccHuskDate').value = selDate;
+        document.getElementById('ccSaleDate').value = selDate;
+
+        if (tab === 'summary') {
+          this.renderSummary();
+        } else if (tab === 'buy') {
+          this.renderBuyList();
+        } else if (tab === 'husk') {
+          this.renderHuskList();
+        } else if (tab === 'sale') {
+          this.renderSaleList();
+        }
+      },
+
+      calcStock() {
+        let purchased = 0;
+        let husked = 0;
+        let soldUnhusked = 0;
+        let soldHusked = 0;
+
+        S.coconut_purchases.forEach(p => {
+          purchased += (parseInt(p.largeCount) || 0) + (parseInt(p.smallCount) || 0);
+        });
+
+        S.coconut_husking.forEach(h => {
+          husked += (parseInt(h.count) || 0);
+        });
+
+        S.coconut_sales.forEach(s => {
+          const qty = parseInt(s.qty) || 0;
+          if (s.type === 'unhusked') {
+            soldUnhusked += qty;
+          } else {
+            soldHusked += qty;
+          }
+        });
+
+        const unhuskedStock = purchased - husked - soldUnhusked;
+        const huskedStock = husked - soldHusked;
+
+        return { unhuskedStock, huskedStock, purchased, husked, soldUnhusked, soldHusked };
+      },
+
+      calcBuyTotal() {
+        const lc = parseInt(document.getElementById('ccBuyLargeCount').value) || 0;
+        const lp = parseFloat(document.getElementById('ccBuyLargePrice').value) || 0;
+        const sc = parseInt(document.getElementById('ccBuySmallCount').value) || 0;
+        const sp = parseFloat(document.getElementById('ccBuySmallPrice').value) || 0;
+        const tot = (lc * lp) + (sc * sp);
+        document.getElementById('ccBuyTotal').textContent = 'Rs. ' + tot.toFixed(2);
+        
+        const paidInput = document.getElementById('ccBuyPaidDrawer');
+        if (paidInput) paidInput.value = tot.toFixed(0);
+      },
+
+      calcHuskTotal() {
+        const cnt = parseInt(document.getElementById('ccHuskCount').value) || 0;
+        const rate = parseFloat(document.getElementById('ccHuskRate').value) || 0;
+        const tot = cnt * rate;
+        document.getElementById('ccHuskTotal').textContent = 'Rs. ' + tot.toFixed(2);
+
+        const paidInput = document.getElementById('ccHuskPaidDrawer');
+        if (paidInput) paidInput.value = tot.toFixed(0);
+      },
+
+      calcSaleTotal() {
+        const cnt = parseInt(document.getElementById('ccSaleCount').value) || 0;
+        const price = parseFloat(document.getElementById('ccSalePrice').value) || 0;
+        const tot = cnt * price;
+        document.getElementById('ccSaleTotal').textContent = 'Rs. ' + tot.toFixed(2);
+
+        const recInput = document.getElementById('ccSaleRecDrawer');
+        if (recInput) recInput.value = tot.toFixed(0);
+      },
+
+      async savePurchase() {
+        const date = document.getElementById('ccBuyDate').value;
+        const estate = document.getElementById('ccBuyEstate').value.trim();
+        const largeCount = parseInt(document.getElementById('ccBuyLargeCount').value) || 0;
+        const largePrice = parseFloat(document.getElementById('ccBuyLargePrice').value) || 0;
+        const smallCount = parseInt(document.getElementById('ccBuySmallCount').value) || 0;
+        const smallPrice = parseFloat(document.getElementById('ccBuySmallPrice').value) || 0;
+        const notes = document.getElementById('ccBuyNotes').value.trim();
+        const paidDrawer = parseFloat(document.getElementById('ccBuyPaidDrawer').value) || 0;
+
+        if (!estate) { toast('වත්ත / සැපයුම්කරු ඇතුළත් කරන්න', 'error'); return; }
+        if (largeCount <= 0 && smallCount <= 0) { toast('ගෙඩි ගණන ඇතුළත් කරන්න', 'error'); return; }
+
+        const total = (largeCount * largePrice) + (smallCount * smallPrice);
+
+        const data = {
+          date, estate, largeCount, largePrice, smallCount, smallPrice, notes, total, paidDrawer,
+          createdAt: new Date().toISOString()
+        };
+
+        const id = await DB.push('coconut_purchases', data);
+
+        if (paidDrawer > 0) {
+          const move = {
+            date: date + 'T12:00:00.000Z',
+            type: 'out',
+            amount: paidDrawer,
+            reason: `🥥 පොල් මිලදී ගැනීම (${estate})`,
+            source: 'coconut_buy',
+            refId: id,
+            createdAt: new Date().toISOString()
+          };
+          await DB.push('cash_movements', move);
+        }
+
+        toast('🥥 පොල් මිලදී ගැනීම සාර්ථකව සුරකින ලදී!', 'success');
+        
+        document.getElementById('ccBuyEstate').value = '';
+        document.getElementById('ccBuyLargeCount').value = '';
+        document.getElementById('ccBuyLargePrice').value = '';
+        document.getElementById('ccBuySmallCount').value = '';
+        document.getElementById('ccBuySmallPrice').value = '';
+        document.getElementById('ccBuyNotes').value = '';
+        document.getElementById('ccBuyPaidDrawer').value = '';
+        this.calcBuyTotal();
+
+        await loadAll();
+        this.renderBuyList();
+      },
+
+      async deletePurchase(id) {
+        if (!confirm('මෙම මිලදී ගැනීමේ වාර්තාව මකාදැමීමට අවශ්‍යද?')) return;
+        await DB.del('coconut_purchases/' + id);
+        
+        const move = S.cash_movements.find(m => m.refId === id && m.source === 'coconut_buy');
+        if (move) {
+          await DB.del('cash_movements/' + move.id);
+        }
+
+        toast('මිලදී ගැනීම් වාර්තාව මකාදමන ලදී.', 'info');
+        await loadAll();
+        this.renderBuyList();
+      },
+
+      async saveHusking() {
+        const date = document.getElementById('ccHuskDate').value;
+        const worker = document.getElementById('ccHuskWorker').value.trim();
+        const count = parseInt(document.getElementById('ccHuskCount').value) || 0;
+        const rate = parseFloat(document.getElementById('ccHuskRate').value) || 0;
+        const paidDrawer = parseFloat(document.getElementById('ccHuskPaidDrawer').value) || 0;
+
+        if (!worker) { toast('ශ්‍රමිකයාගේ නම ඇතුළත් කරන්න', 'error'); return; }
+        if (count <= 0) { toast('ලෙලිගෑ ගෙඩි ගාන ඇතුළත් කරන්න', 'error'); return; }
+        if (rate <= 0) { toast('ගෙඩියකට ගෙවීම ඇතුළත් කරන්න', 'error'); return; }
+
+        const total = count * rate;
+
+        const data = {
+          date, worker, count, rate, total, paidDrawer,
+          createdAt: new Date().toISOString()
+        };
+
+        const id = await DB.push('coconut_husking', data);
+
+        if (paidDrawer > 0) {
+          const move = {
+            date: date + 'T12:00:00.000Z',
+            type: 'out',
+            amount: paidDrawer,
+            reason: `⚒️ පොල් ලෙලිගෑමේ කුලිය (${worker})`,
+            source: 'coconut_husk',
+            refId: id,
+            createdAt: new Date().toISOString()
+          };
+          await DB.push('cash_movements', move);
+        }
+
+        toast('⚒️ ලෙලිගෑමේ වාර්තාව සාර්ථකව සුරකින ලදී!', 'success');
+        
+        document.getElementById('ccHuskWorker').value = '';
+        document.getElementById('ccHuskCount').value = '';
+        document.getElementById('ccHuskRate').value = '';
+        document.getElementById('ccHuskPaidDrawer').value = '';
+        this.calcHuskTotal();
+
+        await loadAll();
+        this.renderHuskList();
+      },
+
+      async deleteHusking(id) {
+        if (!confirm('මෙම ලෙලිගෑමේ වාර්තාව මකාදැමීමට අවශ්‍යද?')) return;
+        await DB.del('coconut_husking/' + id);
+        
+        const move = S.cash_movements.find(m => m.refId === id && m.source === 'coconut_husk');
+        if (move) {
+          await DB.del('cash_movements/' + move.id);
+        }
+
+        toast('ලෙලිගෑමේ වාර්තාව මකාදමන ලදී.', 'info');
+        await loadAll();
+        this.renderHuskList();
+      },
+
+      async saveSale() {
+        const date = document.getElementById('ccSaleDate').value;
+        const buyer = document.getElementById('ccSaleBuyer').value.trim() || 'තොග ගැනුම්කරු';
+        const type = document.getElementById('ccSaleType').value;
+        const qty = parseInt(document.getElementById('ccSaleCount').value) || 0;
+        const price = parseFloat(document.getElementById('ccSalePrice').value) || 0;
+        const recDrawer = parseFloat(document.getElementById('ccSaleRecDrawer').value) || 0;
+        const payMethod = document.getElementById('ccSalePayMethod').value;
+
+        if (qty <= 0) { toast('විකිණූ ගෙඩි ගාන ඇතුළත් කරන්න', 'error'); return; }
+        if (price <= 0) { toast('විකුණුම් මිල ඇතුළත් කරන්න', 'error'); return; }
+
+        const total = qty * price;
+
+        const data = {
+          date, buyer, type, qty, price, total, recDrawer, payMethod,
+          createdAt: new Date().toISOString()
+        };
+
+        const id = await DB.push('coconut_sales', data);
+
+        if (payMethod === 'cash' && recDrawer > 0) {
+          const move = {
+            date: date + 'T12:00:00.000Z',
+            type: 'in',
+            amount: recDrawer,
+            reason: `💰 පොල් විකිණීම (${buyer} - ${type === 'husked' ? 'ලෙලි ගැසූ' : 'ලෙලි නොගැසූ'})`,
+            source: 'coconut_sale',
+            refId: id,
+            createdAt: new Date().toISOString()
+          };
+          await DB.push('cash_movements', move);
+        }
+
+        toast('💰 පොල් විකුණුම් වාර්තාව සාර්ථකව සුරකින ලදී!', 'success');
+        
+        document.getElementById('ccSaleBuyer').value = '';
+        document.getElementById('ccSaleCount').value = '';
+        document.getElementById('ccSalePrice').value = '';
+        document.getElementById('ccSaleRecDrawer').value = '';
+        this.calcSaleTotal();
+
+        await loadAll();
+        this.renderSaleList();
+      },
+
+      async deleteSale(id) {
+        if (!confirm('මෙම විකුණුම් වාර්තාව මකාදැමීමට අවශ්‍යද?')) return;
+        await DB.del('coconut_sales/' + id);
+        
+        const move = S.cash_movements.find(m => m.refId === id && m.source === 'coconut_sale');
+        if (move) {
+          await DB.del('cash_movements/' + move.id);
+        }
+
+        toast('විකුණුම් වාර්තාව මකාදමන ලදී.', 'info');
+        await loadAll();
+        this.renderSaleList();
+      },
+
+      renderSummary() {
+        const dateEl = document.getElementById('coconutDate');
+        if (!dateEl) return;
+        if (!dateEl.value) dateEl.value = new Date().toISOString().split('T')[0];
+        const sel = dateEl.value;
+
+        const stock = this.calcStock();
+        const cur = S.settings.currency || 'Rs.';
+
+        const statsEl = document.getElementById('ccSummaryStats');
+        if (statsEl) {
+          statsEl.innerHTML = `
+            <div class="stat-card">
+              <div class="stat-lbl">ලෙලි නොගැසූ තොගය</div>
+              <div class="stat-val text-orange">${stock.unhuskedStock.toLocaleString()}</div>
+              <div class="stat-sub">ගෙඩි (Unhusked)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-lbl">ලෙලි ගැසූ තොගය</div>
+              <div class="stat-val text-green">${stock.huskedStock.toLocaleString()}</div>
+              <div class="stat-sub">ගෙඩි (Husked)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-lbl">මුළු පොල් මිලදී ගැනීම්</div>
+              <div class="stat-val text-cyan">${stock.purchased.toLocaleString()}</div>
+              <div class="stat-sub">මුළු ගෙඩි ගණන</div>
+            </div>
+          `;
+        }
+
+        const dayPurchases = S.coconut_purchases.filter(p => p.date === sel);
+        const dayHusking = S.coconut_husking.filter(h => h.date === sel);
+        const daySales = S.coconut_sales.filter(s => s.date === sel);
+
+        const buyCost = dayPurchases.reduce((a, p) => a + (p.total || 0), 0);
+        const huskCost = dayHusking.reduce((a, h) => a + (h.total || 0), 0);
+        const saleIncome = daySales.reduce((a, s) => a + (s.total || 0), 0);
+        
+        const sumBuyEl = document.getElementById('ccSumBuy');
+        if (sumBuyEl) {
+          sumBuyEl.innerHTML = `
+            <div class="total-row"><span>ගෙනයාම මිල (Purchases):</span><span class="mono text-orange">Rs. ${buyCost.toFixed(2)}</span></div>
+            <div class="total-row"><span>ලෙලිගෑමේ කුලී (Husking Cost):</span><span class="mono text-red">Rs. ${huskCost.toFixed(2)}</span></div>
+            <div class="total-row"><span>විකුණුම් ආදායම (Sales Income):</span><span class="mono text-green">Rs. ${saleIncome.toFixed(2)}</span></div>
+            <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+              <span>දින ලාභය / පාඩුව:</span>
+              <span class="mono ${saleIncome - (buyCost + huskCost) >= 0 ? 'text-green' : 'text-red'}" style="font-size:16px;font-weight:bold;">
+                Rs. ${(saleIncome - (buyCost + huskCost)).toFixed(2)}
+              </span>
+            </div>
+          `;
+        }
+
+        const sumHuskEl = document.getElementById('ccSumHusk');
+        if (sumHuskEl) {
+          let hHtml = `<div style="font-size:11px;color:var(--t2);margin-bottom:8px;">අද දවසේ ගනුදෙනු සාරාංශය:</div>`;
+          hHtml += `<div class="total-row"><span>මිලදී ගැනීම් වාර ගණන:</span><span class="mono">${dayPurchases.length}</span></div>`;
+          hHtml += `<div class="total-row"><span>ලෙලිගැසීම් වාර ගණන:</span><span class="mono">${dayHusking.length}</span></div>`;
+          hHtml += `<div class="total-row"><span>විකුණුම් වාර ගණන:</span><span class="mono">${daySales.length}</span></div>`;
+          sumHuskEl.innerHTML = hHtml;
+        }
+      },
+
+      renderBuyList() {
+        const sel = document.getElementById('coconutDate')?.value || new Date().toISOString().split('T')[0];
+        const listEl = document.getElementById('ccBuyList');
+        if (!listEl) return;
+
+        const dayPurchases = S.coconut_purchases.filter(p => p.date === sel);
+        if (!dayPurchases.length) {
+          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">මෙම දිනයේ මිලදී ගැනීම් වාර්තා කර නොමැත.</div>`;
+          return;
+        }
+
+        listEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
+              <th style="padding:6px 0;">වත්ත / සැපයුම්කරු</th>
+              <th style="padding:6px 0;text-align:right;">ලොකු</th>
+              <th style="padding:6px 0;text-align:right;">පොඩි</th>
+              <th style="padding:6px 0;text-align:right;">මුළු පිරිවැය</th>
+              <th style="padding:6px 0;text-align:right;">ලාච්චුවෙන්</th>
+              <th style="padding:6px 0;text-align:center;width:40px;">ක්‍රියා</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${dayPurchases.map(p => `
+              <tr style="border-bottom:1px solid var(--border2);">
+                <td style="padding:8px 0;font-weight:600;">${esc(p.estate)}</td>
+                <td style="padding:8px 0;text-align:right;" class="mono">${p.largeCount} <span style="font-size:9px;color:var(--t3)">(@${p.largePrice})</span></td>
+                <td style="padding:8px 0;text-align:right;" class="mono">${p.smallCount} <span style="font-size:9px;color:var(--t3)">(@${p.smallPrice})</span></td>
+                <td style="padding:8px 0;text-align:right;color:var(--orange);" class="mono">Rs. ${p.total.toFixed(2)}</td>
+                <td style="padding:8px 0;text-align:right;color:var(--red);" class="mono">Rs. ${(p.paidDrawer || 0).toFixed(2)}</td>
+                <td style="padding:8px 0;text-align:center;">
+                  <button class="btn btn-danger btn-xs" style="padding:2px 5px;" onclick="CoconutMgr.deletePurchase('${p.id}')">🗑️</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+      },
+
+      renderHuskList() {
+        const sel = document.getElementById('coconutDate')?.value || new Date().toISOString().split('T')[0];
+        const listEl = document.getElementById('ccHuskList');
+        if (!listEl) return;
+
+        const dayHusking = S.coconut_husking.filter(h => h.date === sel);
+        if (!dayHusking.length) {
+          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">මෙම දිනයේ ලෙලිගෑමේ වාර්තා කර නොමැත.</div>`;
+          return;
+        }
+
+        listEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
+              <th style="padding:6px 0;">ශ්‍රමිකයා</th>
+              <th style="padding:6px 0;text-align:right;">ලෙලිගෑ ගණන</th>
+              <th style="padding:6px 0;text-align:right;">ගෙඩියකට මිල</th>
+              <th style="padding:6px 0;text-align:right;">මුළු ගෙවීම</th>
+              <th style="padding:6px 0;text-align:right;">ලාච්චුවෙන්</th>
+              <th style="padding:6px 0;text-align:center;width:40px;">ක්‍රියා</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${dayHusking.map(h => `
+              <tr style="border-bottom:1px solid var(--border2);">
+                <td style="padding:8px 0;font-weight:600;">${esc(h.worker)}</td>
+                <td style="padding:8px 0;text-align:right;" class="mono">${h.count}</td>
+                <td style="padding:8px 0;text-align:right;" class="mono">Rs. ${h.rate.toFixed(2)}</td>
+                <td style="padding:8px 0;text-align:right;color:var(--red);" class="mono">Rs. ${h.total.toFixed(2)}</td>
+                <td style="padding:8px 0;text-align:right;color:var(--red);" class="mono">Rs. ${(h.paidDrawer || 0).toFixed(2)}</td>
+                <td style="padding:8px 0;text-align:center;">
+                  <button class="btn btn-danger btn-xs" style="padding:2px 5px;" onclick="CoconutMgr.deleteHusking('${h.id}')">🗑️</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+      },
+
+      renderSaleList() {
+        const sel = document.getElementById('coconutDate')?.value || new Date().toISOString().split('T')[0];
+        const listEl = document.getElementById('ccSaleList');
+        if (!listEl) return;
+
+        const daySales = S.coconut_sales.filter(s => s.date === sel);
+        if (!daySales.length) {
+          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">මෙම දිනයේ විකුණුම් වාර්තා කර නොමැත.</div>`;
+          return;
+        }
+
+        listEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
+              <th style="padding:6px 0;">ගැනුම්කරු</th>
+              <th style="padding:6px 0;">වර්ගය</th>
+              <th style="padding:6px 0;text-align:right;">ගෙඩි ගාන</th>
+              <th style="padding:6px 0;text-align:right;">ගෙඩියක මිල</th>
+              <th style="padding:6px 0;text-align:right;">මුළු විකුණුම</th>
+              <th style="padding:6px 0;text-align:right;">ලාච්චුවට</th>
+              <th style="padding:6px 0;text-align:center;width:40px;">ක්‍රියා</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${daySales.map(s => `
+              <tr style="border-bottom:1px solid var(--border2);">
+                <td style="padding:8px 0;font-weight:600;">${esc(s.buyer)}</td>
+                <td style="padding:8px 0;"><span class="badge ${s.type === 'husked' ? 'badge-green' : 'badge-cyan'}">${s.type === 'husked' ? 'ලෙලි ගැසූ' : 'ලෙලි නොගැසූ'}</span></td>
+                <td style="padding:8px 0;text-align:right;" class="mono">${s.qty}</td>
+                <td style="padding:8px 0;text-align:right;" class="mono">Rs. ${s.price.toFixed(2)}</td>
+                <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${s.total.toFixed(2)}</td>
+                <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${(s.recDrawer || 0).toFixed(2)} <span style="font-size:8px;color:var(--t3)">(${esc(s.payMethod)})</span></td>
+                <td style="padding:8px 0;text-align:center;">
+                  <button class="btn btn-danger btn-xs" style="padding:2px 5px;" onclick="CoconutMgr.deleteSale('${s.id}')">🗑️</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+      }
+    };
 
     // ── DAY-END SUMMARY ─────────────────────
     const DayEnd = {
@@ -4611,41 +5326,100 @@
         const sel = dateEl.value;
         const cur = S.settings.currency || 'Rs.';
         const fmt = v => `${cur} ${Number(v).toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
         const daySales = S.sales.filter(s => s.date && s.date.startsWith(sel));
         const totalRev = daySales.reduce((a, s) => a + (s.total || 0), 0);
         const totalTxns = daySales.length;
         const avgTxn = totalTxns ? totalRev / totalTxns : 0;
-        const loanS = daySales.filter(s => s.mode === 'loan');
-        const cashS = daySales.filter(s => s.mode !== 'loan');
-        const cashIn = cashS.reduce((a, s) => a + (s.total || 0), 0);
-        const loanOut = loanS.reduce((a, s) => a + (s.total || 0), 0);
+        
+        const posCashIn = daySales.filter(s => s.status !== 'returned' && s.payMethod === 'cash').reduce((a, s) => a + (s.total || 0), 0);
+        const posCardIn = daySales.filter(s => s.status !== 'returned' && s.payMethod === 'card').reduce((a, s) => a + (s.total || 0), 0);
+        const posOnlineIn = daySales.filter(s => s.status !== 'returned' && s.payMethod === 'online').reduce((a, s) => a + (s.total || 0), 0);
+
+        let loanPaymentsIn = 0;
+        S.loans.forEach(loan => {
+          if (loan.paymentHistory) {
+            loan.paymentHistory.forEach(pay => {
+              if (pay.date && pay.date.startsWith(sel)) {
+                loanPaymentsIn += (pay.amount || 0);
+              }
+            });
+          }
+        });
+
+        const dayBuyDraw = S.coconut_purchases.filter(p => p.date === sel).reduce((a, p) => a + (p.paidDrawer || 0), 0);
+        const dayHuskDraw = S.coconut_husking.filter(h => h.date === sel).reduce((a, h) => a + (h.paidDrawer || 0), 0);
+        const daySaleDraw = S.coconut_sales.filter(s => s.date === sel && s.payMethod === 'cash').reduce((a, s) => a + (s.recDrawer || 0), 0);
+
+        const dayMovements = S.cash_movements.filter(m => m.date && m.date.startsWith(sel));
+        const manualCashIn = dayMovements.filter(m => m.type === 'in' && m.source === 'manual').reduce((a, m) => a + (m.amount || 0), 0);
+        const manualCashOut = dayMovements.filter(m => m.type === 'out' && m.source === 'manual').reduce((a, m) => a + (m.amount || 0), 0);
+
         const statsEl = document.getElementById('dayendStats');
-        if (statsEl) statsEl.innerHTML = `
-      <div class="stat-card"><div class="stat-lbl">Total Revenue</div><div class="stat-val text-cyan">${fmt(totalRev)}</div><div class="stat-sub">${totalTxns} transactions</div></div>
-      <div class="stat-card"><div class="stat-lbl">Cash Sales</div><div class="stat-val text-green">${fmt(cashIn)}</div><div class="stat-sub">${cashS.length} sales</div></div>
-      <div class="stat-card"><div class="stat-lbl">Credit (Loan)</div><div class="stat-val text-red">${fmt(loanOut)}</div><div class="stat-sub">${loanS.length} on credit</div></div>
-      <div class="stat-card"><div class="stat-lbl">Avg Transaction</div><div class="stat-val text-orange">${fmt(avgTxn)}</div><div class="stat-sub">per sale</div></div>`;
+        if (statsEl) {
+          statsEl.innerHTML = `
+            <div class="stat-card"><div class="stat-lbl">मुළු විකුණුම් (POS)</div><div class="stat-val text-cyan">${fmt(totalRev)}</div><div class="stat-sub">${totalTxns} බිල්පත්</div></div>
+            <div class="stat-card"><div class="stat-lbl">ලැබුණු ණය වාරික (Loans)</div><div class="stat-val text-green">${fmt(loanPaymentsIn)}</div><div class="stat-sub">ණය පියවීම්</div></div>
+            <div class="stat-card"><div class="stat-lbl">ලාච්චුවට පොල් විකුණුම්</div><div class="stat-val text-orange">${fmt(daySaleDraw)}</div><div class="stat-sub">පොල් ආදායම</div></div>
+            <div class="stat-card"><div class="stat-lbl">ලාච්චුවෙන් පොල් වියදම්</div><div class="stat-val text-red">${fmt(dayBuyDraw + dayHuskDraw)}</div><div class="stat-sub">මිලදී ගැනීම් + ලෙලිගෑම්</div></div>
+          `;
+        }
+
+        const savedFloat = S.settings.openingFloats?.[sel] || 0;
+        const expectedCash = savedFloat + posCashIn + loanPaymentsIn + daySaleDraw + manualCashIn - (dayBuyDraw + dayHuskDraw + manualCashOut);
+
         const cashEl = document.getElementById('dayendCash');
-        if (cashEl) cashEl.innerHTML = `
-      <div class="total-row"><span>Opening Float</span><span class="mono" style="color:var(--t2)">${fmt(0)}</span></div>
-      <div class="total-row"><span>+ Cash Received</span><span class="mono text-green">+ ${fmt(cashIn)}</span></div>
-      <div class="total-row"><span>- Credit (Loans)</span><span class="mono text-red">- ${fmt(loanOut)}</span></div>
-      <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
-        <span>Expected in Drawer</span><span class="mono" style="color:var(--cyan);font-size:17px;">${fmt(cashIn)}</span>
-      </div>
-      <div style="background:var(--cyan3);border:1px solid rgba(0,230,118,0.2);border-radius:var(--r8);padding:10px 12px;margin-top:12px;font-size:12px;color:var(--t2);line-height:1.6;">
-        Drawer-ල ${fmt(cashIn)} තිබෙන්නට ඕනෑ. Loan දෙපු ${fmt(loanOut)} register-ෙ නෑ.
-      </div>`;
+        if (cashEl) {
+          cashEl.innerHTML = `
+            <div class="total-row">
+              <span>ආරම්භක මුදල (Opening Float)</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="number" id="openingFloatInput" value="${savedFloat}" style="width:100px;text-align:right;padding:3px;font-size:12px;background:var(--bg3);border:1px solid var(--border);" onchange="DayEnd.saveOpeningFloat(this.value)">
+              </div>
+            </div>
+            <div class="total-row"><span>+ POS විකුණුම් (Cash Sales)</span><span class="mono text-green">+ ${fmt(posCashIn)}</span></div>
+            <div class="total-row"><span>+ ණය පියවීම් (Loan Repayments)</span><span class="mono text-green">+ ${fmt(loanPaymentsIn)}</span></div>
+            <div class="total-row"><span>+ පොල් විකුණුම් (Coconut Sales)</span><span class="mono text-green">+ ${fmt(daySaleDraw)}</span></div>
+            <div class="total-row"><span>+ ලාච්චුවට දැමූ මුදල් (Manual In)</span><span class="mono text-green">+ ${fmt(manualCashIn)}</span></div>
+            <div style="border-top: 1px dashed var(--border); margin: 4px 0;"></div>
+            <div class="total-row"><span>- පොල් මිලදී ගැනීම් (Purchases)</span><span class="mono text-red">- ${fmt(dayBuyDraw)}</span></div>
+            <div class="total-row"><span>- පොල් ලෙලිගෑමේ කුලී (Husking Cost)</span><span class="mono text-red">- ${fmt(dayHuskDraw)}</span></div>
+            <div class="total-row"><span>- ලාච්චුවෙන් ගත් මුදල් (Manual Out)</span><span class="mono text-red">- ${fmt(manualCashOut)}</span></div>
+            <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+              <span>Expected in Drawer</span><span class="mono" style="color:var(--cyan);font-size:17px;" id="expectedCashVal">${fmt(expectedCash)}</span>
+            </div>
+            
+            <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
+            <div class="form-group" style="margin-bottom:8px;">
+              <label style="font-weight:bold;font-size:12px;">ලාච්චුවේ ඇති සැබෑ මුදල (Actual Cash Counted)</label>
+              <input type="number" id="dayendActualCash" placeholder="0.00" style="font-size:18px;font-weight:900;color:var(--cyan);background:var(--bg2);border:1px solid var(--cyan);padding:8px;width:100%;border-radius:var(--r8);" oninput="DayEnd.calcDiff(${expectedCash})">
+            </div>
+            <div id="dayendDiffRow" style="display:flex;justify-content:space-between;align-items:center;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:8px 12px;margin-top:10px;display:none;">
+              <span>පරතරය (Difference):</span>
+              <span id="dayendDiffVal" class="mono" style="font-size:16px;font-weight:bold;">Rs. 0.00</span>
+            </div>
+
+            <div class="form-group" style="margin-top:10px;margin-bottom:8px;">
+              <label>දින අවසාන සටහන (Day End Note)</label>
+              <input type="text" id="dayendNote" placeholder="සටහනක් ඇතුළත් කරන්න..." style="font-size:12px;">
+            </div>
+            <button class="btn btn-primary w-full" style="margin-top:10px;" onclick="DayEnd.saveDayEnd(${expectedCash})">💾 දින අවසානය සුරකින්න</button>
+          `;
+        }
+
         const payEl = document.getElementById('dayendPayBreak');
         if (payEl) {
           const totItems = daySales.reduce((a, s) => a + (s.items || []).length, 0);
           payEl.innerHTML = `
-        <div class="total-row"><span>Total Transactions</span><span class="mono text-cyan">${totalTxns}</span></div>
-        <div class="total-row"><span>Total Items Sold</span><span class="mono">${totItems}</span></div>
-        <div class="total-row"><span>Cash Sales</span><span class="mono text-green">${cashS.length} (${fmt(cashIn)})</span></div>
-        <div class="total-row"><span>Credit Sales</span><span class="mono text-red">${loanS.length} (${fmt(loanOut)})</span></div>
-        <div class="total-row"><span>Average Sale</span><span class="mono text-orange">${fmt(avgTxn)}</span></div>`;
+            <div class="total-row"><span>Total Transactions</span><span class="mono text-cyan">${totalTxns}</span></div>
+            <div class="total-row"><span>Total Items Sold</span><span class="mono">${totItems}</span></div>
+            <div class="total-row"><span>Cash Sales (Drawer)</span><span class="mono text-green">${fmt(posCashIn)}</span></div>
+            <div class="total-row"><span>Card Sales (Bank)</span><span class="mono text-cyan">${fmt(posCardIn)}</span></div>
+            <div class="total-row"><span>Online Sales (Bank)</span><span class="mono text-purple">${fmt(posOnlineIn)}</span></div>
+            <div class="total-row"><span>Average Sale</span><span class="mono text-orange">${fmt(avgTxn)}</span></div>
+          `;
         }
+
         const hourEl = document.getElementById('dayendHourly');
         if (hourEl) {
           const hrs = Array(24).fill(0);
@@ -4656,11 +5430,12 @@
             const pct = Math.round((hrs[h] / maxH) * 100);
             const lbl = h < 12 ? `${h}am` : h === 12 ? '12pm' : `${h - 12}pm`;
             hHtml += `<div title="${lbl}: ${fmt(hrs[h])}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <div style="width:100%;background:${hrs[h] > 0 ? 'linear-gradient(180deg,var(--cyan),var(--cyan2))' : 'var(--bg3)'};height:${pct || 2}%;border-radius:3px 3px 0 0;min-height:3px;"></div>
-          <div style="font-size:8px;color:var(--t3);white-space:nowrap;">${lbl}</div></div>`;
+              <div style="width:100%;background:${hrs[h] > 0 ? 'linear-gradient(180deg,var(--cyan),var(--cyan2))' : 'var(--bg3)'};height:${pct || 2}%;border-radius:3px 3px 0 0;min-height:3px;"></div>
+              <div style="font-size:8px;color:var(--t3);white-space:nowrap;">${lbl}</div></div>`;
           }
           hourEl.innerHTML = hHtml || '<div style="color:var(--t3);font-size:12px;text-align:center;width:100%;">No sales today</div>';
         }
+
         const topEl = document.getElementById('dayendTopItems');
         if (topEl) {
           const iMap = {};
@@ -4670,25 +5445,186 @@
           else {
             const maxR = top[0][1].rev || 1;
             topEl.innerHTML = top.map(([name, d], i) => `<div class="top-row">
-          <div class="top-rank">${i + 1}</div><div class="top-name">${esc(name)}</div>
-          <div class="top-bar"><div class="top-bar-fill" style="width:${Math.round(d.rev / maxR * 100)}%"></div></div>
-          <div class="top-count">${fmt(d.rev)}</div></div>`).join('');
+              <div class="top-rank">${i + 1}</div><div class="top-name">${esc(name)}</div>
+              <div class="top-bar"><div class="top-bar-fill" style="width:${Math.round(d.rev / maxR * 100)}%"></div></div>
+              <div class="top-count">${fmt(d.rev)}</div></div>`).join('');
           }
         }
+
         const listEl = document.getElementById('dayendSalesList');
         if (listEl) {
           if (!daySales.length) { listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:30px;font-size:13px;">No sales for ${sel}</div>`; }
           else {
             listEl.innerHTML = daySales.map(s => {
               const time = s.date ? new Date(s.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : '--:--';
-              const badge = s.mode === 'loan' ? '<span class="badge badge-red">Loan</span>' : '<span class="badge badge-green">Cash</span>';
-              return `<div class="sale-row" onclick="Admin.viewSale('${s.id}')">
-          <div class="sale-row-info"><strong>${esc(s.billId || s.id || '')}</strong> ${time} ${badge}</div>
-          <div class="sale-row-amt"><div class="total">${fmt(s.total || 0)}</div></div></div>`;
+              const badge = s.payMethod === 'card' ? '<span class="badge badge-cyan">Card</span>' : s.payMethod === 'online' ? '<span class="badge badge-purple">Online</span>' : '<span class="badge badge-green">Cash</span>';
+              return `<div class="sale-row" onclick="SaleDetail.show('${s.id}')">
+                <div class="sale-row-info"><strong>${esc(s.billId || s.id || '')}</strong> ${time} ${badge}</div>
+                <div class="sale-row-amt"><div class="total">${fmt(s.total || 0)}</div></div></div>`;
             }).join('');
           }
         }
+
+        const moveListEl = document.getElementById('cashMoveList');
+        if (moveListEl) {
+          if (!dayMovements.length) {
+            moveListEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:15px;font-size:12px;">අද දින කිසිදු ලාච්චු ගනුදෙනුවක් සිදු වී නොමැත.</div>`;
+          } else {
+            moveListEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
+                  <th style="padding:6px 0;">හේතුව / විස්තරය</th>
+                  <th style="padding:6px 0;text-align:right;">ආදායම් (+)</th>
+                  <th style="padding:6px 0;text-align:right;">වියදම් (-)</th>
+                  <th style="padding:6px 0;text-align:center;width:40px;">ක්‍රියා</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${dayMovements.map(m => {
+                  const isIn = m.type === 'in';
+                  const amtText = fmt(m.amount);
+                  const isManual = m.source === 'manual';
+                  return `
+                    <tr style="border-bottom:1px solid var(--border2);">
+                      <td style="padding:8px 0;"><strong>${esc(m.reason)}</strong> <span style="font-size:9px;color:var(--t3)">(${esc(m.source)})</span></td>
+                      <td style="padding:8px 0;text-align:right;color:var(--green);font-weight:bold;">${isIn ? '+' + amtText : ''}</td>
+                      <td style="padding:8px 0;text-align:right;color:var(--red);font-weight:bold;">${!isIn ? '-' + amtText : ''}</td>
+                      <td style="padding:8px 0;text-align:center;">
+                        ${isManual ? `<button class="btn btn-danger btn-xs" style="padding:2px 5px;" onclick="DayEnd.deleteCashMove('${m.id}')">🗑️</button>` : '<span style="font-size:10px;color:var(--t3)">Auto</span>'}
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>`;
+          }
+        }
+
+        const savedDayEnd = S.day_ends.find(d => d.date === sel);
+        if (savedDayEnd) {
+          const actualInput = document.getElementById('dayendActualCash');
+          const noteInput = document.getElementById('dayendNote');
+          if (actualInput) {
+            actualInput.value = savedDayEnd.actualCash;
+            this.calcDiff(expectedCash);
+          }
+          if (noteInput) {
+            noteInput.value = savedDayEnd.note || '';
+          }
+        }
       },
+
+      async saveOpeningFloat(val) {
+        const dateEl = document.getElementById('dayendDate');
+        if (!dateEl) return;
+        const sel = dateEl.value;
+        const num = parseFloat(val) || 0;
+        
+        S.settings.openingFloats = S.settings.openingFloats || {};
+        S.settings.openingFloats[sel] = num;
+
+        await DB.set('settings/main', S.settings);
+        toast('ආරම්භක මුදල (Opening Float) සුරකින ලදී.', 'success');
+        this.render();
+      },
+
+      calcDiff(expected) {
+        const actualInput = document.getElementById('dayendActualCash');
+        const diffRow = document.getElementById('dayendDiffRow');
+        const diffVal = document.getElementById('dayendDiffVal');
+        if (!actualInput || !diffRow || !diffVal) return;
+
+        const val = parseFloat(actualInput.value);
+        if (isNaN(val)) {
+          diffRow.style.display = 'none';
+          return;
+        }
+
+        const diff = val - expected;
+        diffRow.style.display = 'flex';
+        
+        const cur = S.settings.currency || 'Rs.';
+        if (diff === 0) {
+          diffVal.textContent = 'Rs. 0.00 (හරියටම බැලන්ස්)';
+          diffVal.style.color = 'var(--green)';
+        } else if (diff > 0) {
+          diffVal.textContent = `+${cur} ${diff.toFixed(2)} (වැඩි)`;
+          diffVal.style.color = 'var(--cyan)';
+        } else {
+          diffVal.textContent = `-${cur} ${Math.abs(diff).toFixed(2)} (අඩු)`;
+          diffVal.style.color = 'var(--red)';
+        }
+      },
+
+      async saveDayEnd(expected) {
+        const dateEl = document.getElementById('dayendDate');
+        if (!dateEl) return;
+        const sel = dateEl.value;
+        const actualCash = parseFloat(document.getElementById('dayendActualCash').value);
+        const note = document.getElementById('dayendNote').value.trim();
+
+        if (isNaN(actualCash)) {
+          toast('ලාච්චුවේ ඇති සැබෑ මුදල ඇතුළත් කරන්න (Actual cash is required)', 'error');
+          return;
+        }
+
+        const data = {
+          date: sel,
+          expectedCash,
+          actualCash,
+          diff: actualCash - expected,
+          note,
+          updatedAt: new Date().toISOString()
+        };
+
+        const existing = S.day_ends.find(d => d.date === sel);
+        if (existing) {
+          await DB.patch('day_ends/' + existing.id, data);
+        } else {
+          await DB.push('day_ends', data);
+        }
+
+        toast('💾 දින අවසාන වාර්තාව සාර්ථකව සුරකින ලදී!', 'success');
+        await loadAll();
+        this.render();
+      },
+
+      async addCashMove(type) {
+        const dateEl = document.getElementById('dayendDate');
+        if (!dateEl) return;
+        const date = dateEl.value;
+        const reason = document.getElementById('cashMoveReason').value.trim();
+        const amount = parseFloat(document.getElementById('cashMoveAmount').value) || 0;
+
+        if (!reason) { toast('හේතුව ඇතුළත් කරන්න (Reason is required)', 'error'); return; }
+        if (amount <= 0) { toast('වලංගು මුදලක් ඇතුළත් කරන්න', 'error'); return; }
+
+        const move = {
+          date: date + 'T12:00:00.000Z',
+          type,
+          amount,
+          reason,
+          source: 'manual',
+          createdAt: new Date().toISOString()
+        };
+
+        await DB.push('cash_movements', move);
+        toast(type === 'in' ? 'ලාච්චුවට මුදල් ඇතුළත් කිරීම සුරකින ලදී' : 'ලාච්චුවෙන් මුදල් ගැනීම සුරකින ලදී', 'success');
+
+        document.getElementById('cashMoveReason').value = '';
+        document.getElementById('cashMoveAmount').value = '';
+        await loadAll();
+        this.render();
+      },
+
+      async deleteCashMove(id) {
+        if (!confirm('මෙම මුදල් ගනුදෙනුව මකාදැමීමට අවශ්‍යද?')) return;
+        await DB.del('cash_movements/' + id);
+        toast('මකාදමන ලදී', 'info');
+        await loadAll();
+        this.render();
+      },
+
       print() {
         const d = document.getElementById('dayendDate')?.value || new Date().toISOString().split('T')[0];
         const w = window.open('', '_blank');
@@ -6008,14 +6944,13 @@ window.onload=function(){
       _loans: [],
       _activeCustomerId: null,
 
-      async loadData() {
-        const [custs, loans] = await Promise.all([DB.get('loan_customers'), DB.get('loans')]);
-        this._customers = DB.obj2arr(custs);
-        this._loans = DB.obj2arr(loans);
+      loadData() {
+        this._customers = S.loan_customers || [];
+        this._loans = S.loans || [];
       },
 
-      async render() {
-        await this.loadData();
+      render() {
+        this.loadData();
         this._renderStats();
         this._renderCustList();
         this._checkDueNotifications();
@@ -6230,7 +7165,7 @@ window.onload=function(){
         else await DB.patch('loan_customers/' + id, data);
         Modal.close('loanCustomerModal');
         toast('Customer saved ✅', 'success');
-        await this.render();
+        await loadAll();
       },
 
       async deleteCustomer(id) {
@@ -6242,7 +7177,7 @@ window.onload=function(){
         await DB.del('loan_customers/' + id);
         if (this._activeCustomerId === id) this._activeCustomerId = null;
         toast('Customer deleted', 'info');
-        await this.render();
+        await loadAll();
       },
 
       openNewLoan(preCustomerId = null, prefill = null) {
@@ -6425,7 +7360,7 @@ window.onload=function(){
         Modal.close('loanNewModal');
         toast('Loan created ✅', 'success');
         this._activeCustomerId = custId;
-        await this.render();
+        await loadAll();
       },
 
       openPayment(loanId) {
@@ -6459,7 +7394,7 @@ window.onload=function(){
         await DB.patch('loans/' + loanId, { paidAmount: newPaid, paymentHistory: history, status: cleared ? 'cleared' : 'active' });
         Modal.close('loanPayModal');
         toast(`✅ ${S.settings.currency} ${amt.toFixed(2)} recorded!${cleared ? ' Loan fully cleared! 🎉' : ''}`, 'success');
-        await this.render();
+        await loadAll();
       },
 
       async markInstallmentPaid(loanId, idx) {
@@ -6472,7 +7407,7 @@ window.onload=function(){
         const cleared = newPaid >= loan.totalAmount;
         await DB.patch('loans/' + loanId, { installments: insts, paidAmount: newPaid, paymentHistory: history, status: cleared ? 'cleared' : 'active' });
         toast(`Installment ${idx + 1} marked paid ✅`, 'success');
-        await this.render();
+        await loadAll();
       },
 
       async markCleared(loanId) {
@@ -6480,14 +7415,14 @@ window.onload=function(){
         const loan = this._loans.find(l => l.id === loanId); if (!loan) return;
         await DB.patch('loans/' + loanId, { status: 'cleared', paidAmount: loan.totalAmount });
         toast('Loan cleared ✅', 'success');
-        await this.render();
+        await loadAll();
       },
 
       async clearLoan(loanId) {
         if (!confirm('Remove this loan record permanently?')) return;
         await DB.del('loans/' + loanId);
         toast('Loan removed', 'info');
-        await this.render();
+        await loadAll();
       }
     };
 
