@@ -3286,6 +3286,121 @@
     .quick-cash-btn:active {
       transform: scale(0.95);
     }
+
+    /* ── Google Translate Button & Modal ── */
+    .gt-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: var(--r8);
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      background: var(--cyan3);
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .18s;
+      font-family: 'Exo 2', sans-serif;
+      white-space: nowrap;
+    }
+    .gt-btn:hover {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: var(--glow-cyan);
+    }
+    .gt-btn svg { flex-shrink: 0; }
+
+    .gt-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      display: none;
+    }
+    .gt-overlay.open { display: block; }
+
+    .gt-modal {
+      position: fixed;
+      top: 58px;
+      right: 16px;
+      z-index: 9001;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r16);
+      padding: 16px;
+      width: 300px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,242,254,0.08);
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      animation: gtSlideIn .18s ease;
+    }
+    .gt-modal.open { display: flex; }
+    @keyframes gtSlideIn {
+      from { opacity:0; transform: translateY(-8px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .gt-modal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+    .gt-lang-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .gt-lang-btn {
+      padding: 8px 10px;
+      border-radius: var(--r8);
+      border: 1px solid var(--border2);
+      background: var(--glass);
+      color: var(--t1);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .15s;
+      font-family: 'Exo 2', sans-serif;
+    }
+    .gt-lang-btn:hover {
+      border-color: var(--cyan);
+      background: var(--cyan3);
+      color: var(--cyan);
+    }
+    .gt-lang-btn.active-lang {
+      border-color: var(--cyan);
+      background: var(--cyan3);
+      color: var(--cyan);
+    }
+    .gt-original-btn {
+      width: 100%;
+      padding: 8px;
+      border-radius: var(--r8);
+      border: 1px solid rgba(239,68,68,0.3);
+      background: var(--red2);
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Exo 2', sans-serif;
+      transition: all .15s;
+    }
+    .gt-original-btn:hover {
+      background: var(--red);
+      color: #fff;
+    }
+    /* Hide Google Translate toolbar */
+    .goog-te-banner-frame { display: none !important; }
+    body { top: 0 !important; }
+    .goog-te-gadget { display: none !important; }
   </style>
 </head>
 <body>
@@ -3401,6 +3516,13 @@
         <div class="bt-dot" id="btDot" title="Bluetooth Printer"></div>
         <div class="sync-dot" id="syncDot" title="Firebase sync"></div>
         <div class="clock-display" id="clock">00:00:00</div>
+        <!-- Google Translate Button -->
+        <button class="gt-btn" id="gtNavBtn" onclick="GT.toggle()" title="Translate App">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+          </svg>
+          Translate
+        </button>
         <button class="btn btn-ghost btn-icon" onclick="Settings.open()" title="Settings">⚙️</button>
       </div>
 
@@ -8485,6 +8607,141 @@ window.onload=function(){
 
 
     document.addEventListener('DOMContentLoaded', init);
+  </script>
+
+  <!-- ══ Google Translate Overlay ══ -->
+  <div class="gt-overlay" id="gtOverlay" onclick="GT.close()"></div>
+  <div class="gt-modal" id="gtModal">
+    <div class="gt-modal-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+      </svg>
+      Translate App
+    </div>
+    <div class="gt-lang-grid" id="gtLangGrid">
+      <button class="gt-lang-btn" onclick="GT.setLang('si')">🇱🇰 සිංහල</button>
+      <button class="gt-lang-btn active-lang" onclick="GT.setLang('en')">🇬🇧 English</button>
+      <button class="gt-lang-btn" onclick="GT.setLang('ta')">🇮🇳 தமிழ்</button>
+      <button class="gt-lang-btn" onclick="GT.setLang('zh-CN')">🇨🇳 中文</button>
+      <button class="gt-lang-btn" onclick="GT.setLang('ar')">🇸🇦 العربية</button>
+      <button class="gt-lang-btn" onclick="GT.setLang('hi')">🇮🇳 हिन्दी</button>
+      <button class="gt-lang-btn" onclick="GT.setLang('fr')">🇫🇷 Français</button>
+      <button class="gt-lang-btn" onclick="GT.setLang('de')">🇩🇪 Deutsch</button>
+      <button class="gt-lang-btn" onclick="GT.setLang('ja')">🇯🇵 日本語</button>
+      <button class="gt-lang-btn" onclick="GT.setLang('ko')">🇰🇷 한국어</button>
+    </div>
+    <button class="gt-original-btn" onclick="GT.restore()">✕ Show Original (English)</button>
+  </div>
+
+  <!-- Hidden Google Translate element -->
+  <div id="google_translate_element" style="display:none"></div>
+
+  <script>
+    // ══ Google Translate Controller ══
+    const GT = (() => {
+      let _loaded = false;
+      let _activeLang = 'en';
+
+      function _loadScript() {
+        if (_loaded) return Promise.resolve();
+        return new Promise((resolve) => {
+          window.googleTranslateElementInit = function () {
+            new google.translate.TranslateElement(
+              { pageLanguage: 'en', autoDisplay: false },
+              'google_translate_element'
+            );
+            _loaded = true;
+            resolve();
+          };
+          const s = document.createElement('script');
+          s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+          s.onerror = () => resolve(); // fail silently
+          document.body.appendChild(s);
+        });
+      }
+
+      function _setCookie(lang) {
+        // Google Translate reads /translate_lc cookie
+        const days = 365;
+        const exp = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `googtrans=/en/${lang};expires=${exp};path=/`;
+        document.cookie = `googtrans=/en/${lang};expires=${exp};path=/;domain=${location.hostname}`;
+      }
+
+      function _clearCookie() {
+        document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';
+        document.cookie = `googtrans=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=${location.hostname}`;
+      }
+
+      function _updateActiveBtn(lang) {
+        document.querySelectorAll('.gt-lang-btn').forEach(b => b.classList.remove('active-lang'));
+        const all = document.querySelectorAll('.gt-lang-btn');
+        all.forEach(b => {
+          if (b.getAttribute('onclick').includes(`'${lang}'`)) b.classList.add('active-lang');
+        });
+        const navBtn = document.getElementById('gtNavBtn');
+        if (navBtn) {
+          if (lang !== 'en') {
+            navBtn.style.background = 'var(--cyan)';
+            navBtn.style.color = '#000';
+          } else {
+            navBtn.style.background = '';
+            navBtn.style.color = '';
+          }
+        }
+      }
+
+      return {
+        toggle() {
+          const overlay = document.getElementById('gtOverlay');
+          const modal   = document.getElementById('gtModal');
+          const isOpen  = modal.classList.contains('open');
+          if (isOpen) { this.close(); }
+          else { overlay.classList.add('open'); modal.classList.add('open'); }
+        },
+        close() {
+          document.getElementById('gtOverlay').classList.remove('open');
+          document.getElementById('gtModal').classList.remove('open');
+        },
+        async setLang(lang) {
+          _activeLang = lang;
+          if (lang === 'en') { this.restore(); return; }
+          await _loadScript();
+          _setCookie(lang);
+          // Trigger the Google Translate select element
+          const trySwitch = () => {
+            const sel = document.querySelector('.goog-te-combo');
+            if (sel) {
+              sel.value = lang;
+              sel.dispatchEvent(new Event('change'));
+            } else {
+              // fallback: reload with cookie
+              location.reload();
+            }
+          };
+          setTimeout(trySwitch, _loaded ? 0 : 1500);
+          _updateActiveBtn(lang);
+          this.close();
+        },
+        restore() {
+          _clearCookie();
+          _activeLang = 'en';
+          _updateActiveBtn('en');
+          // Reset page to original
+          const frame = document.querySelector('.goog-te-banner-frame');
+          if (frame) {
+            try {
+              const btn = frame.contentDocument.querySelector('.goog-te-banner-content button');
+              if (btn) { btn.click(); }
+            } catch(e) {}
+          }
+          const sel = document.querySelector('.goog-te-combo');
+          if (sel) { sel.value = ''; sel.dispatchEvent(new Event('change')); }
+          else { location.reload(); }
+          this.close();
+        }
+      };
+    })();
   </script>
 </body>
 
