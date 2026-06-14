@@ -1,17 +1,7 @@
 {
-  "toolbar": { "defaultState": "hidden" },
   "headers": [
     {
       "source": "/sw.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, no-cache, must-revalidate, max-age=0"
-        }
-      ]
-    },
-    {
-      "source": "/",
       "headers": [
         {
           "key": "Cache-Control",
