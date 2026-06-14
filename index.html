@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="RCM POS">
   <meta name="theme-color" content="#060814">
-  <title>රංගන කමියුනිකේට්ශන් - RCM POS</title>
+  <title>චිකන් ෂොප් - POS</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="logo.png">
   <link
@@ -3301,10 +3301,15 @@
           </linearGradient>
         </defs>
         <rect width="100" height="100" rx="22" fill="#0b0e24" stroke="url(#rcmLoaderGrad)" stroke-width="5" />
-        <text x="50%" y="62%" font-family="'Exo 2', sans-serif" font-weight="900" font-size="34"
-          fill="url(#rcmLoaderGrad)" text-anchor="middle" letter-spacing="1">RCM</text>
+        <g transform="translate(15, 15) scale(0.7)">
+          <path d="M40,10 C35,0 45,0 50,8 C55,0 65,0 60,10 C65,10 70,15 65,22 L35,22 Z" fill="#ef4444" />
+          <path d="M75,35 L62,30 L62,40 Z" fill="#fbbf24" />
+          <path d="M30,30 C30,22 42,20 50,20 C58,20 70,22 70,30 C70,38 65,45 65,52 C65,65 58,75 50,75 C42,75 35,65 35,52 C35,45 30,38 30,30 Z" fill="none" stroke="url(#rcmLoaderGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="58" cy="32" r="3" fill="#f8fafc" />
+          <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
+        </g>
       </svg>
-      රංගන කමියුනිකේට්ශන්
+      චිකන් ෂොප්
     </div>
     <div class="spinner"></div>
     <div class="loader-text" id="loaderText">පද්ධතිය සක්‍රීය වෙමින් පවතී...</div>
@@ -3326,10 +3331,15 @@
             </linearGradient>
           </defs>
           <rect width="100" height="100" rx="20" fill="#0b0e24" stroke="url(#rcmSideGrad)" stroke-width="4" />
-          <text x="50%" y="60%" font-family="'Exo 2', sans-serif" font-weight="900" font-size="34"
-            fill="url(#rcmSideGrad)" text-anchor="middle" letter-spacing="1">RCM</text>
+          <g transform="translate(15, 15) scale(0.7)">
+            <path d="M40,10 C35,0 45,0 50,8 C55,0 65,0 60,10 C65,10 70,15 65,22 L35,22 Z" fill="#ef4444" />
+            <path d="M75,35 L62,30 L62,40 Z" fill="#fbbf24" />
+            <path d="M30,30 C30,22 42,20 50,20 C58,20 70,22 70,30 C70,38 65,45 65,52 C65,65 58,75 50,75 C42,75 35,65 35,52 C35,45 30,38 30,30 Z" fill="none" stroke="url(#rcmSideGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="58" cy="32" r="3" fill="#f8fafc" />
+            <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
+          </g>
         </svg>
-        <span class="nav-brand" style="margin-right:0;font-size:14px;font-weight:900;">රංගන කමියුනිකේට්ශන්</span>
+        <span class="nav-brand" style="margin-right:0;font-size:14px;font-weight:900;"> චිකන් ෂොප්</span>
       </div>
       <button class="btn btn-ghost btn-icon" onclick="Nav.closeMenu()" style="padding:4px; font-size:16px;">✕</button>
     </div>
@@ -3365,10 +3375,15 @@
             </linearGradient>
           </defs>
           <rect width="100" height="100" rx="20" fill="#0b0e24" stroke="url(#rcmNavGrad)" stroke-width="4" />
-          <text x="50%" y="60%" font-family="'Exo 2', sans-serif" font-weight="900" font-size="34"
-            fill="url(#rcmNavGrad)" text-anchor="middle" letter-spacing="1">RCM</text>
+          <g transform="translate(15, 15) scale(0.7)">
+            <path d="M40,10 C35,0 45,0 50,8 C55,0 65,0 60,10 C65,10 70,15 65,22 L35,22 Z" fill="#ef4444" />
+            <path d="M75,35 L62,30 L62,40 Z" fill="#fbbf24" />
+            <path d="M30,30 C30,22 42,20 50,20 C58,20 70,22 70,30 C70,38 65,45 65,52 C65,65 58,75 50,75 C42,75 35,65 35,52 C35,45 30,38 30,30 Z" fill="none" stroke="url(#rcmNavGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="58" cy="32" r="3" fill="#f8fafc" />
+            <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
+          </g>
         </svg>
-        රංගන කමියුනිකේට්ශන්
+        රංගන චිකන් ෂොප්
       </div>
       <div class="nav-tabs">
         <div class="nav-tab active" data-tab="pos" onclick="Nav.go('pos')" data-lang="pos">🛒 POS</div>
@@ -3957,7 +3972,7 @@
     // 100% Offline-only POS Config
     const S = {
       categories: [], items: [], sales: [],
-      settings: { shopName: 'රංගන කමියුනිකේට්ශන්', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nස්තූතියි! නැවත පැමිණෙන්න.', apiServerUrl: '' },
+      settings: { shopName: 'රංගන චිකන් ෂොප්', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nස්තූතියි! නැවත පැමිණෙන්න.', apiServerUrl: '' },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
       activeCat: 'all', adminUnlocked: false, pollTimer: null,
       isOnline: false,
@@ -4505,15 +4520,15 @@
         let st = await DB.get('settings/main');
         if (!st || !Object.keys(st).length) {
           st = {
-            shopName: 'රංගන කමියුනිකේට්ශන්',
+            shopName: 'රංගන චිකන් ෂොප්',
             adminPin: '1234',
             currency: 'Rs.',
             lowStockAlert: 5,
             receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nස්තූතියි! නැවත පැමිණෙන්න.'
           };
           await DB.set('settings/main', st);
-        } else if (st && st.receiptNote && st.receiptNote.startsWith('රංගන කමියුනිකේට්ශන්\n')) {
-          st.receiptNote = st.receiptNote.replace('රංගන කමියුනිකේට්ශන්\n', '');
+        } else if (st && st.receiptNote && st.receiptNote.startsWith('රංගන චිකන් ෂොප්\n')) {
+          st.receiptNote = st.receiptNote.replace('රංගන චිකන් ෂොප්\n', '');
           await DB.set('settings/main', st);
         }
         Object.assign(S.settings, st);
@@ -4538,7 +4553,7 @@
         }
 
         // Sync dot controlled by Sync engine
-        toast('රංගන කමියුනිකේට්ශන් POS සක්‍රීයයි ✅', 'success');
+        toast('රංගන චිකන් ෂොප් POS සක්‍රීයයි ✅', 'success');
       } catch (e) {
         txt('❌ ' + e.message);
         toast('පද්ධතිය සක්‍රීය වීමේ දෝෂයක්: ' + e.message, 'error');
@@ -4957,7 +4972,7 @@
       width: 42,
       shopName() {
         const raw = String(S.settings.shopName || '').trim();
-        if (!raw || /[^\x00-\x7F]/.test(raw)) return 'Rangana Communication';
+        if (!raw || /[^\x00-\x7F]/.test(raw)) return 'Rangana Chicken Shop';
         return raw;
       },
       footerNote() {
@@ -6679,7 +6694,7 @@ window.onload=function(){
           return;
         }
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === 'රංගන කමියුනිකේට්ශන්') ? 'Rangana Communication' : S.settings.shopName;
+        const shop = (S.settings.shopName === 'රංගන චිකන් ෂොප්') ? 'Rangana Chicken Shop' : S.settings.shopName;
         const date = new Date(sale.date).toLocaleString();
         const ESC = 0x1B; const LF = 0x0A; const GS = 0x1D;
 
@@ -6711,9 +6726,9 @@ window.onload=function(){
 
         // Footer & Note (Centered)
         let rawNote = S.settings.receiptNote || '';
-        if (rawNote.includes('රංගන කමියුනිකේට්ශන්')) {
+        if (rawNote.includes('රංගන චිකන් ෂොප්')) {
           rawNote = rawNote
-            .replace(/රංගන කමියුනිකේට්ශන්/g, 'Rangana Communication')
+            .replace(/රංගන චිකන් ෂොප්/g, 'Rangana Chicken Shop')
             .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
         }
         let foot = `${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n\n`;
@@ -6763,7 +6778,7 @@ window.onload=function(){
 
       _buildReceiptText(sale) {
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === 'රංගන කමියුනිකේට්ශන්') ? 'RCM - Rangana Communication Mobile' : S.settings.shopName;
+        const shop = (S.settings.shopName === 'රංගන චිකන් ෂොප්') ? 'Rangana Chicken Shop' : S.settings.shopName;
         const date = new Date(sale.date).toLocaleString();
         let text = `${shop}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
         (sale.items || []).forEach(si => {
@@ -6775,9 +6790,9 @@ window.onload=function(){
         text += `TOTAL: ${cur} ${(sale.total || 0).toFixed(2)}\n\n`;
 
         let rawNote = S.settings.receiptNote || shop;
-        if (rawNote.includes('රංගන කමියුනිකේට්ශන්')) {
+        if (rawNote.includes('රංගන චිකන් ෂොප්')) {
           rawNote = rawNote
-            .replace(/රංගන කමියුනිකේට්ශන්/g, 'RCM - Rangana Communication Mobile')
+            .replace(/රංගන චිකන් ෂොප්/g, 'Rangana Chicken Shop')
             .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
         }
         text += `${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n`;
@@ -6836,7 +6851,7 @@ window.onload=function(){
 
         if (type === 'pos') {
           const cur = S.settings.currency;
-          const shop = (S.settings.shopName === 'රංගන කමියුනිකේට්ශන්') ? 'RCM - Rangana Communication Mobile' : S.settings.shopName;
+          const shop = (S.settings.shopName === 'රංගන චිකන් ෂොප්') ? 'Rangana Chicken Shop' : S.settings.shopName;
           const date = new Date(data.date).toLocaleString();
 
           centerText(shop, "4", y); y += 40;
@@ -6850,7 +6865,7 @@ window.onload=function(){
           (data.items || []).forEach(si => {
             const m = si.saleMode === 'wholesale' ? '[WS]' : '';
             leftText(`${si.name} ${m}`, "2", y); y += 24;
-            leftText(`  ${si.qty} x ${si.unitPrice?.toFixed(2)}`, "2", y);
+            leftText("  " + si.qty + " x " + si.unitPrice?.toFixed(2), "2", y);
             rightText(`${cur} ${(si.price || 0).toFixed(2)}`, "2", y);
             y += 28;
           });
@@ -6863,9 +6878,9 @@ window.onload=function(){
           drawLine(y); y += 15;
 
           let rawNote = S.settings.receiptNote || 'Thank You!';
-          if (rawNote.includes('රංගන කමියුනිකේට්ශන්')) {
+          if (rawNote.includes('රංගන චිකන් ෂොප්')) {
             rawNote = rawNote
-              .replace(/රංගන කමියුනිකේට්ශන්/g, 'RCM - Rangana Communication Mobile')
+              .replace(/රංගන චිකන් ෂොප්/g, 'Rangana Chicken Shop')
               .replace(/ස්තූතියි!\s*නැවත\s*පැමිණෙන්න\./g, 'Thank You! Come Again.');
           }
           centerText(rawNote.replace(/[^\x00-\x7F\n]/g, ''), "2", y); y += 30;
@@ -7350,7 +7365,7 @@ window.onload=function(){
 
     // ── PWA ─────────────────────────────────
     function setupPWA() {
-      try { const m = { name: 'Rangana Communication POS', short_name: 'RCM POS', start_url: './', display: 'standalone', background_color: '#06080f', theme_color: '#00d4ff', icons: [{ src: 'logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] }; const bl = new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }); const lk = document.createElement('link'); lk.rel = 'manifest'; lk.href = URL.createObjectURL(bl); document.head.appendChild(lk); } catch (e) { }
+      try { const m = { name: 'Rangana Chicken Shop POS', short_name: 'Chicken Shop POS', start_url: './', display: 'standalone', background_color: '#06080f', theme_color: '#00d4ff', icons: [{ src: 'logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] }; const bl = new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }); const lk = document.createElement('link'); lk.rel = 'manifest'; lk.href = URL.createObjectURL(bl); document.head.appendChild(lk); } catch (e) { }
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').then(reg => {
           reg.update();
