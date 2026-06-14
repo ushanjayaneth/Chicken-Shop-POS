@@ -3397,10 +3397,24 @@
       background: var(--red);
       color: #fff;
     }
-    /* Hide Google Translate toolbar */
-    .goog-te-banner-frame { display: none !important; }
-    body { top: 0 !important; }
+    /* ── Hide Google Translate toolbar completely ── */
+    .goog-te-banner-frame,
+    .goog-te-banner-frame.skiptranslate,
+    iframe.goog-te-banner-frame,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    div#goog-gt-tt,
+    .goog-tooltip,
+    .goog-tooltip:hover,
+    .goog-text-highlight {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
     .goog-te-gadget { display: none !important; }
+    body { top: 0 !important; position: static !important; }
+    html body { margin-top: 0 !important; }
   </style>
 </head>
 <body>
@@ -8618,17 +8632,10 @@ window.onload=function(){
       </svg>
       Translate App
     </div>
-    <div class="gt-lang-grid" id="gtLangGrid">
-      <button class="gt-lang-btn" onclick="GT.setLang('si')">🇱🇰 සිංහල</button>
+    <div class="gt-lang-grid" id="gtLangGrid" style="grid-template-columns:1fr;">
       <button class="gt-lang-btn active-lang" onclick="GT.setLang('en')">🇬🇧 English</button>
+      <button class="gt-lang-btn" onclick="GT.setLang('si')">🇱🇰 සිංහල</button>
       <button class="gt-lang-btn" onclick="GT.setLang('ta')">🇮🇳 தமிழ்</button>
-      <button class="gt-lang-btn" onclick="GT.setLang('zh-CN')">🇨🇳 中文</button>
-      <button class="gt-lang-btn" onclick="GT.setLang('ar')">🇸🇦 العربية</button>
-      <button class="gt-lang-btn" onclick="GT.setLang('hi')">🇮🇳 हिन्दी</button>
-      <button class="gt-lang-btn" onclick="GT.setLang('fr')">🇫🇷 Français</button>
-      <button class="gt-lang-btn" onclick="GT.setLang('de')">🇩🇪 Deutsch</button>
-      <button class="gt-lang-btn" onclick="GT.setLang('ja')">🇯🇵 日本語</button>
-      <button class="gt-lang-btn" onclick="GT.setLang('ko')">🇰🇷 한국어</button>
     </div>
     <button class="gt-original-btn" onclick="GT.restore()">✕ Show Original (English)</button>
   </div>
