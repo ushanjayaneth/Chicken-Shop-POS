@@ -6261,60 +6261,6 @@
           </table>`;
         }
       }
-    };               <td style="padding:8px 0;font-weight:600;">${esc(h.worker)}</td>
-                <td style="padding:8px 0;text-align:right;" class="mono">${h.count}</td>
-                <td style="padding:8px 0;text-align:right;" class="mono">Rs. ${h.rate.toFixed(2)}</td>
-                <td style="padding:8px 0;text-align:right;color:var(--red);" class="mono">Rs. ${h.total.toFixed(2)}</td>
-                <td style="padding:8px 0;text-align:right;color:var(--red);" class="mono">Rs. ${(h.paidDrawer || 0).toFixed(2)}</td>
-                <td style="padding:8px 0;text-align:center;">
-                  <button class="btn btn-danger btn-xs" style="padding:2px 5px;" onclick="CoconutMgr.deleteHusking('${h.id}')">🗑️</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>`;
-      },
-
-      renderSaleList() {
-        const sel = document.getElementById('coconutDate')?.value || new Date().toISOString().split('T')[0];
-        const listEl = document.getElementById('ccSaleList');
-        if (!listEl) return;
-
-        const daySales = S.coconut_sales.filter(s => s.date === sel);
-        if (!daySales.length) {
-          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">No sales recorded on this date.</div>`;
-          return;
-        }
-
-        listEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
-          <thead>
-            <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
-              <th style="padding:6px 0;">Buyer</th>
-              <th style="padding:6px 0;">Type</th>
-              <th style="padding:6px 0;text-align:right;">Qty</th>
-              <th style="padding:6px 0;text-align:right;">Rate</th>
-              <th style="padding:6px 0;text-align:right;">Total</th>
-              <th style="padding:6px 0;text-align:right;">To Drawer</th>
-              <th style="padding:6px 0;text-align:center;width:40px;">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${daySales.map(s => `
-              <tr style="border-bottom:1px solid var(--border2);">
-                <td style="padding:8px 0;font-weight:600;">${esc(s.buyer)}</td>
-                <td style="padding:8px 0;"><span class="badge ${s.type === 'husked' ? 'badge-green' : 'badge-cyan'}">${s.type === 'husked' ? 'Husked' : 'Unhusked'}</span></td>
-                <td style="padding:8px 0;text-align:right;" class="mono">${s.qty}</td>
-                <td style="padding:8px 0;text-align:right;" class="mono">Rs. ${s.price.toFixed(2)}</td>
-                <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${s.total.toFixed(2)}</td>
-                <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${(s.recDrawer || 0).toFixed(2)} <span style="font-size:8px;color:var(--t3)">(${esc(s.payMethod)})</span></td>
-                <td style="padding:8px 0;text-align:center;">
-                  <button class="btn btn-danger btn-xs" style="padding:2px 5px;" onclick="CoconutMgr.deleteSale('${s.id}')">🗑️</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>`;
-      }
     };
 
     // ── DAY-END SUMMARY ─────────────────────
