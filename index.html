@@ -3818,7 +3818,7 @@
       <!-- COCONUT BUSINESS TAB -->
       <div class="tab-panel" id="coconutTab">
         <div class="inv-bar">
-          <h2>🥥 Coconut Business</h2>
+          <h2>🥥 Coconut Business ERP</h2>
           <div style="display:flex;gap:6px;align-items:center;margin-left:auto;">
             <input type="date" id="coconutDate" style="padding:5px 10px;font-size:12px;max-width:160px;" onchange="CoconutMgr.switchTab(CoconutMgr._tab)">
             <button class="btn btn-primary btn-sm" onclick="CoconutMgr.switchTab(CoconutMgr._tab)">🔄 Refresh</button>
@@ -3828,24 +3828,49 @@
 
           <!-- Sub tabs -->
           <div class="opt-tabs" style="margin-bottom:4px;">
-            <div class="opt-tab active" id="ccTab_summary" onclick="CoconutMgr.switchTab('summary')">📊 Stock & Reports</div>
+            <div class="opt-tab active" id="ccTab_summary" onclick="CoconutMgr.switchTab('summary')">📊 Summary & Reports</div>
             <div class="opt-tab" id="ccTab_buy" onclick="CoconutMgr.switchTab('buy')">🛒 Purchases</div>
-            <div class="opt-tab" id="ccTab_husk" onclick="CoconutMgr.switchTab('husk')">⚒️ Husking</div>
+            <div class="opt-tab" id="ccTab_processing" onclick="CoconutMgr.switchTab('processing')">⚙️ Processing</div>
             <div class="opt-tab" id="ccTab_sale" onclick="CoconutMgr.switchTab('sale')">💰 Sales</div>
+            <div class="opt-tab" id="ccTab_payroll" onclick="CoconutMgr.switchTab('payroll')">👥 Workers & Payroll</div>
           </div>
 
           <!-- SUMMARY SECTION -->
           <div id="ccSection_summary">
-            <div class="stats-row" id="ccSummaryStats"></div>
+            <!-- Stock Summary Grid -->
+            <div class="stats-row" id="ccSummaryStats" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px;"></div>
+            
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
-              <div class="admin-section">
-                <h3>📊 Daily Cash Summary</h3>
-                <div id="ccSumBuy"></div>
+              <!-- Date Range Profit/Loss Report -->
+              <div class="admin-section" style="grid-column: span 2;">
+                <h3>📊 Date Range Financial Performance (Profit & Loss)</h3>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px; background:var(--bg2); padding:10px; border-radius:var(--r8); flex-wrap:wrap;">
+                  <div class="form-group" style="margin:0; display:flex; align-items:center; gap:5px;">
+                    <label style="margin:0; font-size:12px;">Start Date:</label>
+                    <input type="date" id="ccPLStartDate" style="padding:4px 8px; font-size:12px; width:130px;">
+                  </div>
+                  <div class="form-group" style="margin:0; display:flex; align-items:center; gap:5px;">
+                    <label style="margin:0; font-size:12px;">End Date:</label>
+                    <input type="date" id="ccPLEndDate" style="padding:4px 8px; font-size:12px; width:130px;">
+                  </div>
+                  <button class="btn btn-primary btn-sm" onclick="CoconutMgr.renderPLReport()">Generate Report</button>
+                </div>
+                <div id="ccPLReportResult"></div>
               </div>
+
+              <!-- Transportation Analyzer Section -->
+              <div class="admin-section">
+                <h3>🚚 Transportation Costs Analyzer</h3>
+                <div id="ccTransportAnalyzer"></div>
+              </div>
+
+              <!-- Details Summary -->
               <div class="admin-section">
                 <h3>📋 Daily Details</h3>
                 <div id="ccSumHusk"></div>
               </div>
+
+              <!-- Drawer Cash Reconciliation -->
               <div class="admin-section" style="grid-column: span 2;">
                 <h3>💵 Coconut Drawer Cash Balance</h3>
                 <div id="ccCashRegister"></div>
@@ -3871,7 +3896,7 @@
                   <input type="number" id="ccBuyLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()">
                 </div>
                 <div class="form-group">
-                  <label>Large Price</label>
+                  <label>Large Price (Rs.)</label>
                   <input type="number" id="ccBuyLargePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()">
                 </div>
                 <div class="form-group">
@@ -3879,8 +3904,20 @@
                   <input type="number" id="ccBuySmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()">
                 </div>
                 <div class="form-group">
-                  <label>Small Price</label>
+                  <label>Small Price (Rs.)</label>
                   <input type="number" id="ccBuySmallPrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()">
+                </div>
+                <div class="form-group">
+                  <label>Transportation Cost (Rs.)</label>
+                  <input type="number" id="ccBuyTransport" placeholder="0.00" step="0.01" value="0" oninput="CoconutMgr.calcBuyTotal()">
+                </div>
+                <div class="form-group">
+                  <label>Payment Method</label>
+                  <select id="ccBuyPayMethod">
+                    <option value="cash">Cash from Drawer</option>
+                    <option value="bank">Bank Transfer</option>
+                    <option value="credit">Supplier Credit / Loan</option>
+                  </select>
                 </div>
               </div>
               <div class="form-group">
@@ -3893,7 +3930,7 @@
                   <span class="mono" style="font-size:18px;font-weight:700;color:var(--orange);" id="ccBuyTotal">Rs. 0.00</span>
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
-                  <label>Paid from Drawer</label>
+                  <label>Paid from Drawer (Cash)</label>
                   <input type="number" id="ccBuyPaidDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--red);">
                 </div>
               </div>
@@ -3905,43 +3942,127 @@
             </div>
           </div>
 
-          <!-- HUSKING SECTION -->
-          <div id="ccSection_husk" style="display:none;">
-            <div class="admin-section" style="margin-bottom:12px;">
-              <h3>⚒️ Worker Husking Payments</h3>
-              <div class="grid-2" style="margin-top:10px;">
-                <div class="form-group">
+          <!-- PROCESSING SECTION -->
+          <div id="ccSection_processing" style="display:none;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-bottom:12px;">
+              
+              <!-- HUSKING WIDGET -->
+              <div class="admin-section">
+                <h3>⚒️ Worker Husking Registry</h3>
+                <div class="form-group" style="margin-top:10px;">
                   <label>Date</label>
                   <input type="date" id="ccHuskDate">
                 </div>
                 <div class="form-group">
-                  <label>Worker Name</label>
-                  <input type="text" id="ccHuskWorker" placeholder="Worker name">
+                  <label>Worker</label>
+                  <select id="ccHuskWorkerSelect" style="width:100%;"></select>
                 </div>
                 <div class="form-group">
-                  <label>Count Husked</label>
+                  <label>Count Husked (Nuts)</label>
                   <input type="number" id="ccHuskCount" placeholder="0" min="0" oninput="CoconutMgr.calcHuskTotal()">
                 </div>
                 <div class="form-group">
-                  <label>Rate per nut</label>
-                  <input type="number" id="ccHuskRate" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcHuskTotal()">
+                  <label>Rate per nut (Rs.)</label>
+                  <input type="number" id="ccHuskRate" placeholder="3.00" value="3.00" step="0.01" oninput="CoconutMgr.calcHuskTotal()">
                 </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px;margin-bottom:10px;">
+                  <span style="font-size:12px;color:var(--t2);">Total Earned</span>
+                  <span class="mono" style="font-size:16px;font-weight:700;color:var(--red);" id="ccHuskTotal">Rs. 0.00</span>
+                </div>
+                <div class="form-group">
+                  <label>Paid from Drawer (Immediate)</label>
+                  <input type="number" id="ccHuskPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);">
+                </div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveHusking()">💾 Save Husking Session</button>
               </div>
-              <div class="grid-2">
-                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
-                  <span style="font-size:13px;color:var(--t2);">Total Payment</span>
-                  <span class="mono" style="font-size:18px;font-weight:700;color:var(--red);" id="ccHuskTotal">Rs. 0.00</span>
+
+              <!-- COPRA PRODUCTION WIDGET -->
+              <div class="admin-section">
+                <h3>🥥 Copra Production Registry</h3>
+                <div class="form-group" style="margin-top:10px;">
+                  <label>Date</label>
+                  <input type="date" id="ccCopraDate">
                 </div>
-                <div class="form-group" style="margin-bottom:10px;">
-                  <label>Paid from Drawer</label>
-                  <input type="number" id="ccHuskPaidDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--red);">
+                <div class="form-group">
+                  <label>Husked Coconuts Used (Nuts)</label>
+                  <input type="number" id="ccCopraNuts" placeholder="0" min="0">
                 </div>
+                <div class="form-group">
+                  <label>Copra Produced (kg)</label>
+                  <input type="number" id="ccCopraWeight" placeholder="0.0" step="0.1">
+                </div>
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label>Shells Produced</label>
+                    <input type="number" id="ccCopraShells" placeholder="0" min="0">
+                  </div>
+                  <div class="form-group">
+                    <label>Shells Unit</label>
+                    <select id="ccCopraShellsUnit">
+                      <option value="kg">kg</option>
+                      <option value="pcs">Pieces</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Labor / Drying Cost (Rs.)</label>
+                  <input type="number" id="ccCopraCost" placeholder="0.00" step="0.01" value="0">
+                </div>
+                <div class="form-group">
+                  <label>Cost Paid from Drawer (Rs.)</label>
+                  <input type="number" id="ccCopraPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);" value="0">
+                </div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveCopra()">💾 Save Copra Registry</button>
               </div>
-              <button class="btn btn-primary w-full" onclick="CoconutMgr.saveHusking()">💾 Save Payment</button>
+
+              <!-- OIL EXTRACTION WIDGET -->
+              <div class="admin-section">
+                <h3>🛢️ Oil Extraction Registry</h3>
+                <div class="form-group" style="margin-top:10px;">
+                  <label>Date</label>
+                  <input type="date" id="ccOilDate">
+                </div>
+                <div class="form-group">
+                  <label>Copra Milled (kg)</label>
+                  <input type="number" id="ccOilCopra" placeholder="0.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Oil Extracted (Liters)</label>
+                  <input type="number" id="ccOilQty" placeholder="0.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Poonac Produced (kg)</label>
+                  <input type="number" id="ccOilPoonac" placeholder="0.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Milling Cost (Rs.)</label>
+                  <input type="number" id="ccOilCost" placeholder="0.00" step="0.01" value="0">
+                </div>
+                <div class="form-group">
+                  <label>Cost Paid from Drawer (Rs.)</label>
+                  <input type="number" id="ccOilPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);" value="0">
+                </div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveOil()">💾 Save Oil Registry</button>
+              </div>
             </div>
-            <div class="admin-section">
-              <h3>📋 Husking List for Selected Date</h3>
-              <div id="ccHuskList" style="margin-top:10px;"></div>
+
+            <!-- List of processing runs -->
+            <div class="admin-section" style="margin-top:14px;">
+              <h3>📋 Processing Logs for Selected Date</h3>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top:10px;">
+                <div>
+                  <h4 style="margin-bottom:6px; color:var(--cyan);">⚒️ Husking Records</h4>
+                  <div id="ccHuskList"></div>
+                </div>
+                <div>
+                  <h4 style="margin-bottom:6px; color:var(--cyan);">🥥 Copra Records</h4>
+                  <div id="ccCopraList"></div>
+                </div>
+                <div>
+                  <h4 style="margin-bottom:6px; color:var(--cyan);">🛢️ Oil Milling Records</h4>
+                  <div id="ccOilList"></div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -3959,18 +4080,23 @@
                   <input type="text" id="ccSaleBuyer" placeholder="e.g. wholesale buyer, customer">
                 </div>
                 <div class="form-group">
-                  <label>Coconut Type</label>
-                  <select id="ccSaleType">
-                    <option value="husked">Husked Coconuts</option>
-                    <option value="unhusked">Unhusked Coconuts</option>
+                  <label>Product Type</label>
+                  <select id="ccSaleType" onchange="CoconutMgr.updateSaleLabels()">
+                    <option value="unhusked">Unhusked Coconuts (Nuts)</option>
+                    <option value="husked">Husked Coconuts (Nuts)</option>
+                    <option value="husks">Coconut Husks (Pcs)</option>
+                    <option value="shells">Coconut Shells (kg)</option>
+                    <option value="copra">Copra (kg)</option>
+                    <option value="oil">Coconut Oil (Liters)</option>
+                    <option value="poonac">Poonac (kg)</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>Quantity</label>
-                  <input type="number" id="ccSaleCount" placeholder="0" min="0" oninput="CoconutMgr.calcSaleTotal()">
+                  <label id="ccSaleQtyLabel">Quantity (Nuts)</label>
+                  <input type="number" id="ccSaleCount" placeholder="0" min="0" step="any" oninput="CoconutMgr.calcSaleTotal()">
                 </div>
                 <div class="form-group">
-                  <label>Price per nut</label>
+                  <label id="ccSalePriceLabel">Price per Nut (Rs.)</label>
                   <input type="number" id="ccSalePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()">
                 </div>
                 <div class="form-group">
@@ -3979,16 +4105,25 @@
                     <option value="cash">Cash</option>
                     <option value="card">Card</option>
                     <option value="online">Online Transfer</option>
+                    <option value="credit">Credit / Customer Loan</option>
                   </select>
+                </div>
+                <div class="form-group">
+                  <label>Transportation Cost (paid by us)</label>
+                  <input type="number" id="ccSaleTransport" placeholder="0.00" step="0.01" value="0" oninput="CoconutMgr.calcSaleTotal()">
+                </div>
+                <div class="form-group">
+                  <label>Transport Paid from Drawer</label>
+                  <input type="number" id="ccSaleTransportPaidDrawer" placeholder="0" min="0" step="0.01" value="0">
                 </div>
               </div>
               <div class="grid-2">
                 <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
-                  <span style="font-size:13px;color:var(--t2);">Total Income</span>
+                  <span style="font-size:13px;color:var(--t2);">Total Revenue</span>
                   <span class="mono" style="font-size:18px;font-weight:700;color:var(--green);" id="ccSaleTotal">Rs. 0.00</span>
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
-                  <label>Received to Drawer</label>
+                  <label>Received to Drawer (Cash)</label>
                   <input type="number" id="ccSaleRecDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--green);">
                 </div>
               </div>
@@ -3997,6 +4132,63 @@
             <div class="admin-section">
               <h3>📋 Sales List for Selected Date</h3>
               <div id="ccSaleList" style="margin-top:10px;"></div>
+            </div>
+          </div>
+
+          <!-- PAYROLL SECTION -->
+          <div id="ccSection_payroll" style="display:none;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+              <!-- Add Worker Form -->
+              <div class="admin-section">
+                <h3>👥 Add New Worker</h3>
+                <div class="form-group" style="margin-top:10px;">
+                  <label>Worker Name</label>
+                  <input type="text" id="ccWorkerName" placeholder="e.g. Kamal, Siripala">
+                </div>
+                <div class="form-group">
+                  <label>Phone Number</label>
+                  <input type="text" id="ccWorkerPhone" placeholder="Optional phone number">
+                </div>
+                <div class="form-group">
+                  <label>Notes</label>
+                  <input type="text" id="ccWorkerNotes" placeholder="Optional notes">
+                </div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveWorker()">💾 Add Worker</button>
+              </div>
+
+              <!-- Pay Worker Form -->
+              <div class="admin-section">
+                <h3>💵 Record Wage Payment</h3>
+                <div class="form-group" style="margin-top:10px;">
+                  <label>Date</label>
+                  <input type="date" id="ccPayDate">
+                </div>
+                <div class="form-group">
+                  <label>Select Worker</label>
+                  <select id="ccPayWorkerSelect" style="width:100%;"></select>
+                </div>
+                <div class="form-group">
+                  <label>Amount Paid (Rs.)</label>
+                  <input type="number" id="ccPayAmount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                  <label>Paid from Drawer (Cash)</label>
+                  <input type="number" id="ccPayPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);">
+                </div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveWorkerPayment()">💾 Save Payment</button>
+              </div>
+
+              <!-- Worker Ledger Table -->
+              <div class="admin-section" style="grid-column: span 2;">
+                <h3>📊 Workers Ledger & Balance Sheet</h3>
+                <div id="ccWorkersLedger" style="margin-top:10px;"></div>
+              </div>
+
+              <!-- Wage Payments List -->
+              <div class="admin-section" style="grid-column: span 2;">
+                <h3>📋 Recent Wage Payments</h3>
+                <div id="ccPaymentsList" style="margin-top:10px;"></div>
+              </div>
             </div>
           </div>
 
@@ -4318,6 +4510,7 @@
     const S = {
       categories: [], items: [], sales: [],
       coconut_purchases: [], coconut_husking: [], coconut_sales: [], cash_movements: [], day_ends: [],
+      coconut_copra: [], coconut_oil: [], coconut_workers: [], coconut_worker_payments: [],
       loans: [], loan_customers: [],
       settings: { shopName: '  Chicken Shop', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.', apiServerUrl: '' },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
@@ -4587,7 +4780,7 @@
             const tx = db.transaction('cache', 'readwrite');
             const store = tx.objectStore('cache');
 
-            const keys = ['categories', 'items', 'sales', 'loan_customers', 'loans', 'coconut_purchases', 'coconut_husking', 'coconut_sales', 'cash_movements', 'day_ends'];
+            const keys = ['categories', 'items', 'sales', 'loan_customers', 'loans', 'coconut_purchases', 'coconut_husking', 'coconut_sales', 'coconut_copra', 'coconut_oil', 'coconut_workers', 'coconut_worker_payments', 'cash_movements', 'day_ends'];
             for (const key of keys) {
               if (remoteDb[key] !== undefined) {
                 store.put({ path: key, data: remoteDb[key] || {}, ts: Date.now() });
@@ -4753,7 +4946,7 @@
 
     let _lastDataStr = "";
     async function loadAll() {
-      const [cats, items, sales, cp, ch, cs, cm, de, loans, custs] = await Promise.all([
+      const [cats, items, sales, cp, ch, cs, cm, de, loans, custs, c_copra, c_oil, c_workers, c_payments] = await Promise.all([
         DB.get('categories'),
         DB.get('items'),
         DB.get('sales'),
@@ -4763,7 +4956,11 @@
         DB.get('cash_movements'),
         DB.get('day_ends'),
         DB.get('loans'),
-        DB.get('loan_customers')
+        DB.get('loan_customers'),
+        DB.get('coconut_copra'),
+        DB.get('coconut_oil'),
+        DB.get('coconut_workers'),
+        DB.get('coconut_worker_payments')
       ]);
 
       // Create a fast, lightweight structural change check
@@ -4778,6 +4975,10 @@
         deLen: Object.keys(de || {}).length,
         lnLen: Object.keys(loans || {}).length,
         lcLen: Object.keys(custs || {}).length,
+        copraLen: Object.keys(c_copra || {}).length,
+        oilLen: Object.keys(c_oil || {}).length,
+        wrkLen: Object.keys(c_workers || {}).length,
+        payLen: Object.keys(c_payments || {}).length,
         cVal: cats,
         iVal: items,
         sVal: sales,
@@ -4787,7 +4988,11 @@
         cmVal: cm,
         deVal: de,
         lnVal: loans,
-        lcVal: custs
+        lcVal: custs,
+        copraVal: c_copra,
+        oilVal: c_oil,
+        wrkVal: c_workers,
+        payVal: c_payments
       });
 
       const isUnchanged = (currentStr === _lastDataStr);
@@ -4799,6 +5004,10 @@
       S.coconut_purchases = DB.obj2arr(cp).sort((a, b) => new Date(b.date) - new Date(a.date));
       S.coconut_husking = DB.obj2arr(ch).sort((a, b) => new Date(b.date) - new Date(a.date));
       S.coconut_sales = DB.obj2arr(cs).sort((a, b) => new Date(b.date) - new Date(a.date));
+      S.coconut_copra = DB.obj2arr(c_copra).sort((a, b) => new Date(b.date) - new Date(a.date));
+      S.coconut_oil = DB.obj2arr(c_oil).sort((a, b) => new Date(b.date) - new Date(a.date));
+      S.coconut_workers = DB.obj2arr(c_workers).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      S.coconut_worker_payments = DB.obj2arr(c_payments).sort((a, b) => new Date(b.date) - new Date(a.date));
       S.cash_movements = DB.obj2arr(cm).sort((a, b) => new Date(b.date) - new Date(a.date));
       S.day_ends = DB.obj2arr(de);
       S.loans = DB.obj2arr(loans);
@@ -4832,74 +5041,153 @@
     function toast(msg, type = 'info') { const d = document.createElement('div'); d.className = `toast toast-${type}`; d.textContent = msg; document.getElementById('toasts').appendChild(d); setTimeout(() => d.remove(), 3500); }
 
     // ── NAV / MODAL ─────────────────────────
-    const Nav = { go(tab) { document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab)); document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tab + 'Tab')); if (tab === 'admin') Admin.render(); if (tab === 'inventory') InvTable.render(); if (tab === 'barcodes') BarcodeTab.render(); if (tab === 'loans') LoanMgr.render(); if (tab === 'returns') ReturnMgr.switchTab('customer'); if (tab === 'coconut') CoconutMgr.switchTab('summary'); if (tab === 'dayend') DayEnd.render(); }, toggleMenu() { const sb = document.getElementById('sidebar'); const ol = document.getElementById('sidebarOverlay'); if (sb.classList.contains('show')) { sb.classList.remove('show'); ol.classList.remove('show'); } else { sb.classList.add('show'); ol.classList.add('show'); } }, closeMenu() { document.getElementById('sidebar').classList.remove('show'); document.getElementById('sidebarOverlay').classList.remove('show'); } };
-    const Modal = { open(id) { document.getElementById(id).classList.add('open'); }, close(id) { document.getElementById(id).classList.remove('open'); } };
-
-    // ── DAY-END SUMMARY ─────────────────────
-    // ── COCONUT BUSINESS ─────────────────────────
-    const CoconutMgr = {
+    const Nav = { go(tab) { document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab)); document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tab + 'Tab')); if (tab === 'admin') Admin.render(); if (tab === 'inventory') InvTable.render(); if (tab === 'barcodes') BarcodeTab.render(); if (tab === 'loans') LoanMgr.render(); if (tab === 'returns') ReturnMgr.switchTab('customer'); if (tab === 'coconut') CoconutMgr.switchTab('summary'); if (tab ==    const CoconutMgr = {
       _tab: 'summary',
 
       init() {
+        const todayStr = new Date().toISOString().split('T')[0];
         const dateEl = document.getElementById('coconutDate');
         if (dateEl && !dateEl.value) {
-          dateEl.value = new Date().toISOString().split('T')[0];
+          dateEl.value = todayStr;
+        }
+        const pLStart = document.getElementById('ccPLStartDate');
+        if (pLStart && !pLStart.value) {
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          pLStart.value = thirtyDaysAgo.toISOString().split('T')[0];
+        }
+        const pLEnd = document.getElementById('ccPLEndDate');
+        if (pLEnd && !pLEnd.value) {
+          pLEnd.value = todayStr;
         }
       },
 
       switchTab(tab) {
         this._tab = tab;
-        ['buy','husk','sale','summary'].forEach(t => {
+        ['summary', 'buy', 'processing', 'sale', 'payroll'].forEach(t => {
           const btn = document.getElementById('ccTab_' + t);
           if (btn) btn.classList.toggle('active', t === tab);
           const sec = document.getElementById('ccSection_' + t);
           if (sec) sec.style.display = t === tab ? 'block' : 'none';
         });
         
-        // Refresh appropriate lists
         const selDate = document.getElementById('coconutDate')?.value || new Date().toISOString().split('T')[0];
-        document.getElementById('ccBuyDate').value = selDate;
-        document.getElementById('ccHuskDate').value = selDate;
-        document.getElementById('ccSaleDate').value = selDate;
+        ['ccBuyDate', 'ccHuskDate', 'ccCopraDate', 'ccOilDate', 'ccSaleDate', 'ccPayDate'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = selDate;
+        });
 
         if (tab === 'summary') {
           this.renderSummary();
+          this.renderPLReport();
         } else if (tab === 'buy') {
           this.renderBuyList();
-        } else if (tab === 'husk') {
-          this.renderHuskList();
+        } else if (tab === 'processing') {
+          this.updateWorkerDropdowns();
+          this.renderProcessingLists();
         } else if (tab === 'sale') {
+          this.updateSaleLabels();
           this.renderSaleList();
+        } else if (tab === 'payroll') {
+          this.updateWorkerDropdowns();
+          this.renderPayroll();
         }
       },
 
       calcStock() {
-        let purchased = 0;
-        let husked = 0;
-        let soldUnhusked = 0;
-        let soldHusked = 0;
+        let purchasedNuts = 0;
+        let huskedNuts = 0;
+        let soldUnhuskedNuts = 0;
+        let soldHuskedNuts = 0;
+        let copraUsedNuts = 0;
+        
+        let copraProducedKg = 0;
+        let copraUsedForOilKg = 0;
+        let copraSoldKg = 0;
 
+        let shellsProduced = 0;
+        let shellsSold = 0;
+        
+        let husksProduced = 0;
+        let husksSold = 0;
+
+        let oilProducedL = 0;
+        let oilSoldL = 0;
+
+        let poonacProducedKg = 0;
+        let poonacSoldKg = 0;
+
+        // 1. Purchases (Unhusked nuts inflow)
         S.coconut_purchases.forEach(p => {
-          purchased += (parseInt(p.largeCount) || 0) + (parseInt(p.smallCount) || 0);
+          purchasedNuts += (parseInt(p.largeCount) || 0) + (parseInt(p.smallCount) || 0);
         });
 
+        // 2. Husking (Unhusked nut outflow, Husked nut inflow, Husks inflow)
         S.coconut_husking.forEach(h => {
-          husked += (parseInt(h.count) || 0);
+          const cnt = parseInt(h.count) || 0;
+          huskedNuts += cnt;
+          husksProduced += cnt; // Each husked nut yields 1 husk
         });
 
+        // 3. Copra production (Husked nut outflow, Copra inflow, Shells inflow)
+        S.coconut_copra.forEach(c => {
+          copraUsedNuts += (parseInt(c.nutsUsed) || 0);
+          copraProducedKg += (parseFloat(c.copraWeight) || 0);
+          shellsProduced += (parseFloat(c.shellsQty) || 0);
+        });
+
+        // 4. Oil extraction (Copra outflow, Oil inflow, Poonac inflow)
+        S.coconut_oil.forEach(o => {
+          copraUsedForOilKg += (parseFloat(o.copraUsed) || 0);
+          oilProducedL += (parseFloat(o.oilQty) || 0);
+          poonacProducedKg += (parseFloat(o.poonacQty) || 0);
+        });
+
+        // 5. Sales (Outflows for everything)
         S.coconut_sales.forEach(s => {
-          const qty = parseInt(s.qty) || 0;
+          const qty = parseFloat(s.qty) || 0;
           if (s.type === 'unhusked') {
-            soldUnhusked += qty;
-          } else {
-            soldHusked += qty;
+            soldUnhuskedNuts += qty;
+          } else if (s.type === 'husked') {
+            soldHuskedNuts += qty;
+          } else if (s.type === 'husks') {
+            husksSold += qty;
+          } else if (s.type === 'shells') {
+            shellsSold += qty;
+          } else if (s.type === 'copra') {
+            copraSoldKg += qty;
+          } else if (s.type === 'oil') {
+            oilSoldL += qty;
+          } else if (s.type === 'poonac') {
+            poonacSoldKg += qty;
           }
         });
 
-        const unhuskedStock = purchased - husked - soldUnhusked;
-        const huskedStock = husked - soldHusked;
-
-        return { unhuskedStock, huskedStock, purchased, husked, soldUnhusked, soldHusked };
+        return {
+          unhuskedStock: purchasedNuts - huskedNuts - soldUnhuskedNuts,
+          huskedStock: huskedNuts - copraUsedNuts - soldHuskedNuts,
+          husksStock: husksProduced - husksSold,
+          shellsStock: shellsProduced - shellsSold,
+          copraStock: copraProducedKg - copraUsedForOilKg - copraSoldKg,
+          oilStock: oilProducedL - oilSoldL,
+          poonacStock: poonacProducedKg - poonacSoldKg,
+          purchasedNuts,
+          huskedNuts,
+          soldUnhuskedNuts,
+          soldHuskedNuts,
+          copraUsedNuts,
+          copraProducedKg,
+          copraUsedForOilKg,
+          copraSoldKg,
+          shellsProduced,
+          shellsSold,
+          husksProduced,
+          husksSold,
+          oilProducedL,
+          oilSoldL,
+          poonacProducedKg,
+          poonacSoldKg
+        };
       },
 
       calcBuyTotal() {
@@ -4907,11 +5195,19 @@
         const lp = parseFloat(document.getElementById('ccBuyLargePrice').value) || 0;
         const sc = parseInt(document.getElementById('ccBuySmallCount').value) || 0;
         const sp = parseFloat(document.getElementById('ccBuySmallPrice').value) || 0;
-        const tot = (lc * lp) + (sc * sp);
+        const tc = parseFloat(document.getElementById('ccBuyTransport').value) || 0;
+        const tot = (lc * lp) + (sc * sp) + tc;
         document.getElementById('ccBuyTotal').textContent = 'Rs. ' + tot.toFixed(2);
         
         const paidInput = document.getElementById('ccBuyPaidDrawer');
-        if (paidInput) paidInput.value = tot.toFixed(0);
+        if (paidInput) {
+          const method = document.getElementById('ccBuyPayMethod')?.value;
+          if (method === 'cash') {
+            paidInput.value = tot.toFixed(0);
+          } else {
+            paidInput.value = 0;
+          }
+        }
       },
 
       calcHuskTotal() {
@@ -4925,13 +5221,60 @@
       },
 
       calcSaleTotal() {
-        const cnt = parseInt(document.getElementById('ccSaleCount').value) || 0;
+        const cnt = parseFloat(document.getElementById('ccSaleCount').value) || 0;
         const price = parseFloat(document.getElementById('ccSalePrice').value) || 0;
         const tot = cnt * price;
         document.getElementById('ccSaleTotal').textContent = 'Rs. ' + tot.toFixed(2);
 
         const recInput = document.getElementById('ccSaleRecDrawer');
-        if (recInput) recInput.value = tot.toFixed(0);
+        if (recInput) {
+          const payMethod = document.getElementById('ccSalePayMethod')?.value;
+          if (payMethod === 'cash') {
+            recInput.value = tot.toFixed(0);
+          } else {
+            recInput.value = 0;
+          }
+        }
+      },
+
+      updateSaleLabels() {
+        const type = document.getElementById('ccSaleType')?.value;
+        const qtyLbl = document.getElementById('ccSaleQtyLabel');
+        const priceLbl = document.getElementById('ccSalePriceLabel');
+        if (!qtyLbl || !priceLbl) return;
+
+        if (type === 'unhusked' || type === 'husked') {
+          qtyLbl.textContent = 'Quantity (Nuts)';
+          priceLbl.textContent = 'Price per Nut (Rs.)';
+        } else if (type === 'husks') {
+          qtyLbl.textContent = 'Quantity (Pcs)';
+          priceLbl.textContent = 'Price per Husk (Rs.)';
+        } else if (type === 'shells') {
+          qtyLbl.textContent = 'Quantity (kg)';
+          priceLbl.textContent = 'Price per kg (Rs.)';
+        } else if (type === 'copra') {
+          qtyLbl.textContent = 'Quantity (kg)';
+          priceLbl.textContent = 'Price per kg (Rs.)';
+        } else if (type === 'oil') {
+          qtyLbl.textContent = 'Quantity (Liters)';
+          priceLbl.textContent = 'Price per Liter (Rs.)';
+        } else if (type === 'poonac') {
+          qtyLbl.textContent = 'Quantity (kg)';
+          priceLbl.textContent = 'Price per kg (Rs.)';
+        }
+      },
+
+      updateWorkerDropdowns() {
+        const huskSel = document.getElementById('ccHuskWorkerSelect');
+        const paySel = document.getElementById('ccPayWorkerSelect');
+        if (!huskSel || !paySel) return;
+
+        let html = S.coconut_workers.map(w => `<option value="${w.id}">${esc(w.name)}</option>`).join('');
+        if (!html) {
+          html = `<option value="">-- Register Workers First --</option>`;
+        }
+        huskSel.innerHTML = html;
+        paySel.innerHTML = html;
       },
 
       async savePurchase() {
@@ -4941,16 +5284,18 @@
         const largePrice = parseFloat(document.getElementById('ccBuyLargePrice').value) || 0;
         const smallCount = parseInt(document.getElementById('ccBuySmallCount').value) || 0;
         const smallPrice = parseFloat(document.getElementById('ccBuySmallPrice').value) || 0;
+        const transportCost = parseFloat(document.getElementById('ccBuyTransport').value) || 0;
+        const payMethod = document.getElementById('ccBuyPayMethod').value;
         const notes = document.getElementById('ccBuyNotes').value.trim();
         const paidDrawer = parseFloat(document.getElementById('ccBuyPaidDrawer').value) || 0;
 
         if (!estate) { toast('Please enter Estate / Supplier', 'error'); return; }
         if (largeCount <= 0 && smallCount <= 0) { toast('Please enter large or small count', 'error'); return; }
 
-        const total = (largeCount * largePrice) + (smallCount * smallPrice);
+        const total = (largeCount * largePrice) + (smallCount * smallPrice) + transportCost;
 
         const data = {
-          date, estate, largeCount, largePrice, smallCount, smallPrice, notes, total, paidDrawer,
+          date, estate, largeCount, largePrice, smallCount, smallPrice, transportCost, payMethod, notes, total, paidDrawer,
           createdAt: new Date().toISOString()
         };
 
@@ -4976,6 +5321,7 @@
         document.getElementById('ccBuyLargePrice').value = '';
         document.getElementById('ccBuySmallCount').value = '';
         document.getElementById('ccBuySmallPrice').value = '';
+        document.getElementById('ccBuyTransport').value = '0';
         document.getElementById('ccBuyNotes').value = '';
         document.getElementById('ccBuyPaidDrawer').value = '';
         this.calcBuyTotal();
@@ -5000,19 +5346,22 @@
 
       async saveHusking() {
         const date = document.getElementById('ccHuskDate').value;
-        const worker = document.getElementById('ccHuskWorker').value.trim();
+        const workerId = document.getElementById('ccHuskWorkerSelect').value;
         const count = parseInt(document.getElementById('ccHuskCount').value) || 0;
         const rate = parseFloat(document.getElementById('ccHuskRate').value) || 0;
         const paidDrawer = parseFloat(document.getElementById('ccHuskPaidDrawer').value) || 0;
 
-        if (!worker) { toast('Please enter worker name', 'error'); return; }
+        if (!workerId) { toast('Please select or register a worker first', 'error'); return; }
         if (count <= 0) { toast('Please enter husked count', 'error'); return; }
         if (rate <= 0) { toast('Please enter husking rate', 'error'); return; }
+
+        const workerObj = S.coconut_workers.find(w => w.id === workerId);
+        const workerName = workerObj ? workerObj.name : 'Unknown Worker';
 
         const total = count * rate;
 
         const data = {
-          date, worker, count, rate, total, paidDrawer,
+          date, workerId, worker: workerName, count, rate, total, paidDrawer,
           createdAt: new Date().toISOString()
         };
 
@@ -5023,7 +5372,7 @@
             date: date + 'T12:00:00.000Z',
             type: 'out',
             amount: paidDrawer,
-            reason: `⚒️ Coconut Husking (${worker})`,
+            reason: `⚒️ Coconut Husking (${workerName})`,
             source: 'coconut_husk',
             refId: id,
             createdAt: new Date().toISOString()
@@ -5033,14 +5382,12 @@
 
         toast('⚒️ Husking record saved successfully!', 'success');
         
-        document.getElementById('ccHuskWorker').value = '';
         document.getElementById('ccHuskCount').value = '';
-        document.getElementById('ccHuskRate').value = '';
         document.getElementById('ccHuskPaidDrawer').value = '';
         this.calcHuskTotal();
 
         await loadAll();
-        this.renderHuskList();
+        this.renderProcessingLists();
       },
 
       async deleteHusking(id) {
@@ -5054,15 +5401,132 @@
 
         toast('Husking record deleted.', 'info');
         await loadAll();
-        this.renderHuskList();
+        this.renderProcessingLists();
+      },
+
+      async saveCopra() {
+        const date = document.getElementById('ccCopraDate').value;
+        const nutsUsed = parseInt(document.getElementById('ccCopraNuts').value) || 0;
+        const copraWeight = parseFloat(document.getElementById('ccCopraWeight').value) || 0;
+        const shellsQty = parseFloat(document.getElementById('ccCopraShells').value) || 0;
+        const shellsUnit = document.getElementById('ccCopraShellsUnit').value;
+        const dryingCost = parseFloat(document.getElementById('ccCopraCost').value) || 0;
+        const paidDrawer = parseFloat(document.getElementById('ccCopraPaidDrawer').value) || 0;
+
+        if (nutsUsed <= 0) { toast('Please enter coconuts used', 'error'); return; }
+        if (copraWeight <= 0) { toast('Please enter copra weight produced', 'error'); return; }
+
+        const data = {
+          date, nutsUsed, copraWeight, shellsQty, shellsUnit, dryingCost, paidDrawer,
+          createdAt: new Date().toISOString()
+        };
+
+        const id = await DB.push('coconut_copra', data);
+
+        if (paidDrawer > 0) {
+          const move = {
+            date: date + 'T12:00:00.000Z',
+            type: 'out',
+            amount: paidDrawer,
+            reason: `🥥 Copra Drying Batch`,
+            source: 'coconut_copra',
+            refId: id,
+            createdAt: new Date().toISOString()
+          };
+          await DB.push('cash_movements', move);
+        }
+
+        toast('🥥 Copra production batch saved!', 'success');
+        
+        document.getElementById('ccCopraNuts').value = '';
+        document.getElementById('ccCopraWeight').value = '';
+        document.getElementById('ccCopraShells').value = '';
+        document.getElementById('ccCopraCost').value = '0';
+        document.getElementById('ccCopraPaidDrawer').value = '0';
+
+        await loadAll();
+        this.renderProcessingLists();
+      },
+
+      async deleteCopra(id) {
+        if (!confirm('Are you sure you want to delete this copra batch?')) return;
+        await DB.del('coconut_copra/' + id);
+        
+        const move = S.cash_movements.find(m => m.refId === id && m.source === 'coconut_copra');
+        if (move) {
+          await DB.del('cash_movements/' + move.id);
+        }
+
+        toast('Copra batch deleted.', 'info');
+        await loadAll();
+        this.renderProcessingLists();
+      },
+
+      async saveOil() {
+        const date = document.getElementById('ccOilDate').value;
+        const copraUsed = parseFloat(document.getElementById('ccOilCopra').value) || 0;
+        const oilQty = parseFloat(document.getElementById('ccOilQty').value) || 0;
+        const poonacQty = parseFloat(document.getElementById('ccOilPoonac').value) || 0;
+        const millingCost = parseFloat(document.getElementById('ccOilCost').value) || 0;
+        const paidDrawer = parseFloat(document.getElementById('ccOilPaidDrawer').value) || 0;
+
+        if (copraUsed <= 0) { toast('Please enter copra milled', 'error'); return; }
+        if (oilQty <= 0) { toast('Please enter oil quantity obtained', 'error'); return; }
+
+        const data = {
+          date, copraUsed, oilQty, poonacQty, millingCost, paidDrawer,
+          createdAt: new Date().toISOString()
+        };
+
+        const id = await DB.push('coconut_oil', data);
+
+        if (paidDrawer > 0) {
+          const move = {
+            date: date + 'T12:00:00.000Z',
+            type: 'out',
+            amount: paidDrawer,
+            reason: `🛢️ Oil Milling Batch`,
+            source: 'coconut_oil',
+            refId: id,
+            createdAt: new Date().toISOString()
+          };
+          await DB.push('cash_movements', move);
+        }
+
+        toast('🛢️ Oil extraction batch saved!', 'success');
+        
+        document.getElementById('ccOilCopra').value = '';
+        document.getElementById('ccOilQty').value = '';
+        document.getElementById('ccOilPoonac').value = '';
+        document.getElementById('ccOilCost').value = '0';
+        document.getElementById('ccOilPaidDrawer').value = '0';
+
+        await loadAll();
+        this.renderProcessingLists();
+      },
+
+      async deleteOil(id) {
+        if (!confirm('Are you sure you want to delete this oil batch?')) return;
+        await DB.del('coconut_oil/' + id);
+        
+        const move = S.cash_movements.find(m => m.refId === id && m.source === 'coconut_oil');
+        if (move) {
+          await DB.del('cash_movements/' + move.id);
+        }
+
+        toast('Oil batch deleted.', 'info');
+        await loadAll();
+        this.renderProcessingLists();
       },
 
       async saveSale() {
         const date = document.getElementById('ccSaleDate').value;
         const buyer = document.getElementById('ccSaleBuyer').value.trim() || 'Wholesale Buyer';
         const type = document.getElementById('ccSaleType').value;
-        const qty = parseInt(document.getElementById('ccSaleCount').value) || 0;
+        const qty = parseFloat(document.getElementById('ccSaleCount').value) || 0;
         const price = parseFloat(document.getElementById('ccSalePrice').value) || 0;
+        const transportCost = parseFloat(document.getElementById('ccSaleTransport').value) || 0;
+        const transportPaidDrawer = parseFloat(document.getElementById('ccSaleTransportPaidDrawer').value) || 0;
         const recDrawer = parseFloat(document.getElementById('ccSaleRecDrawer').value) || 0;
         const payMethod = document.getElementById('ccSalePayMethod').value;
 
@@ -5072,7 +5536,7 @@
         const total = qty * price;
 
         const data = {
-          date, buyer, type, qty, price, total, recDrawer, payMethod,
+          date, buyer, type, qty, price, total, transportCost, transportPaidDrawer, payMethod, recDrawer,
           createdAt: new Date().toISOString()
         };
 
@@ -5083,7 +5547,7 @@
             date: date + 'T12:00:00.000Z',
             type: 'in',
             amount: recDrawer,
-            reason: `💰 Coconut Sale (${buyer} - ${type === 'husked' ? 'Husked' : 'Unhusked'})`,
+            reason: `💰 Coconut Sale (${buyer} - ${type})`,
             source: 'coconut_sale',
             refId: id,
             createdAt: new Date().toISOString()
@@ -5091,11 +5555,26 @@
           await DB.push('cash_movements', move);
         }
 
-        toast('💰 Coconut sales saved successfully!', 'success');
+        if (transportPaidDrawer > 0) {
+          const tMove = {
+            date: date + 'T12:00:00.000Z',
+            type: 'out',
+            amount: transportPaidDrawer,
+            reason: `🚚 Sale Transport (${buyer})`,
+            source: 'coconut_sale_transport',
+            refId: id,
+            createdAt: new Date().toISOString()
+          };
+          await DB.push('cash_movements', tMove);
+        }
+
+        toast('💰 Coconut sale saved successfully!', 'success');
         
         document.getElementById('ccSaleBuyer').value = '';
         document.getElementById('ccSaleCount').value = '';
         document.getElementById('ccSalePrice').value = '';
+        document.getElementById('ccSaleTransport').value = '0';
+        document.getElementById('ccSaleTransportPaidDrawer').value = '0';
         document.getElementById('ccSaleRecDrawer').value = '';
         this.calcSaleTotal();
 
@@ -5112,9 +5591,93 @@
           await DB.del('cash_movements/' + move.id);
         }
 
+        const tMove = S.cash_movements.find(m => m.refId === id && m.source === 'coconut_sale_transport');
+        if (tMove) {
+          await DB.del('cash_movements/' + tMove.id);
+        }
+
         toast('Sales record deleted.', 'info');
         await loadAll();
         this.renderSaleList();
+      },
+
+      async saveWorker() {
+        const name = document.getElementById('ccWorkerName').value.trim();
+        const phone = document.getElementById('ccWorkerPhone').value.trim();
+        const notes = document.getElementById('ccWorkerNotes').value.trim();
+
+        if (!name) { toast('Please enter worker name', 'error'); return; }
+
+        const data = {
+          name, phone, notes,
+          createdAt: new Date().toISOString()
+        };
+
+        await DB.push('coconut_workers', data);
+        toast('Worker registered successfully!', 'success');
+        
+        document.getElementById('ccWorkerName').value = '';
+        document.getElementById('ccWorkerPhone').value = '';
+        document.getElementById('ccWorkerNotes').value = '';
+
+        await loadAll();
+        this.updateWorkerDropdowns();
+        this.renderPayroll();
+      },
+
+      async saveWorkerPayment() {
+        const date = document.getElementById('ccPayDate').value;
+        const workerId = document.getElementById('ccPayWorkerSelect').value;
+        const amount = parseFloat(document.getElementById('ccPayAmount').value) || 0;
+        const paidDrawer = parseFloat(document.getElementById('ccPayPaidDrawer').value) || 0;
+
+        if (!workerId) { toast('Please select a worker', 'error'); return; }
+        if (amount <= 0) { toast('Please enter amount to pay', 'error'); return; }
+
+        const workerObj = S.coconut_workers.find(w => w.id === workerId);
+        const workerName = workerObj ? workerObj.name : 'Unknown';
+
+        const data = {
+          date, workerId, workerName, amount, paidDrawer,
+          createdAt: new Date().toISOString()
+        };
+
+        const id = await DB.push('coconut_worker_payments', data);
+
+        if (paidDrawer > 0) {
+          const move = {
+            date: date + 'T12:00:00.000Z',
+            type: 'out',
+            amount: paidDrawer,
+            reason: `👥 Worker Paid (${workerName})`,
+            source: 'coconut_worker_pay',
+            refId: id,
+            createdAt: new Date().toISOString()
+          };
+          await DB.push('cash_movements', move);
+        }
+
+        toast('Wage payment saved!', 'success');
+        
+        document.getElementById('ccPayAmount').value = '';
+        document.getElementById('ccPayPaidDrawer').value = '';
+
+        await loadAll();
+        this.renderPayroll();
+      },
+
+      async deleteWorkerPayment(id) {
+        if (!confirm('Are you sure you want to delete this payment record?')) return;
+        await DB.del('coconut_worker_payments/' + id);
+        
+        const move = S.cash_movements.find(m => m.refId === id && m.source === 'coconut_worker_pay');
+        if (move) {
+          await DB.del('cash_movements/' + move.id);
+        }
+
+        toast('Payment record deleted.', 'info');
+        await loadAll();
+        this.renderPayroll();
       },
 
       renderSummary() {
@@ -5124,8 +5687,6 @@
         const sel = dateEl.value;
 
         const stock = this.calcStock();
-        const cur = S.settings.currency || 'Rs.';
-
         const statsEl = document.getElementById('ccSummaryStats');
         if (statsEl) {
           statsEl.innerHTML = `
@@ -5140,88 +5701,103 @@
               <div class="stat-sub">Nuts (Husked)</div>
             </div>
             <div class="stat-card">
-              <div class="stat-lbl">Total Coconut Purchased</div>
-              <div class="stat-val text-cyan">${stock.purchased.toLocaleString()}</div>
-              <div class="stat-sub">Total Nuts Count</div>
+              <div class="stat-lbl">Husks Stock</div>
+              <div class="stat-val text-cyan">${stock.husksStock.toLocaleString()}</div>
+              <div class="stat-sub">Pieces</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-lbl">Shells Stock</div>
+              <div class="stat-val text-purple">${stock.shellsStock.toLocaleString()}</div>
+              <div class="stat-sub">Units</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-lbl">Copra Stock</div>
+              <div class="stat-val text-yellow" style="color:var(--orange);">${stock.copraStock.toFixed(1)}</div>
+              <div class="stat-sub">kg</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-lbl">Oil Stock</div>
+              <div class="stat-val text-cyan">${stock.oilStock.toFixed(1)}</div>
+              <div class="stat-sub">Liters</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-lbl">Poonac Stock</div>
+              <div class="stat-val text-cyan" style="color:#d2b48c;">${stock.poonacStock.toFixed(1)}</div>
+              <div class="stat-sub">kg</div>
             </div>
           `;
         }
 
         const dayPurchases = S.coconut_purchases.filter(p => p.date === sel);
         const dayHusking = S.coconut_husking.filter(h => h.date === sel);
+        const dayCopra = S.coconut_copra.filter(c => c.date === sel);
+        const dayOil = S.coconut_oil.filter(o => o.date === sel);
         const daySales = S.coconut_sales.filter(s => s.date === sel);
-
-        const buyCost = dayPurchases.reduce((a, p) => a + (p.total || 0), 0);
-        const huskCost = dayHusking.reduce((a, h) => a + (h.total || 0), 0);
-        const saleIncome = daySales.reduce((a, s) => a + (s.total || 0), 0);
-        
-        const sumBuyEl = document.getElementById('ccSumBuy');
-        if (sumBuyEl) {
-          sumBuyEl.innerHTML = `
-            <div class="total-row"><span>Purchases:</span><span class="mono text-orange">Rs. ${buyCost.toFixed(2)}</span></div>
-            <div class="total-row"><span>Husking Cost:</span><span class="mono text-red">Rs. ${huskCost.toFixed(2)}</span></div>
-            <div class="total-row"><span>Sales Income:</span><span class="mono text-green">Rs. ${saleIncome.toFixed(2)}</span></div>
-            <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
-              <span>Daily Profit / Loss:</span>
-              <span class="mono ${saleIncome - (buyCost + huskCost) >= 0 ? 'text-green' : 'text-red'}" style="font-size:16px;font-weight:bold;">
-                Rs. ${(saleIncome - (buyCost + huskCost)).toFixed(2)}
-              </span>
-            </div>
-          `;
-        }
+        const dayWorkerPay = S.coconut_worker_payments.filter(p => p.date === sel);
 
         const sumHuskEl = document.getElementById('ccSumHusk');
         if (sumHuskEl) {
-          let hHtml = `<div style="font-size:11px;color:var(--t2);margin-bottom:8px;">Daily Transactions Summary:</div>`;
-          hHtml += `<div class="total-row"><span>Purchases Count:</span><span class="mono">${dayPurchases.length}</span></div>`;
-          hHtml += `<div class="total-row"><span>Husking Sessions:</span><span class="mono">${dayHusking.length}</span></div>`;
-          hHtml += `<div class="total-row"><span>Sales Count:</span><span class="mono">${daySales.length}</span></div>`;
-          sumHuskEl.innerHTML = hHtml;
+          sumHuskEl.innerHTML = `
+            <div style="font-size:11px;color:var(--t2);margin-bottom:8px;">Daily Activities Summary:</div>
+            <div class="total-row"><span>Purchases Count:</span><span class="mono">${dayPurchases.length}</span></div>
+            <div class="total-row"><span>Husking Sessions:</span><span class="mono">${dayHusking.length}</span></div>
+            <div class="total-row"><span>Copra Batches:</span><span class="mono">${dayCopra.length}</span></div>
+            <div class="total-row"><span>Oil Extraction Batches:</span><span class="mono">${dayOil.length}</span></div>
+            <div class="total-row"><span>Sales Count:</span><span class="mono">${daySales.length}</span></div>
+            <div class="total-row"><span>Wage Payments:</span><span class="mono">${dayWorkerPay.length}</span></div>
+          `;
         }
 
-        // --- Coconut Drawer Reconciliation ---
-        const dayPurchasesDraw = dayPurchases.reduce((a, p) => a + (p.paidDrawer || 0), 0);
-        const dayHuskingDraw = dayHusking.reduce((a, h) => a + (h.paidDrawer || 0), 0);
-        const daySalesDraw = daySales.filter(s => s.payMethod === 'cash').reduce((a, s) => a + (s.recDrawer || 0), 0);
+        // --- Coconut Drawer Cash Reconciliation ---
+        const drawBuyOut = dayPurchases.filter(p => p.payMethod === 'cash').reduce((a, p) => a + (p.paidDrawer || 0), 0);
+        const drawHuskOut = dayHusking.reduce((a, h) => a + (h.paidDrawer || 0), 0);
+        const drawCopraOut = dayCopra.reduce((a, c) => a + (c.paidDrawer || 0), 0);
+        const drawOilOut = dayOil.reduce((a, o) => a + (o.paidDrawer || 0), 0);
+        const drawSalesIn = daySales.filter(s => s.payMethod === 'cash').reduce((a, s) => a + (s.recDrawer || 0), 0);
+        const drawWorkerPayOut = dayWorkerPay.reduce((a, p) => a + (p.paidDrawer || 0), 0);
+        const drawSaleTransOut = daySales.reduce((a, s) => a + (s.transportPaidDrawer || 0), 0);
 
         const savedFloat = S.settings.coconutOpeningFloats?.[sel] || 0;
-        const expectedCash = savedFloat + daySalesDraw - (dayPurchasesDraw + dayHuskingDraw);
+        const expectedCash = savedFloat + drawSalesIn - (drawBuyOut + drawHuskOut + drawCopraOut + drawOilOut + drawWorkerPayOut + drawSaleTransOut);
 
         const registerEl = document.getElementById('ccCashRegister');
         if (registerEl) {
           registerEl.innerHTML = `
             <div class="total-row">
-              <span>Opening Float</span>
-              <div style="display:flex;align-items:center;gap:6px;">
-                <input type="number" id="ccOpeningFloatInput" value="${savedFloat}" style="width:100px;text-align:right;padding:3px;font-size:12px;background:var(--bg3);border:1px solid var(--border);" onchange="CoconutMgr.saveOpeningFloat(this.value)">
-              </div>
-            </div>
-            <div class="total-row"><span>+ Sales Income</span><span class="mono text-green">+ Rs. ${daySalesDraw.toFixed(2)}</span></div>
-            <div style="border-top: 1px dashed var(--border); margin: 4px 0;"></div>
-            <div class="total-row"><span>- Purchases</span><span class="mono text-red">- Rs. ${dayPurchasesDraw.toFixed(2)}</span></div>
-            <div class="total-row"><span>- Husking Cost</span><span class="mono text-red">- Rs. ${dayHuskingDraw.toFixed(2)}</span></div>
-            <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
-              <span>Expected in Coconut Drawer</span><span class="mono" style="color:var(--cyan);font-size:17px;">Rs. ${expectedCash.toFixed(2)}</span>
-            </div>
-            
-            <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
-            <div class="form-group" style="margin-bottom:8px;">
-              <label style="font-weight:bold;font-size:12px;">Actual Cash Counted</label>
-              <input type="number" id="ccActualCash" placeholder="0.00" style="font-size:18px;font-weight:900;color:var(--cyan);background:var(--bg2);border:1px solid var(--cyan);padding:8px;width:100%;border-radius:var(--r8);" oninput="CoconutMgr.calcDiff(${expectedCash})">
-            </div>
-            <div id="ccDiffRow" style="display:flex;justify-content:space-between;align-items:center;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:8px 12px;margin-top:10px;display:none;">
-              <span>Difference:</span>
-              <span id="ccDiffVal" class="mono" style="font-size:16px;font-weight:bold;">Rs. 0.00</span>
-            </div>
+               <span>Opening Float</span>
+               <div style="display:flex;align-items:center;gap:6px;">
+                 <input type="number" id="ccOpeningFloatInput" value="${savedFloat}" style="width:100px;text-align:right;padding:3px;font-size:12px;background:var(--bg3);border:1px solid var(--border);" onchange="CoconutMgr.saveOpeningFloat(this.value)">
+               </div>
+             </div>
+             <div class="total-row"><span>+ Sales Cash Income</span><span class="mono text-green">+ Rs. ${drawSalesIn.toFixed(2)}</span></div>
+             <div style="border-top: 1px dashed var(--border); margin: 4px 0;"></div>
+             <div class="total-row"><span>- Purchases (Cash)</span><span class="mono text-red">- Rs. ${drawBuyOut.toFixed(2)}</span></div>
+             <div class="total-row"><span>- Husking (Cash)</span><span class="mono text-red">- Rs. ${drawHuskOut.toFixed(2)}</span></div>
+             <div class="total-row"><span>- Copra batched cost (Cash)</span><span class="mono text-red">- Rs. ${drawCopraOut.toFixed(2)}</span></div>
+             <div class="total-row"><span>- Oil milled cost (Cash)</span><span class="mono text-red">- Rs. ${drawOilOut.toFixed(2)}</span></div>
+             <div class="total-row"><span>- Workers payroll (Cash)</span><span class="mono text-red">- Rs. ${drawWorkerPayOut.toFixed(2)}</span></div>
+             <div class="total-row"><span>- Delivery transport (Cash)</span><span class="mono text-red">- Rs. ${drawSaleTransOut.toFixed(2)}</span></div>
+             <div class="total-row grand" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+               <span>Expected in Coconut Drawer</span><span class="mono" style="color:var(--cyan);font-size:17px;">Rs. ${expectedCash.toFixed(2)}</span>
+             </div>
+             
+             <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
+             <div class="form-group" style="margin-bottom:8px;">
+               <label style="font-weight:bold;font-size:12px;">Actual Cash Counted</label>
+               <input type="number" id="ccActualCash" placeholder="0.00" style="font-size:18px;font-weight:900;color:var(--cyan);background:var(--bg2);border:1px solid var(--cyan);padding:8px;width:100%;border-radius:var(--r8);" oninput="CoconutMgr.calcDiff(${expectedCash})">
+             </div>
+             <div id="ccDiffRow" style="display:flex;justify-content:space-between;align-items:center;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:8px 12px;margin-top:10px;display:none;">
+               <span>Difference:</span>
+               <span id="ccDiffVal" class="mono" style="font-size:16px;font-weight:bold;">Rs. 0.00</span>
+             </div>
 
-            <div class="form-group" style="margin-top:10px;margin-bottom:8px;">
-              <label>Day End Note</label>
-              <input type="text" id="ccDayEndNote" placeholder="Enter a note..." style="font-size:12px;">
-            </div>
-            <button class="btn btn-primary w-full" style="margin-top:10px;" onclick="CoconutMgr.saveDayEnd(${expectedCash})">💾 Save Coconut Day End</button>
+             <div class="form-group" style="margin-top:10px;margin-bottom:8px;">
+               <label>Day End Note</label>
+               <input type="text" id="ccDayEndNote" placeholder="Enter a note..." style="font-size:12px;">
+             </div>
+             <button class="btn btn-primary w-full" style="margin-top:10px;" onclick="CoconutMgr.saveDayEnd(${expectedCash})">💾 Save Coconut Day End</button>
           `;
 
-          // Prefill actual cash and note if saved
           const savedCcDayEnd = S.day_ends.find(d => d.date === sel && d.type === 'coconut');
           if (savedCcDayEnd) {
             const actualInput = document.getElementById('ccActualCash');
@@ -5235,6 +5811,151 @@
             }
           }
         }
+
+        this.renderTransportAnalysis();
+      },
+
+      renderTransportAnalysis() {
+        const tDiv = document.getElementById('ccTransportAnalyzer');
+        if (!tDiv) return;
+
+        let purchaseTransport = 0;
+        let salesTransport = 0;
+        let totalNutsPurchased = 0;
+        let totalUnitsSold = 0;
+
+        S.coconut_purchases.forEach(p => {
+          purchaseTransport += (parseFloat(p.transportCost) || 0);
+          totalNutsPurchased += (parseInt(p.largeCount) || 0) + (parseInt(p.smallCount) || 0);
+        });
+
+        S.coconut_sales.forEach(s => {
+          salesTransport += (parseFloat(s.transportCost) || 0);
+          totalUnitsSold += (parseFloat(s.qty) || 0);
+        });
+
+        const totalTransport = purchaseTransport + salesTransport;
+        const avgBuyTransportPerNut = totalNutsPurchased > 0 ? purchaseTransport / totalNutsPurchased : 0;
+        const avgSaleTransportPerUnit = totalUnitsSold > 0 ? salesTransport / totalUnitsSold : 0;
+
+        let warningHtml = "";
+        if (avgBuyTransportPerNut > 5.00) {
+          warningHtml = `
+            <div style="background:rgba(239, 68, 68, 0.15); border:1px solid var(--red); color:var(--red); padding:10px; border-radius:var(--r8); margin-top:10px; font-size:11px; line-height:1.4;">
+              <strong>⚠️ High Transport Overhead:</strong> Buy transport cost is <strong>Rs. ${avgBuyTransportPerNut.toFixed(2)}</strong> per nut. Try to purchase larger loads to decrease unit transport cost.
+            </div>
+          `;
+        } else if (totalTransport > 0) {
+          warningHtml = `
+            <div style="background:rgba(6, 182, 212, 0.1); border:1px solid var(--cyan); color:var(--cyan); padding:10px; border-radius:var(--r8); margin-top:10px; font-size:11px; line-height:1.4;">
+              <strong>💡 Efficiency Tip:</strong> Try consolidating shipments or sharing truck capacity to bring transport cost below Rs. 3.00/nut.
+            </div>
+          `;
+        } else {
+          warningHtml = `
+            <div style="color:var(--t3); padding:10px; text-align:center; font-size:11px;">No transport costs registered.</div>
+          `;
+        }
+
+        tDiv.innerHTML = `
+          <div class="total-row"><span>Purchase Transport:</span><span class="mono">Rs. ${purchaseTransport.toFixed(2)}</span></div>
+          <div class="total-row"><span>Sales Transport:</span><span class="mono">Rs. ${salesTransport.toFixed(2)}</span></div>
+          <div class="total-row grand" style="margin-top:6px; padding-top:6px; border-top:1px solid var(--border);">
+            <span>Total Transport Cost:</span><span class="mono text-orange" style="font-weight:bold;">Rs. ${totalTransport.toFixed(2)}</span>
+          </div>
+          <div style="border-top:1px dashed var(--border); margin:8px 0;"></div>
+          <div class="total-row" style="font-size:11px; color:var(--t2);"><span>Avg Cost / Nut Bought:</span><span class="mono">Rs. ${avgBuyTransportPerNut.toFixed(2)}</span></div>
+          <div class="total-row" style="font-size:11px; color:var(--t2);"><span>Avg Cost / Unit Sold:</span><span class="mono">Rs. ${avgSaleTransportPerUnit.toFixed(2)}</span></div>
+          ${warningHtml}
+        `;
+      },
+
+      renderPLReport() {
+        const startEl = document.getElementById('ccPLStartDate');
+        const endEl = document.getElementById('ccPLEndDate');
+        const resEl = document.getElementById('ccPLReportResult');
+        if (!startEl || !endEl || !resEl) return;
+
+        const start = startEl.value;
+        const end = endEl.value;
+
+        if (!start || !end) {
+          resEl.innerHTML = `<div style="color:var(--t3); font-size:12px;">Please select both start and end dates.</div>`;
+          return;
+        }
+
+        const filterByDate = arr => arr.filter(x => x.date >= start && x.date <= end);
+        
+        const rangeBuy = filterByDate(S.coconut_purchases);
+        const rangeHusk = filterByDate(S.coconut_husking);
+        const rangeCopra = filterByDate(S.coconut_copra);
+        const rangeOil = filterByDate(S.coconut_oil);
+        const rangeSales = filterByDate(S.coconut_sales);
+
+        const buyCost = rangeBuy.reduce((a, p) => a + (p.total || 0), 0);
+        const buyTransport = rangeBuy.reduce((a, p) => a + (p.transportCost || 0), 0);
+        const huskCost = rangeHusk.reduce((a, h) => a + (h.total || 0), 0);
+        const copraDryingCost = rangeCopra.reduce((a, c) => a + (c.dryingCost || 0), 0);
+        const oilMillingCost = rangeOil.reduce((a, o) => a + (o.millingCost || 0), 0);
+        
+        let salesUnhusked = 0;
+        let salesHusked = 0;
+        let salesHusks = 0;
+        let salesShells = 0;
+        let salesCopra = 0;
+        let salesOil = 0;
+        let salesPoonac = 0;
+        let salesTransport = 0;
+
+        rangeSales.forEach(s => {
+          salesTransport += (s.transportCost || 0);
+          const total = s.total || 0;
+          if (s.type === 'unhusked') salesUnhusked += total;
+          else if (s.type === 'husked') salesHusked += total;
+          else if (s.type === 'husks') salesHusks += total;
+          else if (s.type === 'shells') salesShells += total;
+          else if (s.type === 'copra') salesCopra += total;
+          else if (s.type === 'oil') salesOil += total;
+          else if (s.type === 'poonac') salesPoonac += total;
+        });
+
+        const totalRevenue = salesUnhusked + salesHusked + salesHusks + salesShells + salesCopra + salesOil + salesPoonac;
+        const totalCosts = buyCost + huskCost + copraDryingCost + oilMillingCost + salesTransport;
+        const netProfit = totalRevenue - totalCosts;
+
+        resEl.innerHTML = `
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; background:var(--bg3); border:1px solid var(--border); padding:15px; border-radius:var(--r8);">
+             <div>
+               <h4 style="color:var(--green); border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:10px;">💰 Revenue / Sales</h4>
+               <div class="total-row"><span>Unhusked Coconuts:</span><span class="mono">Rs. ${salesUnhusked.toFixed(2)}</span></div>
+               <div class="total-row"><span>Husked Coconuts:</span><span class="mono">Rs. ${salesHusked.toFixed(2)}</span></div>
+               <div class="total-row"><span>Husks (ලෙලි):</span><span class="mono">Rs. ${salesHusks.toFixed(2)}</span></div>
+               <div class="total-row"><span>Shells (කටු):</span><span class="mono">Rs. ${salesShells.toFixed(2)}</span></div>
+               <div class="total-row"><span>Copra (කොප්පරා):</span><span class="mono">Rs. ${salesCopra.toFixed(2)}</span></div>
+               <div class="total-row"><span>Coconut Oil (තෙල්):</span><span class="mono">Rs. ${salesOil.toFixed(2)}</span></div>
+               <div class="total-row"><span>Poonac (පුන්නක්කු):</span><span class="mono">Rs. ${salesPoonac.toFixed(2)}</span></div>
+               <div style="border-top:1px dashed var(--border); margin:4px 0;"></div>
+               <div class="total-row grand"><span>Total Revenue:</span><span class="mono text-green" style="font-weight:bold;">Rs. ${totalRevenue.toFixed(2)}</span></div>
+             </div>
+             <div>
+               <h4 style="color:var(--red); border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:10px;">📉 Costs / Expenses</h4>
+               <div class="total-row"><span>Coconut Purchases:</span><span class="mono">Rs. ${buyCost.toFixed(2)}</span></div>
+               <div class="total-row" style="font-size:11px; color:var(--t3); padding-left:10px;"><span>└ purchase transport:</span><span class="mono">Rs. ${buyTransport.toFixed(2)}</span></div>
+               <div class="total-row"><span>Husking Wages Paid:</span><span class="mono">Rs. ${huskCost.toFixed(2)}</span></div>
+               <div class="total-row"><span>Copra Batches Cost:</span><span class="mono">Rs. ${copraDryingCost.toFixed(2)}</span></div>
+               <div class="total-row"><span>Oil Extraction Cost:</span><span class="mono">Rs. ${oilMillingCost.toFixed(2)}</span></div>
+               <div class="total-row"><span>Sales Delivery Transport:</span><span class="mono">Rs. ${salesTransport.toFixed(2)}</span></div>
+               <div style="border-top:1px dashed var(--border); margin:4px 0;"></div>
+               <div class="total-row grand"><span>Total Cost:</span><span class="mono text-red" style="font-weight:bold;">Rs. ${totalCosts.toFixed(2)}</span></div>
+             </div>
+             <div style="grid-column: span 2; border-top:1px solid var(--border); padding-top:12px; margin-top:5px; display:flex; justify-content:space-between; align-items:center;">
+               <strong style="font-size:14px;">Net Profit / Loss for Period:</strong>
+               <span class="mono ${netProfit >= 0 ? 'text-green' : 'text-red'}" style="font-size:18px; font-weight:bold;">
+                 Rs. ${netProfit.toFixed(2)}
+               </span>
+             </div>
+           </div>
+        `;
       },
 
       calcDiff(expected) {
@@ -5329,6 +6050,7 @@
               <th style="padding:6px 0;">Estate / Supplier</th>
               <th style="padding:6px 0;text-align:right;">Large</th>
               <th style="padding:6px 0;text-align:right;">Small</th>
+              <th style="padding:6px 0;text-align:right;">Transport</th>
               <th style="padding:6px 0;text-align:right;">Total Cost</th>
               <th style="padding:6px 0;text-align:right;">From Drawer</th>
               <th style="padding:6px 0;text-align:center;width:40px;">Action</th>
@@ -5337,9 +6059,10 @@
           <tbody>
             ${dayPurchases.map(p => `
               <tr style="border-bottom:1px solid var(--border2);">
-                <td style="padding:8px 0;font-weight:600;">${esc(p.estate)}</td>
+                <td style="padding:8px 0;font-weight:600;">${esc(p.estate)} <span style="font-size:9px;color:var(--t3)">(${esc(p.payMethod)})</span></td>
                 <td style="padding:8px 0;text-align:right;" class="mono">${p.largeCount} <span style="font-size:9px;color:var(--t3)">(@${p.largePrice})</span></td>
                 <td style="padding:8px 0;text-align:right;" class="mono">${p.smallCount} <span style="font-size:9px;color:var(--t3)">(@${p.smallPrice})</span></td>
+                <td style="padding:8px 0;text-align:right;color:var(--orange);" class="mono">Rs. ${(p.transportCost || 0).toFixed(2)}</td>
                 <td style="padding:8px 0;text-align:right;color:var(--orange);" class="mono">Rs. ${p.total.toFixed(2)}</td>
                 <td style="padding:8px 0;text-align:right;color:var(--red);" class="mono">Rs. ${(p.paidDrawer || 0).toFixed(2)}</td>
                 <td style="padding:8px 0;text-align:center;">
@@ -5351,32 +6074,192 @@
         </table>`;
       },
 
-      renderHuskList() {
+      renderProcessingLists() {
+        const selDate = document.getElementById('coconutDate')?.value || new Date().toISOString().split('T')[0];
+        
+        // 1. Husking list
+        const huskEl = document.getElementById('ccHuskList');
+        if (huskEl) {
+          const dayHusk = S.coconut_husking.filter(h => h.date === selDate);
+          if (!dayHusk.length) {
+            huskEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:10px;font-size:11px;">No husking logs.</div>`;
+          } else {
+            huskEl.innerHTML = `<table style="width:100%;font-size:11px;border-collapse:collapse;">
+              <tbody>
+                ${dayHusk.map(h => `
+                  <tr style="border-bottom:1px solid var(--border2);">
+                    <td style="padding:6px 0;"><strong>${esc(h.worker)}</strong>: ${h.count} nuts</td>
+                    <td style="padding:6px 0;text-align:right;" class="mono">Rs. ${h.total.toFixed(2)}</td>
+                    <td style="padding:6px 0;text-align:center;width:30px;">
+                      <button class="btn btn-danger btn-xs" style="padding:1px 4px;font-size:10px;" onclick="CoconutMgr.deleteHusking('${h.id}')">🗑️</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>`;
+          }
+        }
+
+        // 2. Copra list
+        const copraEl = document.getElementById('ccCopraList');
+        if (copraEl) {
+          const dayCopra = S.coconut_copra.filter(c => c.date === selDate);
+          if (!dayCopra.length) {
+            copraEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:10px;font-size:11px;">No copra logs.</div>`;
+          } else {
+            copraEl.innerHTML = `<table style="width:100%;font-size:11px;border-collapse:collapse;">
+              <tbody>
+                ${dayCopra.map(c => `
+                  <tr style="border-bottom:1px solid var(--border2);">
+                    <td style="padding:6px 0;">Used: ${c.nutsUsed} nuts, Yielded: ${c.copraWeight}kg copra, ${c.shellsQty}${c.shellsUnit} shells</td>
+                    <td style="padding:6px 0;text-align:right;" class="mono">Rs. ${c.dryingCost.toFixed(2)}</td>
+                    <td style="padding:6px 0;text-align:center;width:30px;">
+                      <button class="btn btn-danger btn-xs" style="padding:1px 4px;font-size:10px;" onclick="CoconutMgr.deleteCopra('${c.id}')">🗑️</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>`;
+          }
+        }
+
+        // 3. Oil list
+        const oilEl = document.getElementById('ccOilList');
+        if (oilEl) {
+          const dayOil = S.coconut_oil.filter(o => o.date === selDate);
+          if (!dayOil.length) {
+            oilEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:10px;font-size:11px;">No oil milling logs.</div>`;
+          } else {
+            oilEl.innerHTML = `<table style="width:100%;font-size:11px;border-collapse:collapse;">
+              <tbody>
+                ${dayOil.map(o => `
+                  <tr style="border-bottom:1px solid var(--border2);">
+                    <td style="padding:6px 0;">Milled: ${o.copraUsed}kg, Yielded: ${o.oilQty}L oil, ${o.poonacQty}kg poonac</td>
+                    <td style="padding:6px 0;text-align:right;" class="mono">Rs. ${o.millingCost.toFixed(2)}</td>
+                    <td style="padding:6px 0;text-align:center;width:30px;">
+                      <button class="btn btn-danger btn-xs" style="padding:1px 4px;font-size:10px;" onclick="CoconutMgr.deleteOil('${o.id}')">🗑️</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>`;
+          }
+        }
+      },
+
+      renderSaleList() {
         const sel = document.getElementById('coconutDate')?.value || new Date().toISOString().split('T')[0];
-        const listEl = document.getElementById('ccHuskList');
+        const listEl = document.getElementById('ccSaleList');
         if (!listEl) return;
 
-        const dayHusking = S.coconut_husking.filter(h => h.date === sel);
-        if (!dayHusking.length) {
-          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">No husking records found for this date.</div>`;
+        const daySales = S.coconut_sales.filter(s => s.date === sel);
+        if (!daySales.length) {
+          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">No sales recorded on this date.</div>`;
           return;
         }
 
         listEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
           <thead>
             <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
-              <th style="padding:6px 0;">Worker</th>
-              <th style="padding:6px 0;text-align:right;">Qty Husked</th>
+              <th style="padding:6px 0;">Buyer</th>
+              <th style="padding:6px 0;">Type</th>
+              <th style="padding:6px 0;text-align:right;">Qty</th>
               <th style="padding:6px 0;text-align:right;">Rate</th>
+              <th style="padding:6px 0;text-align:right;">Transport</th>
               <th style="padding:6px 0;text-align:right;">Total</th>
-              <th style="padding:6px 0;text-align:right;">From Drawer</th>
+              <th style="padding:6px 0;text-align:right;">To Drawer</th>
               <th style="padding:6px 0;text-align:center;width:40px;">Action</th>
             </tr>
           </thead>
           <tbody>
-            ${dayHusking.map(h => `
+            ${daySales.map(s => `
               <tr style="border-bottom:1px solid var(--border2);">
-                <td style="padding:8px 0;font-weight:600;">${esc(h.worker)}</td>
+                <td style="padding:8px 0;font-weight:600;">${esc(s.buyer)}</td>
+                <td style="padding:8px 0;"><span class="badge badge-cyan" style="text-transform:capitalize;">${esc(s.type)}</span></td>
+                <td style="padding:8px 0;text-align:right;" class="mono">${s.qty}</td>
+                <td style="padding:8px 0;text-align:right;" class="mono">Rs. ${s.price.toFixed(2)}</td>
+                <td style="padding:8px 0;text-align:right;color:var(--orange);" class="mono">Rs. ${(s.transportCost || 0).toFixed(2)}</td>
+                <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${s.total.toFixed(2)}</td>
+                <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${(s.recDrawer || 0).toFixed(2)} <span style="font-size:8px;color:var(--t3)">(${esc(s.payMethod)})</span></td>
+                <td style="padding:8px 0;text-align:center;">
+                  <button class="btn btn-danger btn-xs" style="padding:2px 5px;" onclick="CoconutMgr.deleteSale('${s.id}')">🗑️</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+      },
+
+      renderPayroll() {
+        const listEl = document.getElementById('ccWorkersLedger');
+        const paysEl = document.getElementById('ccPaymentsList');
+        if (!listEl || !paysEl) return;
+
+        const workerLedger = S.coconut_workers.map(w => {
+          const earnings = S.coconut_husking.filter(h => h.workerId === w.id).reduce((a, h) => a + (h.total || 0), 0);
+          const paid = S.coconut_worker_payments.filter(p => p.workerId === w.id).reduce((a, p) => a + (p.amount || 0), 0);
+          const balance = earnings - paid;
+          return { ...w, earnings, paid, balance };
+        });
+
+        if (!workerLedger.length) {
+          listEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:20px;font-size:12px;">No workers registered yet.</div>`;
+        } else {
+          listEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
+                <th style="padding:6px 0;">Worker Name</th>
+                <th style="padding:6px 0;">Phone</th>
+                <th style="padding:6px 0;text-align:right;">Total Earned</th>
+                <th style="padding:6px 0;text-align:right;">Total Paid</th>
+                <th style="padding:6px 0;text-align:right;">Outstanding Due</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${workerLedger.map(w => `
+                <tr style="border-bottom:1px solid var(--border2);">
+                  <td style="padding:8px 0;font-weight:600;">${esc(w.name)}</td>
+                  <td style="padding:8px 0;">${esc(w.phone || '--')}</td>
+                  <td style="padding:8px 0;text-align:right;color:var(--cyan);" class="mono">Rs. ${w.earnings.toFixed(2)}</td>
+                  <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${w.paid.toFixed(2)}</td>
+                  <td style="padding:8px 0;text-align:right;color:${w.balance > 0 ? 'var(--orange)' : 'var(--t3)'};font-weight:bold;" class="mono">Rs. ${w.balance.toFixed(2)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>`;
+        }
+
+        const selDate = document.getElementById('coconutDate')?.value || new Date().toISOString().split('T')[0];
+        const dayPayments = S.coconut_worker_payments.filter(p => p.date === selDate);
+
+        if (!dayPayments.length) {
+          paysEl.innerHTML = `<div style="color:var(--t3);text-align:center;padding:15px;font-size:12px;">No wage payments recorded today.</div>`;
+        } else {
+          paysEl.innerHTML = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border);text-align:left;color:var(--t3);">
+                <th style="padding:6px 0;">Worker Name</th>
+                <th style="padding:6px 0;text-align:right;">Wages Paid</th>
+                <th style="padding:6px 0;text-align:right;">From Drawer</th>
+                <th style="padding:6px 0;text-align:center;width:40px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${dayPayments.map(p => `
+                <tr style="border-bottom:1px solid var(--border2);">
+                  <td style="padding:8px 0;font-weight:600;">${esc(p.workerName)}</td>
+                  <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${p.amount.toFixed(2)}</td>
+                  <td style="padding:8px 0;text-align:right;color:var(--red);" class="mono">Rs. ${(p.paidDrawer || 0).toFixed(2)}</td>
+                  <td style="padding:8px 0;text-align:center;">
+                    <button class="btn btn-danger btn-xs" style="padding:2px 5px;" onclick="CoconutMgr.deleteWorkerPayment('${p.id}')">🗑️</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>`;
+        }
+      }
+    };               <td style="padding:8px 0;font-weight:600;">${esc(h.worker)}</td>
                 <td style="padding:8px 0;text-align:right;" class="mono">${h.count}</td>
                 <td style="padding:8px 0;text-align:right;" class="mono">Rs. ${h.rate.toFixed(2)}</td>
                 <td style="padding:8px 0;text-align:right;color:var(--red);" class="mono">Rs. ${h.total.toFixed(2)}</td>
