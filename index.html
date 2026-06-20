@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="RCM POS">
   <meta name="theme-color" content="#060814">
-  <title>RMC POS</title>
+  <title>C_M POS</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
@@ -1937,7 +1937,7 @@
       word-break: break-word;
     }
 
-    .receipt-footer-shop {
+    .receipt-footer-Home {
       font-size: 12px;
       font-weight: 800;
       color: #111827;
@@ -3660,7 +3660,7 @@
           <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
         </g>
       </svg>
-      RMC POS
+      C_M POS
     </div>
     <div class="spinner"></div>
     <div class="loader-text" id="loaderText">Initializing System...</div>
@@ -3690,7 +3690,7 @@
             <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
           </g>
         </svg>
-        <span class="nav-brand" style="margin-right:0;font-size:14px;font-weight:900;"> RMC POS</span>
+        <span class="nav-brand" style="margin-right:0;font-size:14px;font-weight:900;"> C_M POS</span>
       </div>
       <button class="btn btn-ghost btn-icon" onclick="Nav.closeMenu()" style="padding:4px; font-size:16px;">✕</button>
     </div>
@@ -4799,7 +4799,7 @@
       coconut_purchases: [], coconut_husking: [], coconut_sales: [], cash_movements: [], day_ends: [],
       coconut_copra: [], coconut_oil: [], coconut_workers: [], coconut_worker_payments: [],
       loans: [], loan_customers: [],
-      settings: { shopName: '  Chicken Shop', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.', apiServerUrl: '' },
+      settings: { HomeName: '  Chicken Shop', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.', apiServerUrl: '' },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
       activeCat: 'all', adminUnlocked: false, pollTimer: null,
       isOnline: false,
@@ -5190,7 +5190,7 @@
         let st = await DB.get('settings/main');
         if (!st || !Object.keys(st).length) {
           st = {
-            shopName: '  Chicken Shop',
+            HomeName: '  Chicken Shop',
             adminPin: '1234',
             currency: 'Rs.',
             lowStockAlert: 5,
@@ -5677,7 +5677,7 @@
   <style>
     body { font-family: sans-serif; padding: 20px; color: #111; max-width: 400px; margin: 0 auto; }
     .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-    .shop-name { font-size: 20px; font-weight: bold; }
+    .Home-name { font-size: 20px; font-weight: bold; }
     .title { font-size: 14px; text-transform: uppercase; margin-top: 5px; color: #555; }
     .info-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
     .table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
@@ -5690,7 +5690,7 @@
 </head>
 <body>
   <div class="header">
-    <div class="shop-name">${esc(S.settings.shopName || 'ShoppingLK Coconut Wholesaler')}</div>
+    <div class="Home-name">${esc(S.settings.HomeName || 'ShoppingLK Coconut Wholesaler')}</div>
     <div class="title">COCONUT PURCHASE VOUCHER</div>
   </div>
   <div class="info-row"><span>Bill ID:</span><strong>${p.billId || p.id}</strong></div>
@@ -6075,7 +6075,7 @@
   <style>
     body { font-family: sans-serif; padding: 20px; color: #111; max-width: 400px; margin: 0 auto; }
     .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-    .shop-name { font-size: 20px; font-weight: bold; }
+    .Home-name { font-size: 20px; font-weight: bold; }
     .title { font-size: 14px; text-transform: uppercase; margin-top: 5px; color: #555; }
     .info-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
     .table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
@@ -6088,7 +6088,7 @@
 </head>
 <body>
   <div class="header">
-    <div class="shop-name">${esc(S.settings.shopName || 'ShoppingLK Coconut Wholesaler')}</div>
+    <div class="Home-name">${esc(S.settings.HomeName || 'ShoppingLK Coconut Wholesaler')}</div>
     <div class="title">COCONUT WHOLESALE INVOICE</div>
   </div>
   <div class="info-row"><span>Invoice ID:</span><strong>${s.billId || s.id}</strong></div>
@@ -7501,18 +7501,18 @@
 
     const ReceiptFormatter = {
       width: 42,
-      shopName() {
-        const raw = String(S.settings.shopName || '').trim();
+      HomeName() {
+        const raw = String(S.settings.HomeName || '').trim();
         if (!raw || /[^\x00-\x7F]/.test(raw)) return '  Chicken Shop';
         return raw;
       },
       footerNote() {
-        const shop = this.shopName();
+        const Home = this.HomeName();
         const raw = String(S.settings.receiptNote || '').replace(/\r/g, '');
         const lines = raw.split('\n')
           .map(line => line.trim())
           .filter(line => line && !/[^\x00-\x7F]/.test(line))
-          .filter(line => line.toLowerCase() !== shop.toLowerCase());
+          .filter(line => line.toLowerCase() !== Home.toLowerCase());
         const ensureLine = (text) => {
           if (!lines.some(line => line.toLowerCase() === text.toLowerCase())) {
             lines.push(text);
@@ -7592,7 +7592,7 @@
       },
       buildText(sale) {
         const lines = [
-          this.center(this.shopName()),
+          this.center(this.HomeName()),
           this.center(`(${this.dateText(sale)})`),
           this.center(this.billId(sale)),
           '-'.repeat(this.width)
@@ -7613,7 +7613,7 @@
           lines.push(this.line('Change Due', this.money(sale.changeDue)));
         }
         lines.push('');
-        lines.push(this.center(this.shopName()));
+        lines.push(this.center(this.HomeName()));
         this.footerNote().split('\n').forEach(line => {
           this.wrap(line).forEach(part => lines.push(this.center(part)));
         });
@@ -7630,7 +7630,7 @@
           </div>`).join('');
         return `<div class="receipt">
           <div class="receipt-h">
-            <div class="receipt-title">${esc(this.shopName())}</div>
+            <div class="receipt-title">${esc(this.HomeName())}</div>
             <div class="receipt-sub">(${esc(this.dateText(sale))})</div>
             <div class="receipt-bill">${esc(this.billId(sale))}</div>
           </div>
@@ -7647,7 +7647,7 @@
             ` : ''}
           </div>
           <div class="r-footer">
-            <div class="receipt-footer-shop">${esc(this.shopName())}</div>
+            <div class="receipt-footer-Home">${esc(this.HomeName())}</div>
             <div>${esc(this.footerNote())}</div>
           </div>
         </div>`;
@@ -7856,9 +7856,9 @@
         const payDetails = window._lastPaymentDetails || { payMethod: 'cash', cashReceived: total, changeDue: 0 };
 
         // Build receipt text for storage
-        const cur = S.settings.currency; const shop = S.settings.shopName;
+        const cur = S.settings.currency; const Home = S.settings.HomeName;
         const dateStr = billDate.toLocaleString();
-        let receiptText = `${shop}\n${dateStr}\n${billId}\n${'─'.repeat(32)}\n`;
+        let receiptText = `${Home}\n${dateStr}\n${billId}\n${'─'.repeat(32)}\n`;
         saleItems.forEach(si => {
           receiptText += `${si.name}${si.saleMode === 'wholesale' ? ' [WS]' : ''}\n  ${si.qty} × ${cur}${si.unitPrice.toFixed(2)} = ${cur}${(si.price || 0).toFixed(2)}\n`;
         });
@@ -7899,7 +7899,7 @@
     // ── RECEIPT ─────────────────────────────
     const Receipt = {
       show(sale) {
-        const cur = S.settings.currency; const shop = S.settings.shopName;
+        const cur = S.settings.currency; const Home = S.settings.HomeName;
         const date = new Date(sale.date).toLocaleString();
         const ih = (sale.items || []).map(si => {
           const qtyVal = si.qty || 0;
@@ -7915,7 +7915,7 @@
         }).join('');
         document.getElementById('receiptBody').innerHTML = `<div class="receipt">
       <div class="receipt-h">
-        <div class="receipt-title">${esc(shop)}</div>
+        <div class="receipt-title">${esc(Home)}</div>
         <div class="receipt-sub">${date}</div>
         <div style="font-size:10px;font-weight:700;color:#333;margin-top:4px;letter-spacing:0.5px;">🧾 ${esc(sale.billId || ('Sale #' + (sale.id || '').slice(-8)))}</div>
       </div>
@@ -7932,7 +7932,7 @@
         ` : ''}
       </div>
       <div class="r-footer">
-        <div style="font-size:12px;font-weight:bold;margin-bottom:2px;word-break:break-word;white-space:normal;text-align:center;">${esc(shop)}</div>
+        <div style="font-size:12px;font-weight:bold;margin-bottom:2px;word-break:break-word;white-space:normal;text-align:center;">${esc(Home)}</div>
         <div style="font-size:11px;margin-top:4px;white-space:pre-wrap;word-break:break-word;">${esc(S.settings.receiptNote || '')}</div>
       </div>
     </div>`;
@@ -8369,7 +8369,7 @@
         const codes = this._getSelectedCodes();
         if (!codes.length) { toast('First generate barcodes, then print.', 'error'); return; }
 
-        const shop = esc(S.settings.shopName);
+        const Home = esc(S.settings.HomeName);
         const cur = S.settings.currency;
 
         let rows = '';
@@ -8379,7 +8379,7 @@
 
           const lbl1 = c1 ? `
         <div class="sticker">
-          <div class="s-shop">${shop}</div>
+          <div class="s-Home">${Home}</div>
           ${c1.price ? `<div class="s-price">${cur} ${parseFloat(c1.price).toFixed(2)}</div>` : `<div class="s-price">&nbsp;</div>`}
           <svg id="sr${i}"></svg>
           <div class="s-num">${c1.code}</div>
@@ -8387,7 +8387,7 @@
 
           const lbl2 = c2 ? `
         <div class="sticker">
-          <div class="s-shop">${shop}</div>
+          <div class="s-Home">${Home}</div>
           ${c2.price ? `<div class="s-price">${cur} ${parseFloat(c2.price).toFixed(2)}</div>` : `<div class="s-price">&nbsp;</div>`}
           <svg id="sr${i + 1}"></svg>
           <div class="s-num">${c2.code}</div>
@@ -8407,7 +8407,7 @@
         pw.document.write(`<!DOCTYPE html>
 <html><head>
 <meta charset="UTF-8">
-<title>Barcodes Roll — ${shop}</title>
+<title>Barcodes Roll — ${Home}</title>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
 <style>
   @page{size: 80mm auto; margin:0;}
@@ -8430,7 +8430,7 @@
     padding: 0 1.5mm;
   }
   .sticker.empty { visibility: hidden; }
-  .s-shop { font-size: 6.5pt; font-weight: bold; margin-bottom: 0.3mm; color:#222; line-height: 1; }
+  .s-Home { font-size: 6.5pt; font-weight: bold; margin-bottom: 0.3mm; color:#222; line-height: 1; }
   .s-price { font-size: 7.5pt; font-weight: 900; margin-bottom: 0.3mm; color:#000; line-height: 1; }
   svg { width: 100%; max-width: 34mm; height: auto; max-height: 9mm; display: block; }
   .s-num { font-family:'Courier New',monospace; font-size: 6pt; font-weight: bold; margin-top: 0.3mm; line-height: 1; }
@@ -8462,13 +8462,13 @@ window.onload=function(){
         const labels = [...codes];
         while (labels.length < 40) labels.push(null);
 
-        const shop = esc(S.settings.shopName);
+        const Home = esc(S.settings.HomeName);
         const cur = S.settings.currency;
 
         const cells = labels.map((item, idx) => {
           if (!item) return `<div class="label empty"></div>`;
           return `<div class="label">
-        <div class="lshop">${shop}</div>
+        <div class="lHome">${Home}</div>
         ${item.price ? `<div class="lprice">${cur} ${parseFloat(item.price).toFixed(2)}</div>` : `<div class="lprice">&nbsp;</div>`}
         <svg id="s${idx}"></svg>
         <div class="lnum">${item.code}</div>
@@ -8486,7 +8486,7 @@ window.onload=function(){
         pw.document.write(`<!DOCTYPE html>
 <html><head>
 <meta charset="UTF-8">
-<title>Barcodes — ${shop}</title>
+<title>Barcodes — ${Home}</title>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
 <style>
   @page{size:A4 portrait;margin:5mm 6mm}
@@ -8507,7 +8507,7 @@ window.onload=function(){
     text-align:center;overflow:hidden;
   }
   .label.empty{border:0.5px dashed #ddd;background:#f9f9f9;}
-  .lshop { font-size: 6pt; font-weight: bold; margin-bottom: 0.5mm; color:#222; }
+  .lHome { font-size: 6pt; font-weight: bold; margin-bottom: 0.5mm; color:#222; }
   .lprice { font-size: 8pt; font-weight: 900; margin-bottom: 0.5mm; color:#000; }
   svg{width:100%;height:auto;display:block;max-height:22mm;}
   .lnum{font-family:'Courier New',monospace;font-size:5.5pt;color:#333;margin-top:1mm;letter-spacing:0.5px;}
@@ -8519,7 +8519,7 @@ window.onload=function(){
 </style>
 </head>
 <body>
-<div class="hdr">${shop} &nbsp;•&nbsp; ${codes.length} barcode stickers &nbsp;•&nbsp; ${new Date().toLocaleDateString()}</div>
+<div class="hdr">${Home} &nbsp;•&nbsp; ${codes.length} barcode stickers &nbsp;•&nbsp; ${new Date().toLocaleDateString()}</div>
 <div class="grid">${cells}</div>
 <script>
 window.onload=function(){
@@ -9233,14 +9233,14 @@ window.onload=function(){
           return;
         }
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
+        const Home = (S.settings.HomeName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.HomeName;
         const date = new Date(sale.date).toLocaleString();
         const ESC = 0x1B; const LF = 0x0A; const GS = 0x1D;
 
         const enc = new TextEncoder();
 
         // Header (Centered)
-        let head = `${shop}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
+        let head = `${Home}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
         const headBytes = enc.encode(head);
 
         // Items (Left-aligned)
@@ -9317,9 +9317,9 @@ window.onload=function(){
 
       _buildReceiptText(sale) {
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
+        const Home = (S.settings.HomeName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.HomeName;
         const date = new Date(sale.date).toLocaleString();
-        let text = `${shop}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
+        let text = `${Home}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
         (sale.items || []).forEach(si => {
           const m = si.saleMode === 'wholesale' ? '[WS]' : '';
           text += `${si.name} ${m}\n  ${si.qty} x ${si.unitPrice?.toFixed(2)} = ${cur} ${(si.price || 0).toFixed(2)}\n`;
@@ -9328,7 +9328,7 @@ window.onload=function(){
         if (sale.cartDiscount > 0) text += `Discount: -${cur} ${sale.cartDiscount.toFixed(2)}\n`;
         text += `TOTAL: ${cur} ${(sale.total || 0).toFixed(2)}\n\n`;
 
-        let rawNote = S.settings.receiptNote || shop;
+        let rawNote = S.settings.receiptNote || Home;
         if (rawNote.includes('  Chicken Shop')) {
           rawNote = rawNote
             .replace(/  Chicken Shop/g, '  Chicken Shop')
@@ -9390,10 +9390,10 @@ window.onload=function(){
 
         if (type === 'pos') {
           const cur = S.settings.currency;
-          const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
+          const Home = (S.settings.HomeName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.HomeName;
           const date = new Date(data.date).toLocaleString();
 
-          centerText(shop, "4", y); y += 40;
+          centerText(Home, "4", y); y += 40;
           centerText(date, "2", y); y += 24;
           centerText(`Sale #${(data.id || '').slice(-8)}`, "2", y); y += 30;
           drawLine(y); y += 15;
@@ -9758,7 +9758,7 @@ window.onload=function(){
           tx.oncomplete = async () => {
             // 3. Save default settings locally
             const defaultSettings = {
-              shopName: '  Chicken Shop',
+              HomeName: '  Chicken Shop',
               adminPin: '1234',
               currency: 'Rs.',
               lowStockAlert: 5,
@@ -9868,7 +9868,7 @@ window.onload=function(){
     const Settings = {
       open() {
         document.getElementById('settingsBody').innerHTML = `
-      <div class="form-group"><label>Shop Name</label><input id="setName" type="text" value="${esc(S.settings.shopName)}"></div>
+      <div class="form-group"><label>Shop Name</label><input id="setName" type="text" value="${esc(S.settings.HomeName)}"></div>
       <div class="grid-2">
         <div class="form-group"><label>Currency Symbol</label><input id="setCur" type="text" value="${esc(S.settings.currency)}"></div>
         <div class="form-group"><label>Low Stock Alert</label><input id="setLow" type="number" value="${S.settings.lowStockAlert || 5}" min="0"></div>
@@ -9931,7 +9931,7 @@ window.onload=function(){
         toast('PIN changed ✅', 'success');
       },
       async save() {
-        S.settings.shopName = document.getElementById('setName').value;
+        S.settings.HomeName = document.getElementById('setName').value;
         S.settings.currency = document.getElementById('setCur').value;
         S.settings.lowStockAlert = parseInt(document.getElementById('setLow').value) || 5;
         S.settings.receiptNote = document.getElementById('setNote').value;
