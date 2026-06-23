@@ -20,6 +20,11 @@
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="html5-qrcode.min.js"></script>
+  <!-- Firebase App & Auth SDK (v9 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
       --bg: #060814;
@@ -3637,10 +3642,289 @@
     .goog-te-gadget { display: none !important; }
     body { top: 0 !important; position: static !important; }
     html body { margin-top: 0 !important; }
+
+    /* ── Enterprise Additions ── */
+    #loginScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(11, 14, 36, 0.96) 0%, rgba(6, 8, 20, 0.99) 100%);
+      backdrop-filter: blur(25px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    #loginScreen.hide {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.05);
+    }
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      padding: 30px;
+      border-radius: var(--r20);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border2);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+    .login-brand {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--t1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .login-brand span {
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .login-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .login-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--t2);
+    }
+    .login-group input {
+      padding: 12px;
+      border-radius: var(--r8);
+      border: 1px solid var(--border2);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--t1);
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .login-group input:focus {
+      outline: none;
+      border-color: var(--cyan);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+    }
+    .login-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .login-remember {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--t2);
+      cursor: pointer;
+    }
+    .login-forgot {
+      color: var(--cyan);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .login-forgot:hover {
+      text-decoration: underline;
+    }
+    .login-btn {
+      padding: 12px;
+      border-radius: var(--r8);
+      border: none;
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan2) 100%);
+      color: #000;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: var(--glow-cyan);
+    }
+    .login-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
+    }
+    
+    /* Session bar */
+    .session-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: var(--r12);
+      margin-bottom: 12px;
+      font-size: 13px;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .session-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .session-badge {
+      padding: 3px 8px;
+      border-radius: var(--r8);
+      font-weight: 700;
+      font-size: 11px;
+    }
+    .session-badge.open {
+      background: var(--green2);
+      color: var(--green);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    .session-badge.closed {
+      background: var(--red2);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    
+    /* Customer Strip */
+    .customer-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 6px 12px;
+      border-radius: var(--r8);
+      border: 1px solid var(--border);
+    }
+    .customer-strip select {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--t1);
+      font-family: inherit;
+      font-size: 12px;
+      outline: none;
+    }
+    .customer-strip select option {
+      background: var(--bg2);
+      color: var(--t1);
+    }
+    
+    /* User Avatar and Branch indicator */
+    .user-avatar-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border2);
+      font-size: 12px;
+    }
+    .user-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--purple);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+    }
+    
+    /* Hold list style */
+    .hold-bar {
+      display: flex;
+      gap: 6px;
+      padding: 0 20px 10px 20px;
+    }
+    .held-sale-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-radius: var(--r8);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    
+    /* Analytics container */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      padding: 16px;
+    }
+    .chart-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r12);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 250px;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Fullscreen Login Screen -->
+  <div id="loginScreen">
+    <div class="login-card">
+      <div class="login-brand">
+        <svg width="48" height="48" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="rcmLoginGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00f2fe" />
+              <stop offset="100%" stop-color="#d946ef" />
+            </linearGradient>
+          </defs>
+          <rect width="100" height="100" rx="22" fill="#0b0e24" stroke="url(#rcmLoginGrad)" stroke-width="5" />
+          <g transform="translate(15, 15) scale(0.7)">
+            <path d="M40,10 C35,0 45,0 50,8 C55,0 65,0 60,10 C65,10 70,15 65,22 L35,22 Z" fill="#ef4444" />
+            <path d="M75,35 L62,30 L62,40 Z" fill="#fbbf24" />
+            <path d="M30,30 C30,22 42,20 50,20 C58,20 70,22 70,30 C70,38 65,45 65,52 C65,65 58,75 50,75 C42,75 35,65 35,52 C35,45 30,38 30,30 Z" fill="none" stroke="url(#rcmLoginGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="58" cy="32" r="3" fill="#f8fafc" />
+            <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
+          </g>
+        </svg>
+        <span>Chicken House <span>POS</span></span>
+      </div>
+      <div class="login-group">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="admin@chickenpos.com" autofocus>
+      </div>
+      <div class="login-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••">
+      </div>
+      <div class="login-options">
+        <label class="login-remember">
+          <input type="checkbox" id="loginRemember" checked style="width:auto;"> Remember me
+        </label>
+        <span class="login-forgot" onclick="AuthMgr.forgotPassword()">Forgot Password?</span>
+      </div>
+      <button class="login-btn" onclick="AuthMgr.login()">🔑 Sign In</button>
+      <div id="loginError" style="color:var(--red); font-size:12px; text-align:center; display:none;"></div>
+    </div>
+  </div>
 
   <div id="loader">
     <div class="loader-brand" style="display:flex;align-items:center;gap:12px;justify-content:center;">
@@ -3704,8 +3988,10 @@
       <div class="nav-tab" data-tab="returns" onclick="Nav.go('returns'); Nav.closeMenu()" data-lang="returns">🔄
         Returns</div>
       <div class="nav-tab" data-tab="coconut" onclick="Nav.go('coconut'); Nav.closeMenu()">🥥 Coconut</div>
-      <div class="nav-tab" data-tab="dayend" onclick="Nav.go('dayend'); Nav.closeMenu()" data-lang="dayend">📊 Day End
-      </div>
+      <div class="nav-tab" data-tab="customers" onclick="Nav.go('customers'); Nav.closeMenu()">👥 Customers</div>
+      <div class="nav-tab" data-tab="warranty" onclick="Nav.go('warranty'); Nav.closeMenu()">🛡️ Warranty</div>
+      <div class="nav-tab" data-tab="analytics" onclick="Nav.go('analytics'); Nav.closeMenu()">📈 Analytics</div>
+      <div class="nav-tab" data-tab="dayend" onclick="Nav.go('dayend'); Nav.closeMenu()" data-lang="dayend">📊 Day End</div>
       <div class="nav-tab" data-tab="admin" onclick="Nav.go('admin'); Nav.closeMenu()" data-lang="admin">🔐 Admin</div>
     </div>
   </div>
@@ -3744,6 +4030,9 @@
         <div class="nav-tab" data-tab="loans" onclick="Nav.go('loans')" data-lang="loans">💳 Loans</div>
         <div class="nav-tab" data-tab="returns" onclick="Nav.go('returns')" data-lang="returns">🔄 Returns</div>
         <div class="nav-tab" data-tab="coconut" onclick="Nav.go('coconut')">🥥 Coconut</div>
+        <div class="nav-tab" data-tab="customers" onclick="Nav.go('customers')">👥 Customers</div>
+        <div class="nav-tab" data-tab="warranty" onclick="Nav.go('warranty')">🛡️ Warranty</div>
+        <div class="nav-tab" data-tab="analytics" onclick="Nav.go('analytics')">📈 Analytics</div>
         <div class="nav-tab" data-tab="dayend" onclick="Nav.go('dayend')" data-lang="dayend">📊 Day End</div>
         <div class="nav-tab" data-tab="admin" onclick="Nav.go('admin')" data-lang="admin">🔐 Admin</div>
       </div>
@@ -3752,6 +4041,14 @@
         <div class="bt-dot" id="btDot" title="Bluetooth Printer"></div>
         <div class="sync-dot" id="syncDot" title="Firebase sync"></div>
         <div class="clock-display" id="clock">00:00:00</div>
+        
+        <!-- User Badge & Logout -->
+        <div class="user-avatar-badge" id="navUserBadge" style="display:none; margin-right:8px;">
+          <div class="user-avatar" id="navUserInitials">A</div>
+          <span id="navUserName" style="font-weight:600;">Admin</span>
+          <span id="navBranchName" class="badge badge-purple" style="font-size:10px;">Main</span>
+          <button class="btn btn-ghost btn-xs" onclick="AuthMgr.logout()" title="Logout" style="padding:2px 6px; border:none; background:transparent;">🚪</button>
+        </div>
         <!-- Google Translate Button -->
         <button class="gt-btn" id="gtNavBtn" onclick="GT.toggle()" title="Translate App">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -3768,6 +4065,20 @@
 
       <!-- POS TAB -->
       <div class="tab-panel active" id="posTab">
+        <!-- Session Tracking Bar -->
+        <div class="session-bar" id="sessionBar">
+          <div class="session-info">
+            <span class="session-badge open" id="sessionStatus">Session: Active</span>
+            <span>👤 Cashier: <strong id="sessionUser">Admin</strong></span>
+            <span>📍 Branch: <strong id="sessionBranch">Main</strong></span>
+            <span>💵 Drawer Cash: <strong id="sessionCash" class="mono">Rs. 0.00</strong></span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-ghost btn-xs" onclick="SessionMgr.cashMovementPrompt()">💸 Cash In/Out</button>
+            <button class="btn btn-danger btn-xs" onclick="SessionMgr.closeSessionPrompt()">🔒 End Session</button>
+          </div>
+        </div>
+
         <div class="pos-left">
           <div class="pos-topbar">
             <div class="pos-search">
@@ -3797,12 +4108,28 @@
         </div>
         <div class="cart-panel">
           <div class="cart-head" style="flex-direction:column;align-items:stretch;padding:0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 20px 5px 20px;">
               <button class="btn btn-ghost btn-xs mobile-only" onclick="POS.toggleCartView(false)">← Back</button>
               <div class="cart-title"><span data-lang="cart">🛒 Cart</span> <span class="cart-badge"
                   id="cartCount">0</span></div>
               <button class="btn btn-ghost btn-xs" onclick="Cart.clear()" data-lang="clear">Clear</button>
             </div>
+            
+            <!-- Customer Selector CRM Strip -->
+            <div class="customer-strip">
+              <span>👥</span>
+              <select id="cartCustomer" onchange="CustomerMgr.onCartCustomerChange()">
+                <option value="">Walk-in Customer</option>
+              </select>
+              <button class="btn btn-ghost btn-xs" onclick="CustomerMgr.openAddModal()" style="padding:2px 6px;">+ New</button>
+            </div>
+
+            <!-- Loyalty Points Display -->
+            <div id="loyaltyRedeemRow" style="display:none; padding:0 20px 8px 20px; align-items:center; justify-content:space-between; font-size:12px;">
+              <span style="color:var(--green); font-weight:700;" id="loyaltyPointsLabel">Points: 0</span>
+              <button class="btn btn-success btn-xs" id="redeemPointsBtn" onclick="CustomerMgr.redeemPointsPrompt()">Redeem Points</button>
+            </div>
+
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; padding:0 20px 10px 20px;">
               <button class="btn btn-sm active" id="gModeRetail" onclick="POS.setMode('retail')" data-lang="retail">🏪
                 Retail</button>
@@ -3835,7 +4162,13 @@
               <div class="total-row grand"><span data-lang="total">Total</span><span class="amount" id="cartTotal">Rs.
                   0.00</span></div>
             </div>
-            <button class="checkout-btn" id="checkoutBtn" onclick="Checkout.runDirectCheckout()" disabled
+            <!-- Hold / Recall sale buttons -->
+            <div class="hold-bar">
+              <button class="btn btn-ghost btn-sm" id="holdSaleBtn" onclick="HoldMgr.hold()" style="flex:1;">📥 Hold Sale</button>
+              <button class="btn btn-ghost btn-sm" id="recallSaleBtn" onclick="HoldMgr.openRecallModal()" style="flex:1;">📤 Recall (<span id="heldCount">0</span>)</button>
+            </div>
+
+            <button class="checkout-btn" id="checkoutBtn" onclick="WarrantyMgr.checkSerialsBeforeCheckout()" disabled
               data-lang="completeSale">💳 Complete Sale</button>
             <button class="checkout-btn" id="loanCheckoutBtn" onclick="Checkout.runWithLoan()" disabled
               data-lang="sendLoans"
@@ -3916,6 +4249,85 @@
               <div id="lowStockDiv"></div>
             </div>
           </div>
+          <!-- Users & Branches Section -->
+          <div class="admin-section mb-12">
+            <h3>👥 Users & Branch Management</h3>
+            <div class="opt-tabs" style="margin-bottom: 12px; border: 1px solid var(--border);">
+              <div class="opt-tab active" id="adminSubTabUsers" onclick="Admin.switchSubTab('users')">👥 Users</div>
+              <div class="opt-tab" id="adminSubTabBranches" onclick="Admin.switchSubTab('branches')">📍 Branches</div>
+            </div>
+            
+            <!-- Users list & Add User -->
+            <div id="adminSecUsers">
+              <div style="display:grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap:8px; align-items:end; margin-bottom:12px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label>Email *</label>
+                  <input type="email" id="newUserEmail" placeholder="staff@chickenpos.com" style="font-size:12px; padding:6px 10px;">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label>Role</label>
+                  <select id="newUserRole" style="font-size:12px; padding:5px 8px;">
+                    <option value="cashier">Cashier</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label>Branch</label>
+                  <select id="newUserBranch" style="font-size:12px; padding:5px 8px;">
+                    <option value="main">Main Branch</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="Admin.addUser()" style="white-space:nowrap; padding:6px 12px;">+ Add User</button>
+              </div>
+              <div class="table-wrap">
+                <table style="width:100%;">
+                  <thead>
+                    <tr>
+                      <th>User ID/Email</th>
+                      <th>Role</th>
+                      <th>Branch</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminUsersBody">
+                    <tr><td colspan="5" style="text-align:center; padding:15px; color:var(--t3);">No users registered</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Branches list & Add Branch -->
+            <div id="adminSecBranches" style="display:none;">
+              <div style="display:grid; grid-template-columns: 1fr 1.2fr auto; gap:8px; align-items:end; margin-bottom:12px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label>Branch Name *</label>
+                  <input type="text" id="newBranchName" placeholder="e.g. Negombo Branch" style="font-size:12px; padding:6px 10px;">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label>Location / Details</label>
+                  <input type="text" id="newBranchLoc" placeholder="e.g. Negombo Town" style="font-size:12px; padding:6px 10px;">
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="Admin.addBranch()" style="padding:6px 12px;">+ Add Branch</button>
+              </div>
+              <div class="table-wrap">
+                <table style="width:100%;">
+                  <thead>
+                    <tr>
+                      <th>Branch Name</th>
+                      <th>Location / Details</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminBranchesBody">
+                    <tr><td colspan="3" style="text-align:center; padding:15px; color:var(--t3);">No branches configured</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
           <div class="admin-section mb-12">
             <h3>📋 Recent Sales</h3>
             <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
@@ -4582,6 +4994,107 @@
         </div>
       </div>
 
+      <!-- CUSTOMERS TAB -->
+      <div class="tab-panel" id="customersTab">
+        <div class="inv-bar">
+          <h2>👥 Customers & Loyalty</h2>
+          <input type="text" class="inv-search" id="custSearch" placeholder="🔍 Search customers by name or phone..." oninput="CustomerMgr.render()">
+          <button class="btn btn-primary btn-sm" onclick="CustomerMgr.openAddModal()" style="margin-left:auto;">+ Add Customer</button>
+        </div>
+        <div class="table-wrap" style="height:calc(100vh - 120px); overflow-y:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email / ID</th>
+                <th>Loyalty Points</th>
+                <th>Branch</th>
+                <th>Joined Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="custBody">
+              <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--t3)">No customers found</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- WARRANTY TAB -->
+      <div class="tab-panel" id="warrantyTab">
+        <div class="inv-bar">
+          <h2>🛡️ Warranty Management</h2>
+          <input type="text" class="inv-search" id="warrSearch" placeholder="🔍 Search by Serial / Bill ID / Customer..." oninput="WarrantyMgr.render()">
+        </div>
+        <div class="table-wrap" style="height:calc(100vh - 120px); overflow-y:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Serial Number</th>
+                <th>Customer</th>
+                <th>Bill ID</th>
+                <th>Sold Date</th>
+                <th>Warranty Expiry</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="warrBody">
+              <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--t3)">No warranty records found</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ANALYTICS TAB -->
+      <div class="tab-panel" id="analyticsTab">
+        <div class="inv-bar">
+          <h2>📈 Enterprise Analytics</h2>
+          <div style="margin-left:auto; display:flex; gap:6px;">
+            <select id="analyticsBranchFilter" onchange="AnalyticsMgr.render()" style="padding:6px; border-radius:var(--r8); background:var(--bg3); border:1px solid var(--border); color:#fff; display:none;">
+              <option value="all">All Branches</option>
+            </select>
+            <select id="analyticsPeriod" onchange="AnalyticsMgr.render()" style="padding:6px; border-radius:var(--r8); background:var(--bg3); border:1px solid var(--border); color:#fff;">
+              <option value="30">Last 30 Days</option>
+              <option value="7">Last 7 Days</option>
+              <option value="90">Last 90 Days</option>
+              <option value="this_month">This Month</option>
+            </select>
+          </div>
+        </div>
+        <div style="height:calc(100vh - 110px); overflow-y:auto; padding-bottom:30px;">
+          <div class="stats-row" id="analyticsStatsRow" style="padding:16px 16px 0 16px;"></div>
+          <div class="analytics-grid">
+            <div class="chart-card">
+              <h3>💵 Revenue Trend</h3>
+              <div class="chart-container">
+                <canvas id="chartRevenue"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>🗂️ Sales by Category</h3>
+              <div class="chart-container">
+                <canvas id="chartCategory"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>🏆 Top Products</h3>
+              <div class="chart-container">
+                <canvas id="chartTopProducts"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3>💳 Payment Methods</h3>
+              <div class="chart-container">
+                <canvas id="chartPaymentMethods"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -4782,6 +5295,80 @@
     </div>
   </div>
 
+  <!-- Customer Add/Edit Modal -->
+  <div class="overlay" id="custModal">
+    <div class="modal modal-sm">
+      <div class="modal-head">
+        <div class="modal-title" id="custModalTitle">👤 Add New Customer</div>
+        <button class="modal-x" onclick="Modal.close('custModal')">✕</button>
+      </div>
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
+        <input type="hidden" id="fCustId">
+        <div class="form-group"><label>Customer Name *</label><input type="text" id="fCustName" placeholder="e.g. John Doe"></div>
+        <div class="form-group"><label>Phone Number *</label><input type="text" id="fCustPhone" placeholder="e.g. 0771234567"></div>
+        <div class="form-group"><label>Email Address</label><input type="email" id="fCustEmail" placeholder="e.g. john@example.com"></div>
+        <div class="form-group"><label>NIC / ID Number</label><input type="text" id="fCustNIC" placeholder="e.g. 951234567V"></div>
+        <div class="form-group"><label>Address</label><input type="text" id="fCustAddress" placeholder="e.g. Negombo"></div>
+        <div class="form-group"><label>Loyalty Points</label><input type="number" id="fCustPoints" value="0" min="0"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="Modal.close('custModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="CustomerMgr.save()">💾 Save Customer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Serial Entry Modal -->
+  <div class="overlay" id="serialModal">
+    <div class="modal modal-md">
+      <div class="modal-head">
+        <div class="modal-title">🛡️ Scan / Enter Serial Numbers</div>
+        <button class="modal-x" onclick="Modal.close('serialModal')">✕</button>
+      </div>
+      <div id="serialModalBody" style="padding:16px; display:flex; flex-direction:column; gap:12px; max-height:400px; overflow-y:auto;">
+        <!-- Filled dynamically -->
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="Modal.close('serialModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="WarrantyMgr.confirmSerials()">Confirm Serials</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Warranty Claim Modal -->
+  <div class="overlay" id="claimModal">
+    <div class="modal modal-sm">
+      <div class="modal-head">
+        <div class="modal-title">🛡️ Log Warranty Claim</div>
+        <button class="modal-x" onclick="Modal.close('claimModal')">✕</button>
+      </div>
+      <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
+        <input type="hidden" id="fClaimWarrId">
+        <div class="form-group"><label>Product</label><div id="claimProdName" style="font-weight:700; color:var(--cyan)"></div></div>
+        <div class="form-group"><label>Serial Number</label><div id="claimSerialNo" style="font-weight:700;"></div></div>
+        <div class="form-group"><label>Issue Description *</label><textarea id="fClaimIssue" rows="3" placeholder="Enter problem details..."></textarea></div>
+        <div class="form-group"><label>Resolution Action</label><select id="fClaimResolution"><option value="Repair">🛠️ Repair Item</option><option value="Replacement">🔄 Replace with New Item</option><option value="Refund">💵 Refund Customer</option><option value="Rejected">❌ Reject Claim</option></select></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="Modal.close('claimModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="WarrantyMgr.saveClaim()">💾 Log Claim</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Held Sales Modal -->
+  <div class="overlay" id="heldSalesModal">
+    <div class="modal modal-md">
+      <div class="modal-head">
+        <div class="modal-title">📥 Recall Held Sales</div>
+        <button class="modal-x" onclick="Modal.close('heldSalesModal')">✕</button>
+      </div>
+      <div id="heldSalesList" style="padding:16px; max-height:400px; overflow-y:auto;">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+  </div>
+
   <div class="shortcut-bar">
     <span>F2</span> <span data-lang="search">Search</span> |
     <span>F4</span> <span data-lang="scanBarcode">Barcode</span> |
@@ -4793,22 +5380,861 @@
   <script>
     'use strict';
 
-    // 100% Offline-only POS Config
+    // Enterprise Sync Config
     const S = {
       categories: [], items: [], sales: [],
       coconut_purchases: [], coconut_husking: [], coconut_sales: [], cash_movements: [], day_ends: [],
       coconut_copra: [], coconut_oil: [], coconut_workers: [], coconut_worker_payments: [],
       loans: [], loan_customers: [],
-      settings: { shopName: '  Chicken Shop', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.', apiServerUrl: '' },
+      warranties: [], sessions: [],
+      settings: { 
+        shopName: '  Chicken Shop', 
+        adminPin: '1234', 
+        currency: 'Rs.', 
+        lowStockAlert: 5, 
+        receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.', 
+        apiServerUrl: '',
+        fbApiKey: '',
+        fbAuthDomain: 'chicken-shop-2d7b5.firebaseapp.com',
+        fbDatabaseURL: 'https://chicken-shop-2d7b5-default-rtdb.firebaseio.com',
+        fbProjectId: 'chicken-shop-2d7b5'
+      },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
       activeCat: 'all', adminUnlocked: false, pollTimer: null,
       isOnline: false,
-      lang: 'en'
+      lang: 'en',
+      
+      // Enterprise States
+      currentUser: null,
+      currentBranchId: 'main',
+      session: null,
+      heldSales: []
     };
 
     function getApiUrl(path) {
-      return '/api/data/' + path;
+      const branchId = S.currentBranchId || 'main';
+      if (path === 'settings/main' || path.startsWith('branches') || path.startsWith('users') || path.startsWith('global') || path.startsWith('sessions')) {
+        return '/api/data/' + path;
+      }
+      return `/api/data/branches/${branchId}/${path}`;
     }
+
+    // ── FIREBASE AUTH MANAGER ──
+    const AuthMgr = {
+      async init() {
+        const config = {
+          apiKey: S.settings.fbApiKey || "AIzaSyFakeKeyPlaceholderForStart",
+          authDomain: S.settings.fbAuthDomain,
+          databaseURL: S.settings.fbDatabaseURL,
+          projectId: S.settings.fbProjectId
+        };
+        
+        if (!firebase.apps.length) {
+          try {
+            firebase.initializeApp(config);
+          } catch (e) {
+            console.error("Firebase init failed:", e);
+          }
+        }
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+          if (user) {
+            S.currentUser = user;
+            try {
+              const uSnap = await DB.get(`users/${user.uid}`);
+              if (uSnap && Object.keys(uSnap).length) {
+                S.currentUser.role = uSnap.role || 'cashier';
+                S.currentBranchId = uSnap.branchId || 'main';
+              } else {
+                const uCount = await DB.get('users');
+                const isFirst = !uCount || Object.keys(uCount).length === 0;
+                const role = isFirst ? 'admin' : 'cashier';
+                const branchId = 'main';
+                
+                const profile = { email: user.email, role, branchId, createdAt: new Date().toISOString() };
+                await DB.set(`users/${user.uid}`, profile);
+                S.currentUser.role = role;
+                S.currentBranchId = branchId;
+              }
+            } catch (e) {
+              S.currentUser.role = 'admin';
+              S.currentBranchId = 'main';
+            }
+
+            this.applyPermissions();
+            document.getElementById('loginScreen').classList.add('hide');
+            document.getElementById('navUserBadge').style.display = 'flex';
+            document.getElementById('navUserInitials').textContent = (user.email || 'A').charAt(0).toUpperCase();
+            document.getElementById('navUserName').textContent = (user.email || '').split('@')[0];
+            
+            const branches = await DB.get('global/branches') || {};
+            const branch = branches[S.currentBranchId];
+            document.getElementById('navBranchName').textContent = branch ? branch.name : 'Main Branch';
+
+            SessionMgr.init();
+            Sync.start();
+          } else {
+            S.currentUser = null;
+            document.getElementById('loginScreen').classList.remove('hide');
+            document.getElementById('navUserBadge').style.display = 'none';
+            document.getElementById('loader').classList.add('hide');
+          }
+        });
+      },
+
+      async login() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const errEl = document.getElementById('loginError');
+        errEl.style.display = 'none';
+        
+        if (!email || !password) {
+          errEl.textContent = 'Please enter email and password.';
+          errEl.style.display = 'block';
+          return;
+        }
+
+        try {
+          toast('Signing in...', 'info');
+          const remember = document.getElementById('loginRemember').checked;
+          const persistence = remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
+          await firebase.auth().setPersistence(persistence);
+          await firebase.auth().signInWithEmailAndPassword(email, password);
+          toast('Signed in successfully! 🔑', 'success');
+        } catch (e) {
+          console.error(e);
+          errEl.textContent = e.message;
+          errEl.style.display = 'block';
+          toast('Sign in failed ❌', 'error');
+        }
+      },
+
+      async logout() {
+        if (confirm('Are you sure you want to sign out?')) {
+          try {
+            await firebase.auth().signOut();
+            toast('Logged out successfully', 'info');
+            setTimeout(() => window.location.reload(), 500);
+          } catch (e) {
+            toast('Logout failed: ' + e.message, 'error');
+          }
+        }
+      },
+
+      async forgotPassword() {
+        const email = prompt('Enter your email to receive password reset link:');
+        if (!email) return;
+        try {
+          await firebase.auth().sendPasswordResetEmail(email);
+          toast('Password reset link sent to email! ✉️', 'success');
+        } catch (e) {
+          toast('Error: ' + e.message, 'error');
+        }
+      },
+
+      applyPermissions() {
+        const role = S.currentUser ? S.currentUser.role : 'cashier';
+        if (role === 'cashier') {
+          document.querySelectorAll('.nav-tab').forEach(el => {
+            if (el.dataset.tab !== 'pos') el.style.display = 'none';
+          });
+          Nav.go('pos');
+        } else if (role === 'manager') {
+          document.querySelectorAll('.nav-tab').forEach(el => {
+            if (el.dataset.tab === 'admin') el.style.display = 'none';
+            else el.style.display = 'flex';
+          });
+          if (document.querySelector('.tab-panel.active')?.id === 'adminTab') Nav.go('pos');
+        } else if (role === 'admin') {
+          document.querySelectorAll('.nav-tab').forEach(el => {
+            el.style.display = 'flex';
+          });
+        }
+      }
+    };
+
+    // ── SESSION MANAGER ──
+    const SessionMgr = {
+      async init() {
+        const sessions = await DB.get('sessions') || {};
+        const openSession = Object.values(sessions).find(s => s && s.status === 'open' && s.userId === S.currentUser.email);
+        
+        if (openSession) {
+          S.session = openSession;
+          this.updateUI();
+        } else {
+          S.session = null;
+          this.updateUI();
+          this.promptOpeningCash();
+        }
+      },
+
+      promptOpeningCash() {
+        const amount = prompt('💰 Enter Opening Cash for drawer (LKR):', '2000');
+        if (amount === null) return;
+        const val = parseFloat(amount) || 0;
+        
+        const session = {
+          id: 'SESS_' + Date.now(),
+          openingCash: val,
+          cashIn: 0,
+          cashOut: 0,
+          salesTotal: 0,
+          startTime: new Date().toISOString(),
+          status: 'open',
+          userId: S.currentUser.email,
+          branchId: S.currentBranchId
+        };
+        
+        DB.set(`sessions/${session.id}`, session);
+        S.session = session;
+        this.updateUI();
+        toast('Session started with Rs. ' + val.toFixed(2), 'success');
+      },
+
+      cashMovementPrompt() {
+        if (!S.session) { toast('No active session', 'error'); return; }
+        const type = prompt('Enter movement type (in / out):', 'in');
+        if (!type || (type !== 'in' && type !== 'out')) return;
+        const amt = prompt('Enter amount (Rs.):');
+        if (!amt) return;
+        const val = parseFloat(amt) || 0;
+        const reason = prompt('Enter reason:');
+        
+        if (type === 'in') S.session.cashIn += val;
+        else S.session.cashOut += val;
+        
+        DB.set(`sessions/${S.session.id}`, S.session);
+        
+        const move = {
+          id: 'M_' + Date.now(),
+          type,
+          amount: val,
+          reason: reason || 'Manual drawer adjustments',
+          date: new Date().toISOString(),
+          sessionId: S.session.id
+        };
+        DB.push('cash_movements', move);
+        
+        this.updateUI();
+        toast('Drawer updated!', 'success');
+      },
+
+      closeSessionPrompt() {
+        if (!S.session) return;
+        
+        const expected = S.session.openingCash + S.session.cashIn - S.session.cashOut + S.session.salesTotal;
+        const actual = prompt(`🔒 Close Register Session\n\nExpected Cash in Drawer: Rs. ${expected.toFixed(2)}\n\nEnter actual Cash in Drawer (Rs.):`, expected.toFixed(2));
+        if (actual === null) return;
+        
+        const actVal = parseFloat(actual) || 0;
+        const diff = actVal - expected;
+        
+        S.session.status = 'closed';
+        S.session.endTime = new Date().toISOString();
+        S.session.actualCash = actVal;
+        S.session.difference = diff;
+        
+        DB.set(`sessions/${S.session.id}`, S.session);
+        
+        const cur = S.settings.currency;
+        const zReport = `
+================================
+         Z-REPORT SUMMARY        
+================================
+Session ID : ${S.session.id}
+Opened At  : ${new Date(S.session.startTime).toLocaleString()}
+Closed At  : ${new Date(S.session.endTime).toLocaleString()}
+User       : ${S.session.userId}
+--------------------------------
+Opening Cash : ${cur} ${S.session.openingCash.toFixed(2)}
+Cash In (+)  : ${cur} ${S.session.cashIn.toFixed(2)}
+Cash Out (-) : ${cur} ${S.session.cashOut.toFixed(2)}
+Cash Sales   : ${cur} ${S.session.salesTotal.toFixed(2)}
+Expected Cash: ${cur} ${expected.toFixed(2)}
+Actual Cash  : ${cur} ${actVal.toFixed(2)}
+Difference   : ${cur} ${diff.toFixed(2)}
+================================
+`;
+        alert(zReport);
+        console.log(zReport);
+        
+        S.session = null;
+        this.updateUI();
+        this.promptOpeningCash();
+      },
+
+      updateUI() {
+        const bar = document.getElementById('sessionBar');
+        if (!bar) return;
+        if (S.session) {
+          document.getElementById('sessionStatus').className = 'session-badge open';
+          document.getElementById('sessionStatus').textContent = 'Session: Open';
+          document.getElementById('sessionUser').textContent = S.currentUser ? S.currentUser.email.split('@')[0] : 'Staff';
+          const expected = S.session.openingCash + S.session.cashIn - S.session.cashOut + S.session.salesTotal;
+          document.getElementById('sessionCash').textContent = S.settings.currency + ' ' + expected.toFixed(2);
+        } else {
+          document.getElementById('sessionStatus').className = 'session-badge closed';
+          document.getElementById('sessionStatus').textContent = 'Session: Closed';
+          document.getElementById('sessionCash').textContent = S.settings.currency + ' 0.00';
+        }
+      }
+    };
+
+    // ── CUSTOMER CRM & LOYALTY MANAGER ──
+    const CustomerMgr = {
+      openAddModal() {
+        document.getElementById('custModalTitle').textContent = '👤 Add New Customer';
+        document.getElementById('fCustId').value = '';
+        document.getElementById('fCustName').value = '';
+        document.getElementById('fCustPhone').value = '';
+        document.getElementById('fCustEmail').value = '';
+        document.getElementById('fCustNIC').value = '';
+        document.getElementById('fCustAddress').value = '';
+        document.getElementById('fCustPoints').value = '0';
+        Modal.open('custModal');
+      },
+
+      openEditModal(id) {
+        const c = S.loan_customers.find(cust => cust.id === id);
+        if (!c) return;
+        document.getElementById('custModalTitle').textContent = '✏️ Edit Customer';
+        document.getElementById('fCustId').value = c.id;
+        document.getElementById('fCustName').value = c.name || '';
+        document.getElementById('fCustPhone').value = c.phone || '';
+        document.getElementById('fCustEmail').value = c.email || '';
+        document.getElementById('fCustNIC').value = c.nic || '';
+        document.getElementById('fCustAddress').value = c.address || '';
+        document.getElementById('fCustPoints').value = c.loyaltyPoints || 0;
+        Modal.open('custModal');
+      },
+
+      async save() {
+        const id = document.getElementById('fCustId').value;
+        const name = document.getElementById('fCustName').value.trim();
+        const phone = document.getElementById('fCustPhone').value.trim();
+        if (!name || !phone) { toast('Name and Phone are required', 'error'); return; }
+        
+        const data = {
+          name,
+          phone,
+          email: document.getElementById('fCustEmail').value.trim(),
+          nic: document.getElementById('fCustNIC').value.trim(),
+          address: document.getElementById('fCustAddress').value.trim(),
+          loyaltyPoints: parseInt(document.getElementById('fCustPoints').value) || 0,
+          updatedAt: new Date().toISOString()
+        };
+
+        if (!id) {
+          data.createdAt = new Date().toISOString();
+          data.branchId = S.currentBranchId;
+          await DB.push('loan_customers', data);
+          toast('Customer added successfully', 'success');
+        } else {
+          await DB.patch('loan_customers/' + id, data);
+          toast('Customer updated successfully', 'success');
+        }
+        
+        Modal.close('custModal');
+        await loadAll();
+        this.updateCartDropdown();
+      },
+
+      render() {
+        const tbody = document.getElementById('custBody');
+        if (!tbody) return;
+        
+        const q = document.getElementById('custSearch').value.trim().toLowerCase();
+        let list = [...S.loan_customers];
+        if (q) {
+          list = list.filter(c => (c.name || '').toLowerCase().includes(q) || (c.phone || '').includes(q));
+        }
+        
+        if (!list.length) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--t3)">No customers found</td></tr>`;
+          return;
+        }
+        
+        tbody.innerHTML = list.map(c => `
+          <tr>
+            <td><strong>${esc(c.name)}</strong></td>
+            <td>${esc(c.phone)}</td>
+            <td>${esc(c.email || c.nic || '—')}</td>
+            <td style="color:var(--green); font-weight:700;">🪙 ${c.loyaltyPoints || 0} pts</td>
+            <td><span class="badge badge-purple">${esc(c.branchId || 'Main')}</span></td>
+            <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td>
+            <td>
+              <button class="btn btn-ghost btn-xs" onclick="CustomerMgr.openEditModal('${c.id}')">✏️ Edit</button>
+              <button class="btn btn-danger btn-xs" onclick="CustomerMgr.delete('${c.id}')">✕ Delete</button>
+            </td>
+          </tr>
+        `).join('');
+      },
+
+      async delete(id) {
+        if (!confirm('Are you sure you want to delete this customer?')) return;
+        await DB.del('loan_customers/' + id);
+        toast('Customer deleted', 'info');
+        await loadAll();
+        this.updateCartDropdown();
+      },
+
+      updateCartDropdown() {
+        const sel = document.getElementById('cartCustomer');
+        if (!sel) return;
+        const curSel = sel.value;
+        let h = `<option value="">Walk-in Customer</option>`;
+        S.loan_customers.forEach(c => {
+          h += `<option value="${c.id}" ${curSel === c.id ? 'selected' : ''}>${esc(c.name)} (${c.phone}) — 🪙 ${c.loyaltyPoints || 0} pts</option>`;
+        });
+        sel.innerHTML = h;
+      },
+
+      onCartCustomerChange() {
+        const id = document.getElementById('cartCustomer').value;
+        const row = document.getElementById('loyaltyRedeemRow');
+        const lbl = document.getElementById('loyaltyPointsLabel');
+        
+        if (id) {
+          const c = S.loan_customers.find(cust => cust.id === id);
+          if (c) {
+            row.style.display = 'flex';
+            lbl.textContent = `Loyalty Balance: 🪙 ${c.loyaltyPoints || 0} points`;
+            return;
+          }
+        }
+        row.style.display = 'none';
+      },
+
+      redeemPointsPrompt() {
+        const id = document.getElementById('cartCustomer').value;
+        if (!id) return;
+        const c = S.loan_customers.find(cust => cust.id === id);
+        if (!c || !c.loyaltyPoints) { toast('No points to redeem', 'error'); return; }
+        
+        const pts = prompt(`Redeem Points (Max: ${c.loyaltyPoints})\n1 Point = Rs. 1.00 Discount\nEnter points to redeem:`, c.loyaltyPoints);
+        if (pts === null) return;
+        const val = Math.min(c.loyaltyPoints, parseInt(pts) || 0);
+        if (val <= 0) return;
+        
+        S.cartDisc = val;
+        S.cartDiscType = 'fixed';
+        Cart.render();
+        
+        window._redeemedPoints = val;
+        toast(`Redeemed ${val} points! Rs. ${val.toFixed(2)} discount applied.`, 'success');
+      }
+    };
+
+    // ── HOLD / RECALL MANAGER ──
+    const HoldMgr = {
+      hold() {
+        if (!S.cart.length) { toast('Cart is empty', 'error'); return; }
+        
+        const label = prompt('Enter a label/identifier for this held sale:', 'Table ' + (S.heldSales.length + 1));
+        if (label === null) return;
+        
+        const held = {
+          id: 'HOLD_' + Date.now(),
+          label: label || 'Untitled',
+          cart: [...S.cart],
+          discount: S.cartDisc,
+          discountType: S.cartDiscType,
+          customerId: document.getElementById('cartCustomer').value,
+          time: new Date().toISOString()
+        };
+        
+        S.heldSales.push(held);
+        localStorage.setItem('held_sales', JSON.stringify(S.heldSales));
+        
+        S.cart = [];
+        S.cartDisc = 0;
+        document.getElementById('cartCustomer').value = '';
+        CustomerMgr.onCartCustomerChange();
+        Cart.render();
+        
+        this.updateBadge();
+        toast('Sale held! 📥', 'success');
+      },
+
+      updateBadge() {
+        const count = S.heldSales.length;
+        document.getElementById('heldCount').textContent = count;
+      },
+
+      openRecallModal() {
+        if (!S.heldSales.length) { toast('No held sales available', 'info'); return; }
+        
+        const body = document.getElementById('heldSalesList');
+        const cur = S.settings.currency;
+        
+        body.innerHTML = S.heldSales.map((h, i) => {
+          const tot = h.cart.reduce((s, ci) => s + ci.price, 0);
+          return `
+            <div class="held-sale-item">
+              <div>
+                <strong>${esc(h.label)}</strong><br>
+                <span style="font-size:10px; color:var(--t3);">${new Date(h.time).toLocaleTimeString()} (${h.cart.length} items)</span>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <span style="font-weight:700; color:var(--cyan); margin-right:10px;">${cur} ${tot.toFixed(2)}</span>
+                <button class="btn btn-primary btn-xs" onclick="HoldMgr.recall(${i})">📥 Recall</button>
+                <button class="btn btn-danger btn-xs" onclick="HoldMgr.delete(${i})">✕</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+        
+        Modal.open('heldSalesModal');
+      },
+
+      recall(idx) {
+        const h = S.heldSales[idx];
+        if (!h) return;
+        
+        S.cart = h.cart;
+        S.cartDisc = h.discount;
+        S.cartDiscType = h.discountType;
+        document.getElementById('cartCustomer').value = h.customerId;
+        CustomerMgr.onCartCustomerChange();
+        Cart.render();
+        
+        S.heldSales.splice(idx, 1);
+        localStorage.setItem('held_sales', JSON.stringify(S.heldSales));
+        
+        Modal.close('heldSalesModal');
+        this.updateBadge();
+        toast('Sale recalled successfully', 'success');
+      },
+
+      delete(idx) {
+        if (!confirm('Discard this held sale?')) return;
+        S.heldSales.splice(idx, 1);
+        localStorage.setItem('held_sales', JSON.stringify(S.heldSales));
+        this.updateBadge();
+        this.openRecallModal();
+        if (S.heldSales.length === 0) Modal.close('heldSalesModal');
+      }
+    };
+
+    // ── WARRANTY & SERIAL MANAGER ──
+    const WarrantyMgr = {
+      openClaimModal(warrId) {
+        const list = S.warranties || [];
+        const w = list.find(item => item.id === warrId);
+        if (!w) return;
+        
+        document.getElementById('fClaimWarrId').value = w.id;
+        document.getElementById('claimProdName').textContent = w.itemName;
+        document.getElementById('claimSerialNo').textContent = w.serialNumber || 'No Serial';
+        document.getElementById('fClaimIssue').value = '';
+        document.getElementById('fClaimResolution').value = 'Repair';
+        Modal.open('claimModal');
+      },
+
+      async saveClaim() {
+        const id = document.getElementById('fClaimWarrId').value;
+        const issue = document.getElementById('fClaimIssue').value.trim();
+        const res = document.getElementById('fClaimResolution').value;
+        if (!issue) { toast('Please enter issue description', 'error'); return; }
+        
+        const warr = S.warranties.find(w => w.id === id);
+        if (!warr) return;
+        
+        warr.status = 'Claimed';
+        warr.claimDetails = {
+          issue,
+          resolution: res,
+          date: new Date().toISOString()
+        };
+        
+        await DB.patch('warranties/' + id, warr);
+        toast('Warranty claim logged successfully! 🛡️', 'success');
+        Modal.close('claimModal');
+        await loadAll();
+      },
+
+      render() {
+        const tbody = document.getElementById('warrBody');
+        if (!tbody) return;
+        
+        const q = document.getElementById('warrSearch').value.trim().toLowerCase();
+        let list = S.warranties || [];
+        
+        if (q) {
+          list = list.filter(w => 
+            (w.itemName || '').toLowerCase().includes(q) || 
+            (w.serialNumber || '').toLowerCase().includes(q) || 
+            (w.billId || '').toLowerCase().includes(q) ||
+            (w.customerName || '').toLowerCase().includes(q)
+          );
+        }
+        
+        if (!list.length) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--t3)">No warranty records found</td></tr>`;
+          return;
+        }
+        
+        tbody.innerHTML = list.map(w => {
+          const daysLeft = Math.ceil((new Date(w.expiryDate) - new Date()) / 864e5);
+          const active = daysLeft > 0 && w.status !== 'Claimed';
+          let statusBadge = '';
+          if (w.status === 'Claimed') {
+            statusBadge = `<span class="badge badge-orange">Claimed</span>`;
+          } else if (daysLeft <= 0) {
+            statusBadge = `<span class="badge badge-red">Expired</span>`;
+          } else if (daysLeft < 30) {
+            statusBadge = `<span class="badge badge-orange">Expiring Soon (${daysLeft}d)</span>`;
+          } else {
+            statusBadge = `<span class="badge badge-green">Active (${daysLeft}d left)</span>`;
+          }
+          
+          return `
+            <tr>
+              <td><strong>${esc(w.itemName)}</strong></td>
+              <td class="mono" style="color:var(--cyan);">${esc(w.serialNumber || '—')}</td>
+              <td>${esc(w.customerName)}<br><span style="font-size:10px;color:var(--t3);">${esc(w.customerPhone || '')}</span></td>
+              <td class="mono" style="font-size:11px;">${esc(w.billId)}</td>
+              <td>${new Date(w.saleDate).toLocaleDateString()}</td>
+              <td>${new Date(w.expiryDate).toLocaleDateString()}</td>
+              <td>${statusBadge}</td>
+              <td>
+                ${active ? `<button class="btn btn-purple btn-xs" onclick="WarrantyMgr.openClaimModal('${w.id}')">🛡️ Claim</button>` : '—'}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      },
+
+      checkSerialsBeforeCheckout() {
+        const serialItems = S.cart.filter(ci => {
+          const item = S.items.find(i => i.id === ci.itemId);
+          return item && item.trackSerials;
+        });
+        
+        if (serialItems.length === 0) {
+          CheckoutPayment.open();
+          return;
+        }
+        
+        const body = document.getElementById('serialModalBody');
+        let html = '';
+        
+        serialItems.forEach((ci, itemIdx) => {
+          html += `
+            <div style="border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:8px;">
+              <h4 style="color:var(--cyan); margin-bottom:6px;">${esc(ci.name)} (Qty: ${ci.qty})</h4>
+          `;
+          
+          for (let i = 0; i < ci.qty; i++) {
+            const val = (ci.serialNumbers && ci.serialNumbers[i]) ? ci.serialNumbers[i] : '';
+            html += `
+              <div class="form-group" style="margin-bottom:6px;">
+                <label>Unit ${i + 1} Serial Number *</label>
+                <input type="text" class="serial-input-field" data-item-id="${ci.itemId}" data-index="${i}" value="${val}" placeholder="Scan or type serial...">
+              </div>
+            `;
+          }
+          
+          html += `</div>`;
+        });
+        
+        body.innerHTML = html;
+        Modal.open('serialModal');
+      },
+
+      confirmSerials() {
+        const fields = document.querySelectorAll('.serial-input-field');
+        let valid = true;
+        
+        fields.forEach(f => {
+          const itemId = f.dataset.itemId;
+          const idx = parseInt(f.dataset.index);
+          const val = f.value.trim();
+          
+          if (!val) {
+            valid = false;
+            f.style.borderColor = 'var(--red)';
+          } else {
+            f.style.borderColor = '';
+            const ci = S.cart.find(c => c.itemId === itemId);
+            if (ci) {
+              if (!ci.serialNumbers) ci.serialNumbers = [];
+              ci.serialNumbers[idx] = val;
+            }
+          }
+        });
+        
+        if (!valid) {
+          toast('Please enter all required serial numbers', 'error');
+          return;
+        }
+        
+        Modal.close('serialModal');
+        CheckoutPayment.open();
+      }
+    };
+
+    // ── ENTERPRISE ANALYTICS MANAGER ──
+    const AnalyticsMgr = {
+      charts: {},
+
+      render() {
+        const periodDays = parseInt(document.getElementById('analyticsPeriod').value) || 30;
+        const branchId = document.getElementById('analyticsBranchFilter').value || 'all';
+        
+        const now = new Date();
+        const startDate = new Date();
+        
+        if (document.getElementById('analyticsPeriod').value === 'this_month') {
+          startDate.setDate(1);
+          startDate.setHours(0,0,0,0);
+        } else {
+          startDate.setDate(now.getDate() - periodDays);
+        }
+        
+        let salesList = S.sales || [];
+        salesList = salesList.filter(s => new Date(s.date) >= startDate);
+        if (branchId !== 'all') {
+          salesList = salesList.filter(s => s.branchId === branchId);
+        }
+        
+        const cur = S.settings.currency;
+        const totalRev = salesList.reduce((a, s) => a + (s.total || 0), 0);
+        const totalProfit = salesList.reduce((a, s) => a + (s.profit || 0), 0);
+        const avgSale = salesList.length ? totalRev / salesList.length : 0;
+        
+        document.getElementById('analyticsStatsRow').innerHTML = `
+          <div class="stat-card"><div class="stat-lbl">💰 Revenue</div><div class="stat-val text-cyan">${cur} ${totalRev.toFixed(2)}</div><div class="stat-sub">${salesList.length} sales</div></div>
+          <div class="stat-card"><div class="stat-lbl">📈 Profit</div><div class="stat-val ${totalProfit >= 0 ? 'text-green' : 'text-red'}">${cur} ${totalProfit.toFixed(2)}</div><div class="stat-sub">${totalRev > 0 ? (totalProfit / totalRev * 100).toFixed(1) : 0}% margin</div></div>
+          <div class="stat-card"><div class="stat-lbl">👥 CRM Database</div><div class="stat-val text-purple">${S.loan_customers.length}</div><div class="stat-sub">Customers registered</div></div>
+          <div class="stat-card"><div class="stat-lbl">🛡️ Active Warranties</div><div class="stat-val text-orange">${(S.warranties || []).filter(w => w.status === 'Active').length}</div><div class="stat-sub">Tracked items</div></div>
+          <div class="stat-card"><div class="stat-lbl">🛒 Avg Checkout</div><div class="stat-val">${cur} ${avgSale.toFixed(2)}</div><div class="stat-sub">Per receipt</div></div>
+        `;
+        
+        this.renderRevenueChart(salesList, periodDays);
+        this.renderCategoryChart(salesList);
+        this.renderTopProductsChart(salesList);
+        this.renderPaymentMethodsChart(salesList);
+      },
+
+      renderRevenueChart(sales, days) {
+        const dailyData = {};
+        for (let i = days - 1; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          dailyData[dateStr] = 0;
+        }
+        
+        sales.forEach(s => {
+          const dateStr = new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          if (dailyData[dateStr] !== undefined) {
+            dailyData[dateStr] += s.total || 0;
+          }
+        });
+        
+        const labels = Object.keys(dailyData);
+        const data = Object.values(dailyData);
+        
+        this.drawChart('chartRevenue', 'line', {
+          labels,
+          datasets: [{
+            label: 'Daily Revenue',
+            data,
+            borderColor: '#00f2fe',
+            backgroundColor: 'rgba(0, 242, 254, 0.1)',
+            fill: true,
+            tension: 0.3
+          }]
+        });
+      },
+
+      renderCategoryChart(sales) {
+        const catData = {};
+        sales.forEach(s => {
+          (s.items || []).forEach(si => {
+            const item = S.items.find(i => i.id === si.itemId);
+            const catId = item ? item.categoryId : 'uncategorized';
+            const catName = S.categories.find(c => c.id === catId)?.name || 'Uncategorized';
+            catData[catName] = (catData[catName] || 0) + si.price;
+          });
+        });
+        
+        this.drawChart('chartCategory', 'doughnut', {
+          labels: Object.keys(catData),
+          datasets: [{
+            data: Object.values(catData),
+            backgroundColor: ['#00f2fe', '#d946ef', '#22c55e', '#f59e0b', '#ef4444', '#a855f7', '#6366f1']
+          }]
+        });
+      },
+
+      renderTopProductsChart(sales) {
+        const prodData = {};
+        sales.forEach(s => {
+          (s.items || []).forEach(si => {
+            prodData[si.name] = (prodData[si.name] || 0) + si.qty;
+          });
+        });
+        
+        const sorted = Object.entries(prodData).sort((a,b) => b[1] - a[1]).slice(0, 10);
+        const labels = sorted.map(x => x[0]);
+        const data = sorted.map(x => x[1]);
+        
+        this.drawChart('chartTopProducts', 'bar', {
+          labels,
+          datasets: [{
+            label: 'Qty Sold',
+            data,
+            backgroundColor: '#d946ef',
+            borderRadius: 5
+          }]
+        }, { indexAxis: 'y' });
+      },
+
+      renderPaymentMethodsChart(sales) {
+        const methods = { cash: 0, card: 0, online: 0 };
+        sales.forEach(s => {
+          const m = s.payMethod || 'cash';
+          methods[m] = (methods[m] || 0) + (s.total || 0);
+        });
+        
+        this.drawChart('chartPaymentMethods', 'pie', {
+          labels: ['Cash', 'Card', 'Online Transfer'],
+          datasets: [{
+            data: [methods.cash, methods.card, methods.online],
+            backgroundColor: ['#22c55e', '#00f2fe', '#f59e0b']
+          }]
+        });
+      },
+
+      drawChart(canvasId, type, configData, extraOptions = {}) {
+        if (this.charts[canvasId]) {
+          this.charts[canvasId].destroy();
+        }
+        
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        this.charts[canvasId] = new Chart(ctx, {
+          type,
+          data: configData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: '#cbd5e1', font: { family: 'Exo 2' } }
+              }
+            },
+            scales: type === 'line' || type === 'bar' ? {
+              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#cbd5e1' } },
+              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#cbd5e1' } }
+            } : {},
+            ...extraOptions
+          }
+        });
+      }
+    };
 
 
     const L = {};
@@ -5052,7 +6478,14 @@
         this._updateBadge('syncing');
         try {
           const url = getApiUrl('');
-          const res = await fetch(url);
+          const headers = {};
+          if (firebase.apps.length && firebase.auth().currentUser) {
+            try {
+              const token = await firebase.auth().currentUser.getIdToken();
+              headers['Authorization'] = `Bearer ${token}`;
+            } catch (e) { }
+          }
+          const res = await fetch(url, { headers });
           if (!res.ok) throw new Error(`Pull failed: HTTP ${res.status}`);
           
           const remoteDb = await res.json();
@@ -5067,7 +6500,7 @@
             const tx = db.transaction('cache', 'readwrite');
             const store = tx.objectStore('cache');
 
-            const keys = ['categories', 'items', 'sales', 'loan_customers', 'loans', 'coconut_purchases', 'coconut_husking', 'coconut_sales', 'coconut_copra', 'coconut_oil', 'coconut_workers', 'coconut_worker_payments', 'cash_movements', 'day_ends'];
+            const keys = ['categories', 'items', 'sales', 'loan_customers', 'loans', 'coconut_purchases', 'coconut_husking', 'coconut_sales', 'coconut_copra', 'coconut_oil', 'coconut_workers', 'coconut_worker_payments', 'cash_movements', 'day_ends', 'warranties', 'sessions'];
             for (const key of keys) {
               if (remoteDb[key] !== undefined) {
                 store.put({ path: key, data: remoteDb[key] || {}, ts: Date.now() });
@@ -5194,7 +6627,11 @@
             adminPin: '1234',
             currency: 'Rs.',
             lowStockAlert: 5,
-            receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.'
+            receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.',
+            fbApiKey: '',
+            fbAuthDomain: 'chicken-shop-2d7b5.firebaseapp.com',
+            fbDatabaseURL: 'https://chicken-shop-2d7b5-default-rtdb.firebaseio.com',
+            fbProjectId: 'chicken-shop-2d7b5'
           };
           await DB.set('settings/main', st);
         } else if (st && st.receiptNote && st.receiptNote.startsWith('  Chicken Shop\n')) {
@@ -5203,13 +6640,19 @@
         }
         Object.assign(S.settings, st);
 
-        await loadAll();
-        // updateUILanguage();
-        
-        document.getElementById('loader').classList.add('hide');
-        
+        // Load held sales from storage
+        try {
+          const hs = localStorage.getItem('held_sales');
+          if (hs) {
+            S.heldSales = JSON.parse(hs) || [];
+            HoldMgr.updateBadge();
+          }
+        } catch (e) { }
+
+        // Enforce Firebase Auth
+        await AuthMgr.init();
+
         startClock(); startPoll(); setupPWA();
-        Sync.start();
         CoconutMgr.init();
 
         // Allow horizontal mouse wheel scroll on tabs
@@ -5223,7 +6666,6 @@
           }, { passive: false });
         }
 
-        // Sync dot controlled by Sync engine
         toast('  Chicken Shop POS Active ✅', 'success');
       } catch (e) {
         txt('❌ ' + e.message);
@@ -5233,7 +6675,7 @@
 
     let _lastDataStr = "";
     async function loadAll() {
-      const [cats, items, sales, cp, ch, cs, cm, de, loans, custs, c_copra, c_oil, c_workers, c_payments] = await Promise.all([
+      const [cats, items, sales, cp, ch, cs, cm, de, loans, custs, c_copra, c_oil, c_workers, c_payments, warrs] = await Promise.all([
         DB.get('categories'),
         DB.get('items'),
         DB.get('sales'),
@@ -5247,7 +6689,8 @@
         DB.get('coconut_copra'),
         DB.get('coconut_oil'),
         DB.get('coconut_workers'),
-        DB.get('coconut_worker_payments')
+        DB.get('coconut_worker_payments'),
+        DB.get('warranties')
       ]);
 
       // Create a fast, lightweight structural change check
@@ -5299,14 +6742,19 @@
       S.day_ends = DB.obj2arr(de);
       S.loans = DB.obj2arr(loans);
       S.loan_customers = DB.obj2arr(custs);
+      S.warranties = DB.obj2arr(warrs).sort((a, b) => new Date(b.saleDate) - new Date(a.saleDate));
 
       // Console logging to satisfy "confirm if the database is loading"
       console.log(`[Database Telemetry] Sync complete. Categories: ${S.categories.length}, Products: ${S.items.length}, Sales: ${S.sales.length}. Changed since last poll: ${!isUnchanged}`);
 
       if (!isUnchanged) {
         POS.renderCats(); POS.renderGrid(); InvTable.render();
+        CustomerMgr.updateCartDropdown();
         if (S.adminUnlocked) Admin.render();
         if (document.getElementById('barcodesTab')?.classList.contains('active')) { BarcodeTab.render(); }
+        if (document.getElementById('customersTab')?.classList.contains('active')) { CustomerMgr.render(); }
+        if (document.getElementById('warrantyTab')?.classList.contains('active')) { WarrantyMgr.render(); }
+        if (document.getElementById('analyticsTab')?.classList.contains('active')) { AnalyticsMgr.render(); }
         try { await ReturnMgr.load(); } catch (e) { }
         
         if (document.getElementById('coconutTab')?.classList.contains('active')) {
@@ -5318,8 +6766,6 @@
         if (document.getElementById('loansTab')?.classList.contains('active')) {
           LoanMgr.render();
         }
-        
-        
       }
     }
     function startPoll() { }
@@ -5327,7 +6773,32 @@
     function txt(t) { const el = document.getElementById('loaderText'); if (el) el.textContent = t; }
     function toast(msg, type = 'info') { const d = document.createElement('div'); d.className = `toast toast-${type}`; d.textContent = msg; document.getElementById('toasts').appendChild(d); setTimeout(() => d.remove(), 3500); }
 
-    const Nav = { go(tab) { document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab)); document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tab + 'Tab')); if (tab === 'admin') Admin.render(); if (tab === 'inventory') InvTable.render(); if (tab === 'barcodes') BarcodeTab.render(); if (tab === 'loans') LoanMgr.render(); if (tab === 'returns') ReturnMgr.switchTab('customer'); if (tab === 'coconut') CoconutMgr.switchTab('summary'); if (tab === 'dayend') DayEnd.render(); }, toggleMenu() { const sb = document.getElementById('sidebar'); const ol = document.getElementById('sidebarOverlay'); if (sb.classList.contains('show')) { sb.classList.remove('show'); ol.classList.remove('show'); } else { sb.classList.add('show'); ol.classList.add('show'); } }, closeMenu() { document.getElementById('sidebar').classList.remove('show'); document.getElementById('sidebarOverlay').classList.remove('show'); } };
+    const Nav = { 
+      go(tab) { 
+        // Role check redirection
+        const role = S.currentUser ? S.currentUser.role : 'cashier';
+        if (role === 'cashier' && tab !== 'pos') {
+          tab = 'pos';
+        } else if (role === 'manager' && tab === 'admin') {
+          tab = 'pos';
+        }
+        
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab)); 
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tab + 'Tab')); 
+        if (tab === 'admin') Admin.render(); 
+        if (tab === 'inventory') InvTable.render(); 
+        if (tab === 'barcodes') BarcodeTab.render(); 
+        if (tab === 'loans') LoanMgr.render(); 
+        if (tab === 'returns') ReturnMgr.switchTab('customer'); 
+        if (tab === 'coconut') CoconutMgr.switchTab('summary'); 
+        if (tab === 'dayend') DayEnd.render(); 
+        if (tab === 'customers') CustomerMgr.render();
+        if (tab === 'warranty') WarrantyMgr.render();
+        if (tab === 'analytics') AnalyticsMgr.render();
+      }, 
+      toggleMenu() { const sb = document.getElementById('sidebar'); const ol = document.getElementById('sidebarOverlay'); if (sb.classList.contains('show')) { sb.classList.remove('show'); ol.classList.remove('show'); } else { sb.classList.add('show'); ol.classList.add('show'); } }, 
+      closeMenu() { document.getElementById('sidebar').classList.remove('show'); document.getElementById('sidebarOverlay').classList.remove('show'); } 
+    };
     const Modal = { open(id) { document.getElementById(id).classList.add('open'); }, close(id) { document.getElementById(id).classList.remove('open'); } };
 
     const CoconutMgr = {
@@ -7612,6 +9083,12 @@
           lines.push(this.line('Cash Received', this.money(sale.cashReceived || sale.total)));
           lines.push(this.line('Change Due', this.money(sale.changeDue)));
         }
+        if (sale.customerName && sale.customerName !== 'Walk-in Customer') {
+          lines.push('-'.repeat(this.width));
+          lines.push(this.line('Customer', sale.customerName));
+          if (sale.earnedPoints > 0) lines.push(this.line('Loyalty Points Earned', '+' + sale.earnedPoints));
+          if (sale.updatedPoints !== undefined) lines.push(this.line('Loyalty Balance', sale.updatedPoints));
+        }
         lines.push('');
         lines.push(this.center(this.shopName()));
         this.footerNote().split('\n').forEach(line => {
@@ -7628,6 +9105,17 @@
               <span class="receipt-amount">${esc(row.amount)}</span>
             </div>
           </div>`).join('');
+          
+        let customerInfoHtml = '';
+        if (sale.customerName && sale.customerName !== 'Walk-in Customer') {
+          customerInfoHtml = `
+            <div style="border-top:1px dashed #94a3b8;margin:8px 0;"></div>
+            <div class="r-line"><span>Customer</span><span>${esc(sale.customerName)}</span></div>
+            ${sale.earnedPoints > 0 ? `<div class="r-line"><span>Points Earned</span><span>+${sale.earnedPoints}</span></div>` : ''}
+            ${sale.updatedPoints !== undefined ? `<div class="r-line"><span>Loyalty Balance</span><span>${sale.updatedPoints}</span></div>` : ''}
+          `;
+        }
+
         return `<div class="receipt">
           <div class="receipt-h">
             <div class="receipt-title">${esc(this.shopName())}</div>
@@ -7645,6 +9133,7 @@
               <div class="r-line"><span>Cash Received</span><span>${esc(this.money(sale.cashReceived || sale.total))}</span></div>
               <div class="r-line"><span>Change Due</span><span>${esc(this.money(sale.changeDue))}</span></div>
             ` : ''}
+            ${customerInfoHtml}
           </div>
           <div class="r-footer">
             <div class="receipt-footer-shop">${esc(this.shopName())}</div>
@@ -7815,7 +9304,6 @@
       async run(silent = false) {
         if (!S.cart.length) return;
         const total = Cart.total(); const sub = Cart.sub(); let profit = 0; const saleItems = [];
-        // Generate human-readable bill ID: date + seq
         const billDate = new Date();
         const billId = 'BILL-' + billDate.getFullYear().toString().slice(-2) + String(billDate.getMonth() + 1).padStart(2, '0') + String(billDate.getDate()).padStart(2, '0') + '-' + String(billDate.getHours()).padStart(2, '0') + String(billDate.getMinutes()).padStart(2, '0') + String(billDate.getSeconds()).padStart(2, '0');
 
@@ -7826,7 +9314,6 @@
           for (let i = 0; i < batches.length && remaining > 0; i++) {
             if ((batches[i].quantity || 0) <= 0) continue;
             const used = Math.min(batches[i].quantity, remaining);
-            // Fix: use batch costPrice, fall back to item costPrice, never 0 if item has cost
             const unitCost = batches[i].costPrice != null && batches[i].costPrice > 0
               ? batches[i].costPrice
               : (item.costPrice || 0);
@@ -7848,28 +9335,56 @@
             itemId: ci.itemId, name: ci.name, qty: ci.qty, unit: ci.unit,
             unitPrice: ci.unitPrice, costPrice: item.costPrice || 0,
             discount: ci.discount || 0, discType: ci.discType || 'percent',
-            price: ci.price - da, saleMode: ci.saleMode || 'retail'
+            price: ci.price - da, saleMode: ci.saleMode || 'retail',
+            serialNumbers: ci.serialNumbers || []
           });
         }
         const cda = S.cartDiscType === 'percent' ? sub * S.cartDisc / 100 : S.cartDisc;
 
         const payDetails = window._lastPaymentDetails || { payMethod: 'cash', cashReceived: total, changeDue: 0 };
 
-        // Build receipt text for storage
-        const cur = S.settings.currency; const shop = S.settings.shopName;
-        const dateStr = billDate.toLocaleString();
-        let receiptText = `${shop}\n${dateStr}\n${billId}\n${'─'.repeat(32)}\n`;
-        saleItems.forEach(si => {
-          receiptText += `${si.name}${si.saleMode === 'wholesale' ? ' [WS]' : ''}\n  ${si.qty} × ${cur}${si.unitPrice.toFixed(2)} = ${cur}${(si.price || 0).toFixed(2)}\n`;
-        });
-        receiptText += `${'─'.repeat(32)}\nSubtotal: ${cur}${sub.toFixed(2)}\n`;
-        if (cda > 0) receiptText += `Discount: -${cur}${cda.toFixed(2)}\n`;
-        receiptText += `TOTAL: ${cur}${total.toFixed(2)}\n`;
-        const pmLabels = { cash: 'Cash', card: 'Card', online: 'Online' };
-        receiptText += `Pay Method: ${pmLabels[payDetails.payMethod] || payDetails.payMethod.toUpperCase()}\n`;
-        if (payDetails.payMethod === 'cash') {
-          receiptText += `Cash Received: ${cur}${payDetails.cashReceived.toFixed(2)}\n`;
-          receiptText += `Change Due: ${cur}${payDetails.changeDue.toFixed(2)}\n`;
+        // Customer loyalty processing
+        const customerId = document.getElementById('cartCustomer').value;
+        const customer = customerId ? S.loan_customers.find(c => c.id === customerId) : null;
+        let earnedPoints = 0;
+        let updatedPoints = 0;
+        
+        if (customer) {
+          earnedPoints = Math.floor(total / 100);
+          const redeemed = window._redeemedPoints || 0;
+          updatedPoints = Math.max(0, (customer.loyaltyPoints || 0) + earnedPoints - redeemed);
+          await DB.patch('loan_customers/' + customer.id, { loyaltyPoints: updatedPoints });
+          window._redeemedPoints = 0;
+        }
+
+        // Register session updates
+        if (S.session && payDetails.payMethod === 'cash') {
+          S.session.salesTotal += total;
+          await DB.set(`sessions/${S.session.id}`, S.session);
+          SessionMgr.updateUI();
+        }
+
+        // Register warranties
+        for (const ci of S.cart) {
+          const item = S.items.find(i => i.id === ci.itemId);
+          if (item && (item.warrantyMonths > 0 || item.trackSerials)) {
+            const expiry = new Date(billDate);
+            expiry.setMonth(expiry.getMonth() + (item.warrantyMonths || 0));
+            const warrRecord = {
+              id: 'WARR_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+              itemId: item.id,
+              itemName: item.name,
+              serialNumber: ci.serialNumbers ? ci.serialNumbers.join(', ') : '',
+              saleDate: billDate.toISOString(),
+              expiryDate: expiry.toISOString(),
+              customerName: customer ? customer.name : 'Walk-in Customer',
+              customerPhone: customer ? customer.phone : '',
+              billId,
+              status: 'Active',
+              branchId: S.currentBranchId
+            };
+            await DB.push('warranties', warrRecord);
+          }
         }
 
         const sale = {
@@ -7879,20 +9394,26 @@
           payMethod: payDetails.payMethod,
           cashReceived: payDetails.cashReceived,
           changeDue: payDetails.changeDue,
-          receiptText
+          branchId: S.currentBranchId,
+          customerName: customer ? customer.name : 'Walk-in Customer',
+          earnedPoints,
+          updatedPoints
         };
         sale.receiptText = ReceiptFormatter.buildText(sale);
+        
         try {
           const id = await DB.push('sales', sale); sale.id = id;
           window._lastSale = sale;
           if (!silent) { Receipt.show(sale); }
           S.cart = []; S.cartDisc = 0; Cart.render(); await loadAll();
+          document.getElementById('cartCustomer').value = '';
+          CustomerMgr.onCartCustomerChange();
           if (!silent) toast('Sale completed! 🎉', 'success');
         } catch (e) { toast('Sale error: ' + e.message, 'error'); }
       },
       async runDirectCheckout() {
         window._lastPaymentDetails = { payMethod: 'cash', cashReceived: Cart.total(), changeDue: 0 };
-        await this.run(false);
+        WarrantyMgr.checkSerialsBeforeCheckout();
       }
     };
 
@@ -8102,6 +9623,19 @@
           }</div>
         <div class="form-group"><label>Unit</label><input id="fUnit" type="text" value="${esc(item?.unit || 'pcs')}" placeholder="pcs / kg / L"></div>
       </div>
+      
+      <!-- Serial and Warranty settings -->
+      <div class="grid-2" style="background:var(--bg3); padding:12px; border-radius:var(--r8); margin-bottom:12px; border:1px solid var(--border);">
+        <div class="form-group" style="display:flex; align-items:center; gap:8px; margin-bottom:0; justify-content:flex-start; height:100%;">
+          <input type="checkbox" id="fTrackSerials" ${item?.trackSerials ? 'checked' : ''} style="width:auto;">
+          <label for="fTrackSerials" style="margin-bottom:0; font-weight:700;">🛡️ Track Serials</label>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Warranty Duration (months)</label>
+          <input id="fWarranty" type="number" value="${item?.warrantyMonths || 0}" placeholder="0 = No Warranty" min="0">
+        </div>
+      </div>
+
       <div class="grid-2">
         <div class="form-group"><label>Low Stock Alert</label><input id="fThresh" type="number" value="${item?.lowStockThreshold || S.settings.lowStockAlert}" min="0"></div>
         <div class="form-group"><label>Default Discount (%)</label><input id="fDisc" type="number" value="${item?.defaultDiscount || 0}" min="0" max="100"></div>
@@ -8235,7 +9769,23 @@
         if (!name) { toast('Name required', 'error'); return; }
         const type = document.getElementById('fType').value;
         let finalImage = this._tempImageDataUrl || document.getElementById('fImg').value.trim() || null;
-        const data = { name, type, barcode: document.getElementById('fBarcode').value.trim() || null, categoryId: document.getElementById('fCat').value || null, price: parseFloat(document.getElementById('fPrice').value) || 0, costPrice: parseFloat(document.getElementById('fCost').value) || 0, unit: document.getElementById('fUnit').value || 'pcs', lowStockThreshold: parseFloat(document.getElementById('fThresh').value) || 5, defaultDiscount: parseFloat(document.getElementById('fDisc').value) || 0, image: finalImage, description: document.getElementById('fDesc').value.trim() || null, liquidOptions: type === 'liquid' ? this.getLiqOpts() : null, updatedAt: new Date().toISOString() };
+        const data = { 
+          name, 
+          type, 
+          barcode: document.getElementById('fBarcode').value.trim() || null, 
+          categoryId: document.getElementById('fCat').value || null, 
+          price: parseFloat(document.getElementById('fPrice').value) || 0, 
+          costPrice: parseFloat(document.getElementById('fCost').value) || 0, 
+          unit: document.getElementById('fUnit').value || 'pcs', 
+          lowStockThreshold: parseFloat(document.getElementById('fThresh').value) || 5, 
+          defaultDiscount: parseFloat(document.getElementById('fDisc').value) || 0, 
+          image: finalImage, 
+          description: document.getElementById('fDesc').value.trim() || null, 
+          liquidOptions: type === 'liquid' ? this.getLiqOpts() : null, 
+          updatedAt: new Date().toISOString(),
+          trackSerials: document.getElementById('fTrackSerials')?.checked || false,
+          warrantyMonths: parseInt(document.getElementById('fWarranty')?.value) || 0
+        };
         if (!id) { const iq = parseFloat(document.getElementById('fInitStock')?.value) || 0; data.createdAt = new Date().toISOString(); data.stockBatches = iq > 0 ? [{ batchId: 'b_' + Date.now(), quantity: iq, costPrice: data.costPrice, dateAdded: new Date().toISOString().split('T')[0] }] : []; await DB.push('items', data); toast('Product added ✅', 'success'); }
         else { await DB.patch('items/' + id, data); toast('Updated ✅', 'success'); }
         Modal.close('itemModal'); await loadAll();
@@ -9874,6 +11424,16 @@ window.onload=function(){
         <div class="form-group"><label>Low Stock Alert</label><input id="setLow" type="number" value="${S.settings.lowStockAlert || 5}" min="0"></div>
       </div>
       <div class="form-group"><label>Receipt Footer Note</label><input id="setNote" type="text" value="${esc(S.settings.receiptNote || '')}"></div>
+      
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
+      <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px">📡 Firebase Configuration</div>
+      <div class="form-group"><label>API Key</label><input id="setFbApiKey" type="password" value="${esc(S.settings.fbApiKey || '')}" placeholder="AIzaSy..."></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Project ID</label><input id="setFbProjectId" type="text" value="${esc(S.settings.fbProjectId || '')}" placeholder="chicken-shop-2d7b5"></div>
+        <div class="form-group"><label>Auth Domain</label><input id="setFbAuthDomain" type="text" value="${esc(S.settings.fbAuthDomain || '')}" placeholder="chicken-shop-2d7b5.firebaseapp.com"></div>
+      </div>
+      <div class="form-group"><label>Database URL</label><input id="setFbDatabaseURL" type="text" value="${esc(S.settings.fbDatabaseURL || '')}" placeholder="https://..."></div>
+
       <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
       <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px">🔑 Change Admin PIN</div>
       <div class="grid-3">
@@ -9935,6 +11495,13 @@ window.onload=function(){
         S.settings.currency = document.getElementById('setCur').value;
         S.settings.lowStockAlert = parseInt(document.getElementById('setLow').value) || 5;
         S.settings.receiptNote = document.getElementById('setNote').value;
+        
+        // Save Firebase details
+        S.settings.fbApiKey = document.getElementById('setFbApiKey').value.trim();
+        S.settings.fbProjectId = document.getElementById('setFbProjectId').value.trim();
+        S.settings.fbAuthDomain = document.getElementById('setFbAuthDomain').value.trim();
+        S.settings.fbDatabaseURL = document.getElementById('setFbDatabaseURL').value.trim();
+
         await DB.set('settings/main', S.settings);
         Modal.close('settingsModal'); toast('Settings saved ✅', 'success');
         Sync.pull().then(() => loadAll());
@@ -10118,7 +11685,7 @@ window.onload=function(){
       if (e.key === 'F8') {
         const checkoutBtn = document.getElementById('checkoutBtn');
         if (checkoutBtn && !checkoutBtn.disabled) {
-          Checkout.runDirectCheckout();
+          WarrantyMgr.checkSerialsBeforeCheckout();
           e.preventDefault();
         }
         return;
