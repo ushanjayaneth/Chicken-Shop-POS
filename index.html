@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="RCM POS">
   <meta name="theme-color" content="#060814">
-  <title>C_M POS</title>
+  <title>RMC POS</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
@@ -20,8 +20,6 @@
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="html5-qrcode.min.js"></script>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
       --bg: #060814;
@@ -1939,7 +1937,7 @@
       word-break: break-word;
     }
 
-    .receipt-footer-Home {
+    .receipt-footer-shop {
       font-size: 12px;
       font-weight: 800;
       color: #111827;
@@ -3639,139 +3637,9 @@
     .goog-te-gadget { display: none !important; }
     body { top: 0 !important; position: static !important; }
     html body { margin-top: 0 !important; }
-
-    /* ── Enterprise Additions ── */
-
-    /* Session bar */
-    .session-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      border-radius: var(--r12);
-      margin-bottom: 12px;
-      font-size: 13px;
-      gap: 10px;
-      flex-wrap: wrap;
-      width: 100%;
-    }
-    .session-info {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-    .session-badge {
-      padding: 3px 8px;
-      border-radius: var(--r8);
-      font-weight: 700;
-      font-size: 11px;
-    }
-    .session-badge.open {
-      background: var(--green2);
-      color: var(--green);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-    }
-    .session-badge.closed {
-      background: var(--red2);
-      color: var(--red);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-    
-    /* Customer Strip */
-    .customer-strip {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 8px 20px;
-      background: rgba(255, 255, 255, 0.02);
-      padding: 6px 12px;
-      border-radius: var(--r8);
-      border: 1px solid var(--border);
-    }
-    .customer-strip select {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--t1);
-      font-family: inherit;
-      font-size: 12px;
-      outline: none;
-    }
-    .customer-strip select option {
-      background: var(--bg2);
-      color: var(--t1);
-    }
-    
-    /* User Avatar and Branch indicator */
-    .user-avatar-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      padding: 4px 10px;
-      border-radius: 20px;
-      border: 1px solid var(--border2);
-      font-size: 12px;
-    }
-    .user-avatar {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--purple);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 11px;
-    }
-    
-    /* Hold list style */
-    .hold-bar {
-      display: flex;
-      gap: 6px;
-      padding: 0 20px 10px 20px;
-    }
-    .held-sale-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      border-radius: var(--r8);
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      margin-bottom: 8px;
-      font-size: 12px;
-    }
-    
-    /* Analytics container */
-    .analytics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 16px;
-      padding: 16px;
-    }
-    .chart-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r12);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .chart-container {
-      position: relative;
-      width: 100%;
-      height: 250px;
-    }
   </style>
 </head>
 <body>
-
 
 
   <div id="loader">
@@ -3792,7 +3660,7 @@
           <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
         </g>
       </svg>
-      C_M POS
+      RMC POS
     </div>
     <div class="spinner"></div>
     <div class="loader-text" id="loaderText">Initializing System...</div>
@@ -3822,7 +3690,7 @@
             <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
           </g>
         </svg>
-        <span class="nav-brand" style="margin-right:0;font-size:14px;font-weight:900;"> C_M POS</span>
+        <span class="nav-brand" style="margin-right:0;font-size:14px;font-weight:900;"> RMC POS</span>
       </div>
       <button class="btn btn-ghost btn-icon" onclick="Nav.closeMenu()" style="padding:4px; font-size:16px;">✕</button>
     </div>
@@ -3836,10 +3704,8 @@
       <div class="nav-tab" data-tab="returns" onclick="Nav.go('returns'); Nav.closeMenu()" data-lang="returns">🔄
         Returns</div>
       <div class="nav-tab" data-tab="coconut" onclick="Nav.go('coconut'); Nav.closeMenu()">🥥 Coconut</div>
-      <div class="nav-tab" data-tab="customers" onclick="Nav.go('customers'); Nav.closeMenu()">👥 Customers</div>
-      <div class="nav-tab" data-tab="warranty" onclick="Nav.go('warranty'); Nav.closeMenu()">🛡️ Warranty</div>
-      <div class="nav-tab" data-tab="analytics" onclick="Nav.go('analytics'); Nav.closeMenu()">📈 Analytics</div>
-      <div class="nav-tab" data-tab="dayend" onclick="Nav.go('dayend'); Nav.closeMenu()" data-lang="dayend">📊 Day End</div>
+      <div class="nav-tab" data-tab="dayend" onclick="Nav.go('dayend'); Nav.closeMenu()" data-lang="dayend">📊 Day End
+      </div>
       <div class="nav-tab" data-tab="admin" onclick="Nav.go('admin'); Nav.closeMenu()" data-lang="admin">🔐 Admin</div>
     </div>
   </div>
@@ -3878,9 +3744,6 @@
         <div class="nav-tab" data-tab="loans" onclick="Nav.go('loans')" data-lang="loans">💳 Loans</div>
         <div class="nav-tab" data-tab="returns" onclick="Nav.go('returns')" data-lang="returns">🔄 Returns</div>
         <div class="nav-tab" data-tab="coconut" onclick="Nav.go('coconut')">🥥 Coconut</div>
-        <div class="nav-tab" data-tab="customers" onclick="Nav.go('customers')">👥 Customers</div>
-        <div class="nav-tab" data-tab="warranty" onclick="Nav.go('warranty')">🛡️ Warranty</div>
-        <div class="nav-tab" data-tab="analytics" onclick="Nav.go('analytics')">📈 Analytics</div>
         <div class="nav-tab" data-tab="dayend" onclick="Nav.go('dayend')" data-lang="dayend">📊 Day End</div>
         <div class="nav-tab" data-tab="admin" onclick="Nav.go('admin')" data-lang="admin">🔐 Admin</div>
       </div>
@@ -3889,8 +3752,6 @@
         <div class="bt-dot" id="btDot" title="Bluetooth Printer"></div>
         <div class="sync-dot" id="syncDot" title="Firebase sync"></div>
         <div class="clock-display" id="clock">00:00:00</div>
-        
-
         <!-- Google Translate Button -->
         <button class="gt-btn" id="gtNavBtn" onclick="GT.toggle()" title="Translate App">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -3907,20 +3768,6 @@
 
       <!-- POS TAB -->
       <div class="tab-panel active" id="posTab">
-        <!-- Session Tracking Bar -->
-        <div class="session-bar" id="sessionBar">
-          <div class="session-info">
-            <span class="session-badge open" id="sessionStatus">Session: Active</span>
-            <span>👤 Cashier: <strong id="sessionUser">Admin</strong></span>
-            <span>📍 Branch: <strong id="sessionBranch">Main</strong></span>
-            <span>💵 Drawer Cash: <strong id="sessionCash" class="mono">Rs. 0.00</strong></span>
-          </div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-ghost btn-xs" onclick="SessionMgr.cashMovementPrompt()">💸 Cash In/Out</button>
-            <button class="btn btn-danger btn-xs" onclick="SessionMgr.closeSessionPrompt()">🔒 End Session</button>
-          </div>
-        </div>
-
         <div class="pos-left">
           <div class="pos-topbar">
             <div class="pos-search">
@@ -3950,28 +3797,17 @@
         </div>
         <div class="cart-panel">
           <div class="cart-head" style="flex-direction:column;align-items:stretch;padding:0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 20px 5px 20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 20px;">
               <button class="btn btn-ghost btn-xs mobile-only" onclick="POS.toggleCartView(false)">← Back</button>
               <div class="cart-title"><span data-lang="cart">🛒 Cart</span> <span class="cart-badge"
                   id="cartCount">0</span></div>
-              <button class="btn btn-ghost btn-xs" onclick="Cart.clear()" data-lang="clear">Clear</button>
+              <div style="display:flex;gap:4px;align-items:center;">
+                <button class="btn btn-orange btn-xs" onclick="HoldSale.openList()" title="Held Sales" style="position:relative;">
+                  ⏸ Hold <span id="heldBadge" style="display:none;background:var(--orange);color:#000;border-radius:10px;font-size:9px;font-weight:900;padding:1px 5px;margin-left:2px;">0</span>
+                </button>
+                <button class="btn btn-ghost btn-xs" onclick="Cart.clear()" data-lang="clear">Clear</button>
+              </div>
             </div>
-            
-            <!-- Customer Selector CRM Strip -->
-            <div class="customer-strip">
-              <span>👥</span>
-              <select id="cartCustomer" onchange="CustomerMgr.onCartCustomerChange()">
-                <option value="">Walk-in Customer</option>
-              </select>
-              <button class="btn btn-ghost btn-xs" onclick="CustomerMgr.openAddModal()" style="padding:2px 6px;">+ New</button>
-            </div>
-
-            <!-- Loyalty Points Display -->
-            <div id="loyaltyRedeemRow" style="display:none; padding:0 20px 8px 20px; align-items:center; justify-content:space-between; font-size:12px;">
-              <span style="color:var(--green); font-weight:700;" id="loyaltyPointsLabel">Points: 0</span>
-              <button class="btn btn-success btn-xs" id="redeemPointsBtn" onclick="CustomerMgr.redeemPointsPrompt()">Redeem Points</button>
-            </div>
-
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; padding:0 20px 10px 20px;">
               <button class="btn btn-sm active" id="gModeRetail" onclick="POS.setMode('retail')" data-lang="retail">🏪
                 Retail</button>
@@ -4004,13 +3840,7 @@
               <div class="total-row grand"><span data-lang="total">Total</span><span class="amount" id="cartTotal">Rs.
                   0.00</span></div>
             </div>
-            <!-- Hold / Recall sale buttons -->
-            <div class="hold-bar">
-              <button class="btn btn-ghost btn-sm" id="holdSaleBtn" onclick="HoldMgr.hold()" style="flex:1;">📥 Hold Sale</button>
-              <button class="btn btn-ghost btn-sm" id="recallSaleBtn" onclick="HoldMgr.openRecallModal()" style="flex:1;">📤 Recall (<span id="heldCount">0</span>)</button>
-            </div>
-
-            <button class="checkout-btn" id="checkoutBtn" onclick="WarrantyMgr.checkSerialsBeforeCheckout()" disabled
+            <button class="checkout-btn" id="checkoutBtn" onclick="Checkout.runDirectCheckout()" disabled
               data-lang="completeSale">💳 Complete Sale</button>
             <button class="checkout-btn" id="loanCheckoutBtn" onclick="Checkout.runWithLoan()" disabled
               data-lang="sendLoans"
@@ -4091,85 +3921,6 @@
               <div id="lowStockDiv"></div>
             </div>
           </div>
-          <!-- Users & Branches Section -->
-          <div class="admin-section mb-12">
-            <h3>👥 Users & Branch Management</h3>
-            <div class="opt-tabs" style="margin-bottom: 12px; border: 1px solid var(--border);">
-              <div class="opt-tab active" id="adminSubTabUsers" onclick="Admin.switchSubTab('users')">👥 Users</div>
-              <div class="opt-tab" id="adminSubTabBranches" onclick="Admin.switchSubTab('branches')">📍 Branches</div>
-            </div>
-            
-            <!-- Users list & Add User -->
-            <div id="adminSecUsers">
-              <div style="display:grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap:8px; align-items:end; margin-bottom:12px;">
-                <div class="form-group" style="margin-bottom:0;">
-                  <label>Email *</label>
-                  <input type="email" id="newUserEmail" placeholder="staff@chickenpos.com" style="font-size:12px; padding:6px 10px;">
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                  <label>Role</label>
-                  <select id="newUserRole" style="font-size:12px; padding:5px 8px;">
-                    <option value="cashier">Cashier</option>
-                    <option value="manager">Manager</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                  <label>Branch</label>
-                  <select id="newUserBranch" style="font-size:12px; padding:5px 8px;">
-                    <option value="main">Main Branch</option>
-                  </select>
-                </div>
-                <button class="btn btn-primary btn-sm" onclick="Admin.addUser()" style="white-space:nowrap; padding:6px 12px;">+ Add User</button>
-              </div>
-              <div class="table-wrap">
-                <table style="width:100%;">
-                  <thead>
-                    <tr>
-                      <th>User ID/Email</th>
-                      <th>Role</th>
-                      <th>Branch</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adminUsersBody">
-                    <tr><td colspan="5" style="text-align:center; padding:15px; color:var(--t3);">No users registered</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Branches list & Add Branch -->
-            <div id="adminSecBranches" style="display:none;">
-              <div style="display:grid; grid-template-columns: 1fr 1.2fr auto; gap:8px; align-items:end; margin-bottom:12px;">
-                <div class="form-group" style="margin-bottom:0;">
-                  <label>Branch Name *</label>
-                  <input type="text" id="newBranchName" placeholder="e.g. Negombo Branch" style="font-size:12px; padding:6px 10px;">
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                  <label>Location / Details</label>
-                  <input type="text" id="newBranchLoc" placeholder="e.g. Negombo Town" style="font-size:12px; padding:6px 10px;">
-                </div>
-                <button class="btn btn-primary btn-sm" onclick="Admin.addBranch()" style="padding:6px 12px;">+ Add Branch</button>
-              </div>
-              <div class="table-wrap">
-                <table style="width:100%;">
-                  <thead>
-                    <tr>
-                      <th>Branch Name</th>
-                      <th>Location / Details</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adminBranchesBody">
-                    <tr><td colspan="3" style="text-align:center; padding:15px; color:var(--t3);">No branches configured</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
           <div class="admin-section mb-12">
             <h3>📋 Recent Sales</h3>
             <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
@@ -4836,107 +4587,6 @@
         </div>
       </div>
 
-      <!-- CUSTOMERS TAB -->
-      <div class="tab-panel" id="customersTab">
-        <div class="inv-bar">
-          <h2>👥 Customers & Loyalty</h2>
-          <input type="text" class="inv-search" id="custSearch" placeholder="🔍 Search customers by name or phone..." oninput="CustomerMgr.render()">
-          <button class="btn btn-primary btn-sm" onclick="CustomerMgr.openAddModal()" style="margin-left:auto;">+ Add Customer</button>
-        </div>
-        <div class="table-wrap" style="height:calc(100vh - 120px); overflow-y:auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Email / ID</th>
-                <th>Loyalty Points</th>
-                <th>Branch</th>
-                <th>Joined Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="custBody">
-              <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--t3)">No customers found</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- WARRANTY TAB -->
-      <div class="tab-panel" id="warrantyTab">
-        <div class="inv-bar">
-          <h2>🛡️ Warranty Management</h2>
-          <input type="text" class="inv-search" id="warrSearch" placeholder="🔍 Search by Serial / Bill ID / Customer..." oninput="WarrantyMgr.render()">
-        </div>
-        <div class="table-wrap" style="height:calc(100vh - 120px); overflow-y:auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Serial Number</th>
-                <th>Customer</th>
-                <th>Bill ID</th>
-                <th>Sold Date</th>
-                <th>Warranty Expiry</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="warrBody">
-              <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--t3)">No warranty records found</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ANALYTICS TAB -->
-      <div class="tab-panel" id="analyticsTab">
-        <div class="inv-bar">
-          <h2>📈 Enterprise Analytics</h2>
-          <div style="margin-left:auto; display:flex; gap:6px;">
-            <select id="analyticsBranchFilter" onchange="AnalyticsMgr.render()" style="padding:6px; border-radius:var(--r8); background:var(--bg3); border:1px solid var(--border); color:#fff; display:none;">
-              <option value="all">All Branches</option>
-            </select>
-            <select id="analyticsPeriod" onchange="AnalyticsMgr.render()" style="padding:6px; border-radius:var(--r8); background:var(--bg3); border:1px solid var(--border); color:#fff;">
-              <option value="30">Last 30 Days</option>
-              <option value="7">Last 7 Days</option>
-              <option value="90">Last 90 Days</option>
-              <option value="this_month">This Month</option>
-            </select>
-          </div>
-        </div>
-        <div style="height:calc(100vh - 110px); overflow-y:auto; padding-bottom:30px;">
-          <div class="stats-row" id="analyticsStatsRow" style="padding:16px 16px 0 16px;"></div>
-          <div class="analytics-grid">
-            <div class="chart-card">
-              <h3>💵 Revenue Trend</h3>
-              <div class="chart-container">
-                <canvas id="chartRevenue"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <h3>🗂️ Sales by Category</h3>
-              <div class="chart-container">
-                <canvas id="chartCategory"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <h3>🏆 Top Products</h3>
-              <div class="chart-container">
-                <canvas id="chartTopProducts"></canvas>
-              </div>
-            </div>
-            <div class="chart-card">
-              <h3>💳 Payment Methods</h3>
-              <div class="chart-container">
-                <canvas id="chartPaymentMethods"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -4965,7 +4615,20 @@
       <div id="discBody"></div>
     </div>
   </div>
+  <!-- Hold Sale Modal -->
+  <div class="overlay" id="holdSaleModal">
+    <div class="modal modal-md">
+      <div class="modal-head">
+        <div class="modal-title">⏸ Hold Sale</div>
+        <button class="modal-x" onclick="Modal.close('holdSaleModal')">✕</button>
+      </div>
+      <div id="holdSaleBody">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+  </div>
   <!-- Loan modals -->
+
   <div class="overlay" id="loanCustomerModal">
     <div class="modal modal-sm">
       <div class="modal-head">
@@ -5137,80 +4800,6 @@
     </div>
   </div>
 
-  <!-- Customer Add/Edit Modal -->
-  <div class="overlay" id="custModal">
-    <div class="modal modal-sm">
-      <div class="modal-head">
-        <div class="modal-title" id="custModalTitle">👤 Add New Customer</div>
-        <button class="modal-x" onclick="Modal.close('custModal')">✕</button>
-      </div>
-      <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
-        <input type="hidden" id="fCustId">
-        <div class="form-group"><label>Customer Name *</label><input type="text" id="fCustName" placeholder="e.g. John Doe"></div>
-        <div class="form-group"><label>Phone Number *</label><input type="text" id="fCustPhone" placeholder="e.g. 0771234567"></div>
-        <div class="form-group"><label>Email Address</label><input type="email" id="fCustEmail" placeholder="e.g. john@example.com"></div>
-        <div class="form-group"><label>NIC / ID Number</label><input type="text" id="fCustNIC" placeholder="e.g. 951234567V"></div>
-        <div class="form-group"><label>Address</label><input type="text" id="fCustAddress" placeholder="e.g. Negombo"></div>
-        <div class="form-group"><label>Loyalty Points</label><input type="number" id="fCustPoints" value="0" min="0"></div>
-      </div>
-      <div class="modal-foot">
-        <button class="btn btn-ghost" onclick="Modal.close('custModal')">Cancel</button>
-        <button class="btn btn-primary" onclick="CustomerMgr.save()">💾 Save Customer</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Serial Entry Modal -->
-  <div class="overlay" id="serialModal">
-    <div class="modal modal-md">
-      <div class="modal-head">
-        <div class="modal-title">🛡️ Scan / Enter Serial Numbers</div>
-        <button class="modal-x" onclick="Modal.close('serialModal')">✕</button>
-      </div>
-      <div id="serialModalBody" style="padding:16px; display:flex; flex-direction:column; gap:12px; max-height:400px; overflow-y:auto;">
-        <!-- Filled dynamically -->
-      </div>
-      <div class="modal-foot">
-        <button class="btn btn-ghost" onclick="Modal.close('serialModal')">Cancel</button>
-        <button class="btn btn-primary" onclick="WarrantyMgr.confirmSerials()">Confirm Serials</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Warranty Claim Modal -->
-  <div class="overlay" id="claimModal">
-    <div class="modal modal-sm">
-      <div class="modal-head">
-        <div class="modal-title">🛡️ Log Warranty Claim</div>
-        <button class="modal-x" onclick="Modal.close('claimModal')">✕</button>
-      </div>
-      <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
-        <input type="hidden" id="fClaimWarrId">
-        <div class="form-group"><label>Product</label><div id="claimProdName" style="font-weight:700; color:var(--cyan)"></div></div>
-        <div class="form-group"><label>Serial Number</label><div id="claimSerialNo" style="font-weight:700;"></div></div>
-        <div class="form-group"><label>Issue Description *</label><textarea id="fClaimIssue" rows="3" placeholder="Enter problem details..."></textarea></div>
-        <div class="form-group"><label>Resolution Action</label><select id="fClaimResolution"><option value="Repair">🛠️ Repair Item</option><option value="Replacement">🔄 Replace with New Item</option><option value="Refund">💵 Refund Customer</option><option value="Rejected">❌ Reject Claim</option></select></div>
-      </div>
-      <div class="modal-foot">
-        <button class="btn btn-ghost" onclick="Modal.close('claimModal')">Cancel</button>
-        <button class="btn btn-primary" onclick="WarrantyMgr.saveClaim()">💾 Log Claim</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Held Sales Modal -->
-  <div class="overlay" id="heldSalesModal">
-    <div class="modal modal-md">
-      <div class="modal-head">
-        <div class="modal-title">📥 Recall Held Sales</div>
-        <button class="modal-x" onclick="Modal.close('heldSalesModal')">✕</button>
-      </div>
-      <div id="heldSalesList" style="padding:16px; max-height:400px; overflow-y:auto;">
-        <!-- Filled dynamically -->
-      </div>
-    </div>
-  </div>
-
   <div class="shortcut-bar">
     <span>F2</span> <span data-lang="search">Search</span> |
     <span>F4</span> <span data-lang="scanBarcode">Barcode</span> |
@@ -5222,7 +4811,7 @@
   <script>
     'use strict';
 
-    // Enterprise Sync Config
+    // 100% Offline-only POS Config
     const S = {
       categories: [], items: [], sales: [],
       coconut_purchases: [], coconut_husking: [], coconut_sales: [], cash_movements: [], day_ends: [],
@@ -5230,738 +4819,15 @@
       loans: [], loan_customers: [],
       settings: { shopName: '  Chicken Shop', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.', apiServerUrl: '' },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
+      heldSales: [],
       activeCat: 'all', adminUnlocked: false, pollTimer: null,
       isOnline: false,
-      lang: 'en',
-      
-      // Enterprise States
-      currentUser: null,
-      currentBranchId: 'main',
-      session: null,
-      heldSales: []
+      lang: 'en'
     };
 
     function getApiUrl(path) {
-      const branchId = S.currentBranchId || 'main';
-      if (path === 'settings/main' || path.startsWith('branches') || path.startsWith('users') || path.startsWith('global') || path.startsWith('sessions')) {
-        return '/api/data/' + path;
-      }
-      return `/api/data/branches/${branchId}/${path}`;
+      return '/api/data/' + path;
     }
-
-    // ── NO AUTH (direct access) ──
-    const AuthMgr = {
-      async init() {
-        S.currentUser = { uid: 'local', email: 'admin', role: 'admin', name: 'Admin' };
-        S.currentBranchId = 'main';
-        // Hide loader and show app
-        document.getElementById('loader').classList.add('hide');
-        SessionMgr.init();
-        Sync.start();
-      },
-      applyPermissions() {
-        document.querySelectorAll('.nav-tab').forEach(el => { el.style.display = 'flex'; });
-      }
-    };
-
-    // ── SESSION MANAGER ──
-    const SessionMgr = {
-      async init() {
-        const sessions = await DB.get('sessions') || {};
-        const openSession = Object.values(sessions).find(s => s && s.status === 'open' && s.userId === S.currentUser.email);
-        
-        if (openSession) {
-          S.session = openSession;
-          this.updateUI();
-        } else {
-          S.session = null;
-          this.updateUI();
-          this.promptOpeningCash();
-        }
-      },
-
-      promptOpeningCash() {
-        // Use a non-blocking modal instead of prompt()
-        const modalHtml = `
-          <div id="openCashModal" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;">
-            <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r16);padding:28px;max-width:340px;width:90%;">
-              <div style="font-size:16px;font-weight:800;margin-bottom:16px;text-align:center">💰 Opening Cash</div>
-              <div style="color:var(--t2);font-size:13px;margin-bottom:12px;">Drawer ඇතුළී ගල්ල නිකළය උනාන්න (රු.) ඇතුළු කරන්න:</div>
-              <input id="openCashAmt" type="number" value="2000" min="0" style="margin-bottom:16px;font-size:16px;font-weight:700;text-align:center;">
-              <div style="display:flex;gap:10px;">
-                <button onclick="SessionMgr._openCashConfirm()" style="flex:1;padding:12px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#000;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;font-size:14px;">✅ Start Session</button>
-                <button onclick="document.getElementById('openCashModal').remove()" style="padding:12px 16px;background:var(--glass);border:1px solid var(--border2);color:var(--t2);border-radius:var(--r8);cursor:pointer;">❌</button>
-              </div>
-            </div>
-          </div>`;
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        setTimeout(() => document.getElementById('openCashAmt')?.focus(), 100);
-      },
-
-      _openCashConfirm() {
-        const el = document.getElementById('openCashAmt');
-        const val = parseFloat(el?.value) || 0;
-        document.getElementById('openCashModal')?.remove();
-        const session = {
-          id: 'SESS_' + Date.now(),
-          openingCash: val,
-          cashIn: 0,
-          cashOut: 0,
-          salesTotal: 0,
-          startTime: new Date().toISOString(),
-          status: 'open',
-          userId: S.currentUser.email,
-          branchId: S.currentBranchId
-        };
-        DB.set(`sessions/${session.id}`, session);
-        S.session = session;
-        this.updateUI();
-        toast('Session started with Rs. ' + val.toFixed(2), 'success');
-      },
-
-      cashMovementPrompt() {
-        if (!S.session) { toast('No active session', 'error'); return; }
-        const type = prompt('Enter movement type (in / out):', 'in');
-        if (!type || (type !== 'in' && type !== 'out')) return;
-        const amt = prompt('Enter amount (Rs.):');
-        if (!amt) return;
-        const val = parseFloat(amt) || 0;
-        const reason = prompt('Enter reason:');
-        
-        if (type === 'in') S.session.cashIn += val;
-        else S.session.cashOut += val;
-        
-        DB.set(`sessions/${S.session.id}`, S.session);
-        
-        const move = {
-          id: 'M_' + Date.now(),
-          type,
-          amount: val,
-          reason: reason || 'Manual drawer adjustments',
-          date: new Date().toISOString(),
-          sessionId: S.session.id
-        };
-        DB.push('cash_movements', move);
-        
-        this.updateUI();
-        toast('Drawer updated!', 'success');
-      },
-
-      closeSessionPrompt() {
-        if (!S.session) return;
-        
-        const expected = S.session.openingCash + S.session.cashIn - S.session.cashOut + S.session.salesTotal;
-        const actual = prompt(`🔒 Close Register Session\n\nExpected Cash in Drawer: Rs. ${expected.toFixed(2)}\n\nEnter actual Cash in Drawer (Rs.):`, expected.toFixed(2));
-        if (actual === null) return;
-        
-        const actVal = parseFloat(actual) || 0;
-        const diff = actVal - expected;
-        
-        S.session.status = 'closed';
-        S.session.endTime = new Date().toISOString();
-        S.session.actualCash = actVal;
-        S.session.difference = diff;
-        
-        DB.set(`sessions/${S.session.id}`, S.session);
-        
-        const cur = S.settings.currency;
-        const zReport = `
-================================
-         Z-REPORT SUMMARY        
-================================
-Session ID : ${S.session.id}
-Opened At  : ${new Date(S.session.startTime).toLocaleString()}
-Closed At  : ${new Date(S.session.endTime).toLocaleString()}
-User       : ${S.session.userId}
---------------------------------
-Opening Cash : ${cur} ${S.session.openingCash.toFixed(2)}
-Cash In (+)  : ${cur} ${S.session.cashIn.toFixed(2)}
-Cash Out (-) : ${cur} ${S.session.cashOut.toFixed(2)}
-Cash Sales   : ${cur} ${S.session.salesTotal.toFixed(2)}
-Expected Cash: ${cur} ${expected.toFixed(2)}
-Actual Cash  : ${cur} ${actVal.toFixed(2)}
-Difference   : ${cur} ${diff.toFixed(2)}
-================================
-`;
-        alert(zReport);
-        console.log(zReport);
-        
-        S.session = null;
-        this.updateUI();
-        this.promptOpeningCash();
-      },
-
-      updateUI() {
-        const bar = document.getElementById('sessionBar');
-        if (!bar) return;
-        if (S.session) {
-          document.getElementById('sessionStatus').className = 'session-badge open';
-          document.getElementById('sessionStatus').textContent = 'Session: Open';
-          document.getElementById('sessionUser').textContent = S.currentUser ? S.currentUser.email.split('@')[0] : 'Staff';
-          const expected = S.session.openingCash + S.session.cashIn - S.session.cashOut + S.session.salesTotal;
-          document.getElementById('sessionCash').textContent = S.settings.currency + ' ' + expected.toFixed(2);
-        } else {
-          document.getElementById('sessionStatus').className = 'session-badge closed';
-          document.getElementById('sessionStatus').textContent = 'Session: Closed';
-          document.getElementById('sessionCash').textContent = S.settings.currency + ' 0.00';
-        }
-      }
-    };
-
-    // ── CUSTOMER CRM & LOYALTY MANAGER ──
-    const CustomerMgr = {
-      openAddModal() {
-        document.getElementById('custModalTitle').textContent = '👤 Add New Customer';
-        document.getElementById('fCustId').value = '';
-        document.getElementById('fCustName').value = '';
-        document.getElementById('fCustPhone').value = '';
-        document.getElementById('fCustEmail').value = '';
-        document.getElementById('fCustNIC').value = '';
-        document.getElementById('fCustAddress').value = '';
-        document.getElementById('fCustPoints').value = '0';
-        Modal.open('custModal');
-      },
-
-      openEditModal(id) {
-        const c = S.loan_customers.find(cust => cust.id === id);
-        if (!c) return;
-        document.getElementById('custModalTitle').textContent = '✏️ Edit Customer';
-        document.getElementById('fCustId').value = c.id;
-        document.getElementById('fCustName').value = c.name || '';
-        document.getElementById('fCustPhone').value = c.phone || '';
-        document.getElementById('fCustEmail').value = c.email || '';
-        document.getElementById('fCustNIC').value = c.nic || '';
-        document.getElementById('fCustAddress').value = c.address || '';
-        document.getElementById('fCustPoints').value = c.loyaltyPoints || 0;
-        Modal.open('custModal');
-      },
-
-      async save() {
-        const id = document.getElementById('fCustId').value;
-        const name = document.getElementById('fCustName').value.trim();
-        const phone = document.getElementById('fCustPhone').value.trim();
-        if (!name || !phone) { toast('Name and Phone are required', 'error'); return; }
-        
-        const data = {
-          name,
-          phone,
-          email: document.getElementById('fCustEmail').value.trim(),
-          nic: document.getElementById('fCustNIC').value.trim(),
-          address: document.getElementById('fCustAddress').value.trim(),
-          loyaltyPoints: parseInt(document.getElementById('fCustPoints').value) || 0,
-          updatedAt: new Date().toISOString()
-        };
-
-        if (!id) {
-          data.createdAt = new Date().toISOString();
-          data.branchId = S.currentBranchId;
-          await DB.push('loan_customers', data);
-          toast('Customer added successfully', 'success');
-        } else {
-          await DB.patch('loan_customers/' + id, data);
-          toast('Customer updated successfully', 'success');
-        }
-        
-        Modal.close('custModal');
-        await loadAll();
-        this.updateCartDropdown();
-      },
-
-      render() {
-        const tbody = document.getElementById('custBody');
-        if (!tbody) return;
-        
-        const q = document.getElementById('custSearch').value.trim().toLowerCase();
-        let list = [...S.loan_customers];
-        if (q) {
-          list = list.filter(c => (c.name || '').toLowerCase().includes(q) || (c.phone || '').includes(q));
-        }
-        
-        if (!list.length) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--t3)">No customers found</td></tr>`;
-          return;
-        }
-        
-        tbody.innerHTML = list.map(c => `
-          <tr>
-            <td><strong>${esc(c.name)}</strong></td>
-            <td>${esc(c.phone)}</td>
-            <td>${esc(c.email || c.nic || '—')}</td>
-            <td style="color:var(--green); font-weight:700;">🪙 ${c.loyaltyPoints || 0} pts</td>
-            <td><span class="badge badge-purple">${esc(c.branchId || 'Main')}</span></td>
-            <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td>
-            <td>
-              <button class="btn btn-ghost btn-xs" onclick="CustomerMgr.openEditModal('${c.id}')">✏️ Edit</button>
-              <button class="btn btn-danger btn-xs" onclick="CustomerMgr.delete('${c.id}')">✕ Delete</button>
-            </td>
-          </tr>
-        `).join('');
-      },
-
-      async delete(id) {
-        if (!confirm('Are you sure you want to delete this customer?')) return;
-        await DB.del('loan_customers/' + id);
-        toast('Customer deleted', 'info');
-        await loadAll();
-        this.updateCartDropdown();
-      },
-
-      updateCartDropdown() {
-        const sel = document.getElementById('cartCustomer');
-        if (!sel) return;
-        const curSel = sel.value;
-        let h = `<option value="">Walk-in Customer</option>`;
-        S.loan_customers.forEach(c => {
-          h += `<option value="${c.id}" ${curSel === c.id ? 'selected' : ''}>${esc(c.name)} (${c.phone}) — 🪙 ${c.loyaltyPoints || 0} pts</option>`;
-        });
-        sel.innerHTML = h;
-      },
-
-      onCartCustomerChange() {
-        const id = document.getElementById('cartCustomer').value;
-        const row = document.getElementById('loyaltyRedeemRow');
-        const lbl = document.getElementById('loyaltyPointsLabel');
-        
-        if (id) {
-          const c = S.loan_customers.find(cust => cust.id === id);
-          if (c) {
-            row.style.display = 'flex';
-            lbl.textContent = `Loyalty Balance: 🪙 ${c.loyaltyPoints || 0} points`;
-            return;
-          }
-        }
-        row.style.display = 'none';
-      },
-
-      redeemPointsPrompt() {
-        const id = document.getElementById('cartCustomer').value;
-        if (!id) return;
-        const c = S.loan_customers.find(cust => cust.id === id);
-        if (!c || !c.loyaltyPoints) { toast('No points to redeem', 'error'); return; }
-        
-        const pts = prompt(`Redeem Points (Max: ${c.loyaltyPoints})\n1 Point = Rs. 1.00 Discount\nEnter points to redeem:`, c.loyaltyPoints);
-        if (pts === null) return;
-        const val = Math.min(c.loyaltyPoints, parseInt(pts) || 0);
-        if (val <= 0) return;
-        
-        S.cartDisc = val;
-        S.cartDiscType = 'fixed';
-        Cart.render();
-        
-        window._redeemedPoints = val;
-        toast(`Redeemed ${val} points! Rs. ${val.toFixed(2)} discount applied.`, 'success');
-      }
-    };
-
-    // ── HOLD / RECALL MANAGER ──
-    const HoldMgr = {
-      hold() {
-        if (!S.cart.length) { toast('Cart is empty', 'error'); return; }
-        
-        const label = prompt('Enter a label/identifier for this held sale:', 'Table ' + (S.heldSales.length + 1));
-        if (label === null) return;
-        
-        const held = {
-          id: 'HOLD_' + Date.now(),
-          label: label || 'Untitled',
-          cart: [...S.cart],
-          discount: S.cartDisc,
-          discountType: S.cartDiscType,
-          customerId: document.getElementById('cartCustomer').value,
-          time: new Date().toISOString()
-        };
-        
-        S.heldSales.push(held);
-        localStorage.setItem('held_sales', JSON.stringify(S.heldSales));
-        
-        S.cart = [];
-        S.cartDisc = 0;
-        document.getElementById('cartCustomer').value = '';
-        CustomerMgr.onCartCustomerChange();
-        Cart.render();
-        
-        this.updateBadge();
-        toast('Sale held! 📥', 'success');
-      },
-
-      updateBadge() {
-        const count = S.heldSales.length;
-        document.getElementById('heldCount').textContent = count;
-      },
-
-      openRecallModal() {
-        if (!S.heldSales.length) { toast('No held sales available', 'info'); return; }
-        
-        const body = document.getElementById('heldSalesList');
-        const cur = S.settings.currency;
-        
-        body.innerHTML = S.heldSales.map((h, i) => {
-          const tot = h.cart.reduce((s, ci) => s + ci.price, 0);
-          return `
-            <div class="held-sale-item">
-              <div>
-                <strong>${esc(h.label)}</strong><br>
-                <span style="font-size:10px; color:var(--t3);">${new Date(h.time).toLocaleTimeString()} (${h.cart.length} items)</span>
-              </div>
-              <div style="display:flex; gap:6px; align-items:center;">
-                <span style="font-weight:700; color:var(--cyan); margin-right:10px;">${cur} ${tot.toFixed(2)}</span>
-                <button class="btn btn-primary btn-xs" onclick="HoldMgr.recall(${i})">📥 Recall</button>
-                <button class="btn btn-danger btn-xs" onclick="HoldMgr.delete(${i})">✕</button>
-              </div>
-            </div>
-          `;
-        }).join('');
-        
-        Modal.open('heldSalesModal');
-      },
-
-      recall(idx) {
-        const h = S.heldSales[idx];
-        if (!h) return;
-        
-        S.cart = h.cart;
-        S.cartDisc = h.discount;
-        S.cartDiscType = h.discountType;
-        document.getElementById('cartCustomer').value = h.customerId;
-        CustomerMgr.onCartCustomerChange();
-        Cart.render();
-        
-        S.heldSales.splice(idx, 1);
-        localStorage.setItem('held_sales', JSON.stringify(S.heldSales));
-        
-        Modal.close('heldSalesModal');
-        this.updateBadge();
-        toast('Sale recalled successfully', 'success');
-      },
-
-      delete(idx) {
-        if (!confirm('Discard this held sale?')) return;
-        S.heldSales.splice(idx, 1);
-        localStorage.setItem('held_sales', JSON.stringify(S.heldSales));
-        this.updateBadge();
-        this.openRecallModal();
-        if (S.heldSales.length === 0) Modal.close('heldSalesModal');
-      }
-    };
-
-    // ── WARRANTY & SERIAL MANAGER ──
-    const WarrantyMgr = {
-      openClaimModal(warrId) {
-        const list = S.warranties || [];
-        const w = list.find(item => item.id === warrId);
-        if (!w) return;
-        
-        document.getElementById('fClaimWarrId').value = w.id;
-        document.getElementById('claimProdName').textContent = w.itemName;
-        document.getElementById('claimSerialNo').textContent = w.serialNumber || 'No Serial';
-        document.getElementById('fClaimIssue').value = '';
-        document.getElementById('fClaimResolution').value = 'Repair';
-        Modal.open('claimModal');
-      },
-
-      async saveClaim() {
-        const id = document.getElementById('fClaimWarrId').value;
-        const issue = document.getElementById('fClaimIssue').value.trim();
-        const res = document.getElementById('fClaimResolution').value;
-        if (!issue) { toast('Please enter issue description', 'error'); return; }
-        
-        const warr = S.warranties.find(w => w.id === id);
-        if (!warr) return;
-        
-        warr.status = 'Claimed';
-        warr.claimDetails = {
-          issue,
-          resolution: res,
-          date: new Date().toISOString()
-        };
-        
-        await DB.patch('warranties/' + id, warr);
-        toast('Warranty claim logged successfully! 🛡️', 'success');
-        Modal.close('claimModal');
-        await loadAll();
-      },
-
-      render() {
-        const tbody = document.getElementById('warrBody');
-        if (!tbody) return;
-        
-        const q = document.getElementById('warrSearch').value.trim().toLowerCase();
-        let list = S.warranties || [];
-        
-        if (q) {
-          list = list.filter(w => 
-            (w.itemName || '').toLowerCase().includes(q) || 
-            (w.serialNumber || '').toLowerCase().includes(q) || 
-            (w.billId || '').toLowerCase().includes(q) ||
-            (w.customerName || '').toLowerCase().includes(q)
-          );
-        }
-        
-        if (!list.length) {
-          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--t3)">No warranty records found</td></tr>`;
-          return;
-        }
-        
-        tbody.innerHTML = list.map(w => {
-          const daysLeft = Math.ceil((new Date(w.expiryDate) - new Date()) / 864e5);
-          const active = daysLeft > 0 && w.status !== 'Claimed';
-          let statusBadge = '';
-          if (w.status === 'Claimed') {
-            statusBadge = `<span class="badge badge-orange">Claimed</span>`;
-          } else if (daysLeft <= 0) {
-            statusBadge = `<span class="badge badge-red">Expired</span>`;
-          } else if (daysLeft < 30) {
-            statusBadge = `<span class="badge badge-orange">Expiring Soon (${daysLeft}d)</span>`;
-          } else {
-            statusBadge = `<span class="badge badge-green">Active (${daysLeft}d left)</span>`;
-          }
-          
-          return `
-            <tr>
-              <td><strong>${esc(w.itemName)}</strong></td>
-              <td class="mono" style="color:var(--cyan);">${esc(w.serialNumber || '—')}</td>
-              <td>${esc(w.customerName)}<br><span style="font-size:10px;color:var(--t3);">${esc(w.customerPhone || '')}</span></td>
-              <td class="mono" style="font-size:11px;">${esc(w.billId)}</td>
-              <td>${new Date(w.saleDate).toLocaleDateString()}</td>
-              <td>${new Date(w.expiryDate).toLocaleDateString()}</td>
-              <td>${statusBadge}</td>
-              <td>
-                ${active ? `<button class="btn btn-purple btn-xs" onclick="WarrantyMgr.openClaimModal('${w.id}')">🛡️ Claim</button>` : '—'}
-              </td>
-            </tr>
-          `;
-        }).join('');
-      },
-
-      checkSerialsBeforeCheckout() {
-        const serialItems = S.cart.filter(ci => {
-          const item = S.items.find(i => i.id === ci.itemId);
-          return item && item.trackSerials;
-        });
-        
-        if (serialItems.length === 0) {
-          CheckoutPayment.open();
-          return;
-        }
-        
-        const body = document.getElementById('serialModalBody');
-        let html = '';
-        
-        serialItems.forEach((ci, itemIdx) => {
-          html += `
-            <div style="border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:8px;">
-              <h4 style="color:var(--cyan); margin-bottom:6px;">${esc(ci.name)} (Qty: ${ci.qty})</h4>
-          `;
-          
-          for (let i = 0; i < ci.qty; i++) {
-            const val = (ci.serialNumbers && ci.serialNumbers[i]) ? ci.serialNumbers[i] : '';
-            html += `
-              <div class="form-group" style="margin-bottom:6px;">
-                <label>Unit ${i + 1} Serial Number *</label>
-                <input type="text" class="serial-input-field" data-item-id="${ci.itemId}" data-index="${i}" value="${val}" placeholder="Scan or type serial...">
-              </div>
-            `;
-          }
-          
-          html += `</div>`;
-        });
-        
-        body.innerHTML = html;
-        Modal.open('serialModal');
-      },
-
-      confirmSerials() {
-        const fields = document.querySelectorAll('.serial-input-field');
-        let valid = true;
-        
-        fields.forEach(f => {
-          const itemId = f.dataset.itemId;
-          const idx = parseInt(f.dataset.index);
-          const val = f.value.trim();
-          
-          if (!val) {
-            valid = false;
-            f.style.borderColor = 'var(--red)';
-          } else {
-            f.style.borderColor = '';
-            const ci = S.cart.find(c => c.itemId === itemId);
-            if (ci) {
-              if (!ci.serialNumbers) ci.serialNumbers = [];
-              ci.serialNumbers[idx] = val;
-            }
-          }
-        });
-        
-        if (!valid) {
-          toast('Please enter all required serial numbers', 'error');
-          return;
-        }
-        
-        Modal.close('serialModal');
-        CheckoutPayment.open();
-      }
-    };
-
-    // ── ENTERPRISE ANALYTICS MANAGER ──
-    const AnalyticsMgr = {
-      charts: {},
-
-      render() {
-        const periodDays = parseInt(document.getElementById('analyticsPeriod').value) || 30;
-        const branchId = document.getElementById('analyticsBranchFilter').value || 'all';
-        
-        const now = new Date();
-        const startDate = new Date();
-        
-        if (document.getElementById('analyticsPeriod').value === 'this_month') {
-          startDate.setDate(1);
-          startDate.setHours(0,0,0,0);
-        } else {
-          startDate.setDate(now.getDate() - periodDays);
-        }
-        
-        let salesList = S.sales || [];
-        salesList = salesList.filter(s => new Date(s.date) >= startDate);
-        if (branchId !== 'all') {
-          salesList = salesList.filter(s => s.branchId === branchId);
-        }
-        
-        const cur = S.settings.currency;
-        const totalRev = salesList.reduce((a, s) => a + (s.total || 0), 0);
-        const totalProfit = salesList.reduce((a, s) => a + (s.profit || 0), 0);
-        const avgSale = salesList.length ? totalRev / salesList.length : 0;
-        
-        document.getElementById('analyticsStatsRow').innerHTML = `
-          <div class="stat-card"><div class="stat-lbl">💰 Revenue</div><div class="stat-val text-cyan">${cur} ${totalRev.toFixed(2)}</div><div class="stat-sub">${salesList.length} sales</div></div>
-          <div class="stat-card"><div class="stat-lbl">📈 Profit</div><div class="stat-val ${totalProfit >= 0 ? 'text-green' : 'text-red'}">${cur} ${totalProfit.toFixed(2)}</div><div class="stat-sub">${totalRev > 0 ? (totalProfit / totalRev * 100).toFixed(1) : 0}% margin</div></div>
-          <div class="stat-card"><div class="stat-lbl">👥 CRM Database</div><div class="stat-val text-purple">${S.loan_customers.length}</div><div class="stat-sub">Customers registered</div></div>
-          <div class="stat-card"><div class="stat-lbl">🛡️ Active Warranties</div><div class="stat-val text-orange">${(S.warranties || []).filter(w => w.status === 'Active').length}</div><div class="stat-sub">Tracked items</div></div>
-          <div class="stat-card"><div class="stat-lbl">🛒 Avg Checkout</div><div class="stat-val">${cur} ${avgSale.toFixed(2)}</div><div class="stat-sub">Per receipt</div></div>
-        `;
-        
-        this.renderRevenueChart(salesList, periodDays);
-        this.renderCategoryChart(salesList);
-        this.renderTopProductsChart(salesList);
-        this.renderPaymentMethodsChart(salesList);
-      },
-
-      renderRevenueChart(sales, days) {
-        const dailyData = {};
-        for (let i = days - 1; i >= 0; i--) {
-          const d = new Date();
-          d.setDate(d.getDate() - i);
-          const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-          dailyData[dateStr] = 0;
-        }
-        
-        sales.forEach(s => {
-          const dateStr = new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-          if (dailyData[dateStr] !== undefined) {
-            dailyData[dateStr] += s.total || 0;
-          }
-        });
-        
-        const labels = Object.keys(dailyData);
-        const data = Object.values(dailyData);
-        
-        this.drawChart('chartRevenue', 'line', {
-          labels,
-          datasets: [{
-            label: 'Daily Revenue',
-            data,
-            borderColor: '#00f2fe',
-            backgroundColor: 'rgba(0, 242, 254, 0.1)',
-            fill: true,
-            tension: 0.3
-          }]
-        });
-      },
-
-      renderCategoryChart(sales) {
-        const catData = {};
-        sales.forEach(s => {
-          (s.items || []).forEach(si => {
-            const item = S.items.find(i => i.id === si.itemId);
-            const catId = item ? item.categoryId : 'uncategorized';
-            const catName = S.categories.find(c => c.id === catId)?.name || 'Uncategorized';
-            catData[catName] = (catData[catName] || 0) + si.price;
-          });
-        });
-        
-        this.drawChart('chartCategory', 'doughnut', {
-          labels: Object.keys(catData),
-          datasets: [{
-            data: Object.values(catData),
-            backgroundColor: ['#00f2fe', '#d946ef', '#22c55e', '#f59e0b', '#ef4444', '#a855f7', '#6366f1']
-          }]
-        });
-      },
-
-      renderTopProductsChart(sales) {
-        const prodData = {};
-        sales.forEach(s => {
-          (s.items || []).forEach(si => {
-            prodData[si.name] = (prodData[si.name] || 0) + si.qty;
-          });
-        });
-        
-        const sorted = Object.entries(prodData).sort((a,b) => b[1] - a[1]).slice(0, 10);
-        const labels = sorted.map(x => x[0]);
-        const data = sorted.map(x => x[1]);
-        
-        this.drawChart('chartTopProducts', 'bar', {
-          labels,
-          datasets: [{
-            label: 'Qty Sold',
-            data,
-            backgroundColor: '#d946ef',
-            borderRadius: 5
-          }]
-        }, { indexAxis: 'y' });
-      },
-
-      renderPaymentMethodsChart(sales) {
-        const methods = { cash: 0, card: 0, online: 0 };
-        sales.forEach(s => {
-          const m = s.payMethod || 'cash';
-          methods[m] = (methods[m] || 0) + (s.total || 0);
-        });
-        
-        this.drawChart('chartPaymentMethods', 'pie', {
-          labels: ['Cash', 'Card', 'Online Transfer'],
-          datasets: [{
-            data: [methods.cash, methods.card, methods.online],
-            backgroundColor: ['#22c55e', '#00f2fe', '#f59e0b']
-          }]
-        });
-      },
-
-      drawChart(canvasId, type, configData, extraOptions = {}) {
-        if (this.charts[canvasId]) {
-          this.charts[canvasId].destroy();
-        }
-        
-        const ctx = document.getElementById(canvasId).getContext('2d');
-        this.charts[canvasId] = new Chart(ctx, {
-          type,
-          data: configData,
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                labels: { color: '#cbd5e1', font: { family: 'Exo 2' } }
-              }
-            },
-            scales: type === 'line' || type === 'bar' ? {
-              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#cbd5e1' } },
-              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#cbd5e1' } }
-            } : {},
-            ...extraOptions
-          }
-        });
-      }
-    };
 
 
     const L = {};
@@ -6205,14 +5071,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
         this._updateBadge('syncing');
         try {
           const url = getApiUrl('');
-          const headers = {};
-          if (firebase.apps.length && firebase.auth().currentUser) {
-            try {
-              const token = await firebase.auth().currentUser.getIdToken();
-              headers['Authorization'] = `Bearer ${token}`;
-            } catch (e) { }
-          }
-          const res = await fetch(url, { headers });
+          const res = await fetch(url);
           if (!res.ok) throw new Error(`Pull failed: HTTP ${res.status}`);
           
           const remoteDb = await res.json();
@@ -6227,7 +5086,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
             const tx = db.transaction('cache', 'readwrite');
             const store = tx.objectStore('cache');
 
-            const keys = ['categories', 'items', 'sales', 'loan_customers', 'loans', 'coconut_purchases', 'coconut_husking', 'coconut_sales', 'coconut_copra', 'coconut_oil', 'coconut_workers', 'coconut_worker_payments', 'cash_movements', 'day_ends', 'warranties', 'sessions'];
+            const keys = ['categories', 'items', 'sales', 'loan_customers', 'loans', 'coconut_purchases', 'coconut_husking', 'coconut_sales', 'coconut_copra', 'coconut_oil', 'coconut_workers', 'coconut_worker_payments', 'cash_movements', 'day_ends'];
             for (const key of keys) {
               if (remoteDb[key] !== undefined) {
                 store.put({ path: key, data: remoteDb[key] || {}, ts: Date.now() });
@@ -6350,15 +5209,11 @@ Difference   : ${cur} ${diff.toFixed(2)}
         let st = await DB.get('settings/main');
         if (!st || !Object.keys(st).length) {
           st = {
-            HomeName: '  Chicken Shop',
+            shopName: '  Chicken Shop',
             adminPin: '1234',
             currency: 'Rs.',
             lowStockAlert: 5,
-            receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.',
-            fbApiKey: '',
-            fbAuthDomain: 'chicken-shop-2d7b5.firebaseapp.com',
-            fbDatabaseURL: 'https://chicken-shop-2d7b5-default-rtdb.firebaseio.com',
-            fbProjectId: 'chicken-shop-2d7b5'
+            receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.'
           };
           await DB.set('settings/main', st);
         } else if (st && st.receiptNote && st.receiptNote.startsWith('  Chicken Shop\n')) {
@@ -6367,19 +5222,13 @@ Difference   : ${cur} ${diff.toFixed(2)}
         }
         Object.assign(S.settings, st);
 
-        // Load held sales from storage
-        try {
-          const hs = localStorage.getItem('held_sales');
-          if (hs) {
-            S.heldSales = JSON.parse(hs) || [];
-            HoldMgr.updateBadge();
-          }
-        } catch (e) { }
-
-        // Direct startup - no auth required
-        await AuthMgr.init();
-
+        await loadAll();
+        // updateUILanguage();
+        
+        document.getElementById('loader').classList.add('hide');
+        
         startClock(); startPoll(); setupPWA();
+        Sync.start();
         CoconutMgr.init();
 
         // Allow horizontal mouse wheel scroll on tabs
@@ -6393,6 +5242,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
           }, { passive: false });
         }
 
+        // Sync dot controlled by Sync engine
         toast('  Chicken Shop POS Active ✅', 'success');
       } catch (e) {
         txt('❌ ' + e.message);
@@ -6402,7 +5252,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
 
     let _lastDataStr = "";
     async function loadAll() {
-      const [cats, items, sales, cp, ch, cs, cm, de, loans, custs, c_copra, c_oil, c_workers, c_payments, warrs] = await Promise.all([
+      const [cats, items, sales, cp, ch, cs, cm, de, loans, custs, c_copra, c_oil, c_workers, c_payments] = await Promise.all([
         DB.get('categories'),
         DB.get('items'),
         DB.get('sales'),
@@ -6416,8 +5266,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
         DB.get('coconut_copra'),
         DB.get('coconut_oil'),
         DB.get('coconut_workers'),
-        DB.get('coconut_worker_payments'),
-        DB.get('warranties')
+        DB.get('coconut_worker_payments')
       ]);
 
       // Create a fast, lightweight structural change check
@@ -6469,19 +5318,14 @@ Difference   : ${cur} ${diff.toFixed(2)}
       S.day_ends = DB.obj2arr(de);
       S.loans = DB.obj2arr(loans);
       S.loan_customers = DB.obj2arr(custs);
-      S.warranties = DB.obj2arr(warrs).sort((a, b) => new Date(b.saleDate) - new Date(a.saleDate));
 
       // Console logging to satisfy "confirm if the database is loading"
       console.log(`[Database Telemetry] Sync complete. Categories: ${S.categories.length}, Products: ${S.items.length}, Sales: ${S.sales.length}. Changed since last poll: ${!isUnchanged}`);
 
       if (!isUnchanged) {
         POS.renderCats(); POS.renderGrid(); InvTable.render();
-        CustomerMgr.updateCartDropdown();
         if (S.adminUnlocked) Admin.render();
         if (document.getElementById('barcodesTab')?.classList.contains('active')) { BarcodeTab.render(); }
-        if (document.getElementById('customersTab')?.classList.contains('active')) { CustomerMgr.render(); }
-        if (document.getElementById('warrantyTab')?.classList.contains('active')) { WarrantyMgr.render(); }
-        if (document.getElementById('analyticsTab')?.classList.contains('active')) { AnalyticsMgr.render(); }
         try { await ReturnMgr.load(); } catch (e) { }
         
         if (document.getElementById('coconutTab')?.classList.contains('active')) {
@@ -6493,6 +5337,8 @@ Difference   : ${cur} ${diff.toFixed(2)}
         if (document.getElementById('loansTab')?.classList.contains('active')) {
           LoanMgr.render();
         }
+        
+        
       }
     }
     function startPoll() { }
@@ -6500,32 +5346,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
     function txt(t) { const el = document.getElementById('loaderText'); if (el) el.textContent = t; }
     function toast(msg, type = 'info') { const d = document.createElement('div'); d.className = `toast toast-${type}`; d.textContent = msg; document.getElementById('toasts').appendChild(d); setTimeout(() => d.remove(), 3500); }
 
-    const Nav = { 
-      go(tab) { 
-        // Role check redirection
-        const role = S.currentUser ? S.currentUser.role : 'cashier';
-        if (role === 'cashier' && tab !== 'pos') {
-          tab = 'pos';
-        } else if (role === 'manager' && tab === 'admin') {
-          tab = 'pos';
-        }
-        
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab)); 
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tab + 'Tab')); 
-        if (tab === 'admin') Admin.render(); 
-        if (tab === 'inventory') InvTable.render(); 
-        if (tab === 'barcodes') BarcodeTab.render(); 
-        if (tab === 'loans') LoanMgr.render(); 
-        if (tab === 'returns') ReturnMgr.switchTab('customer'); 
-        if (tab === 'coconut') CoconutMgr.switchTab('summary'); 
-        if (tab === 'dayend') DayEnd.render(); 
-        if (tab === 'customers') CustomerMgr.render();
-        if (tab === 'warranty') WarrantyMgr.render();
-        if (tab === 'analytics') AnalyticsMgr.render();
-      }, 
-      toggleMenu() { const sb = document.getElementById('sidebar'); const ol = document.getElementById('sidebarOverlay'); if (sb.classList.contains('show')) { sb.classList.remove('show'); ol.classList.remove('show'); } else { sb.classList.add('show'); ol.classList.add('show'); } }, 
-      closeMenu() { document.getElementById('sidebar').classList.remove('show'); document.getElementById('sidebarOverlay').classList.remove('show'); } 
-    };
+    const Nav = { go(tab) { document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab)); document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tab + 'Tab')); if (tab === 'admin') Admin.render(); if (tab === 'inventory') InvTable.render(); if (tab === 'barcodes') BarcodeTab.render(); if (tab === 'loans') LoanMgr.render(); if (tab === 'returns') ReturnMgr.switchTab('customer'); if (tab === 'coconut') CoconutMgr.switchTab('summary'); if (tab === 'dayend') DayEnd.render(); }, toggleMenu() { const sb = document.getElementById('sidebar'); const ol = document.getElementById('sidebarOverlay'); if (sb.classList.contains('show')) { sb.classList.remove('show'); ol.classList.remove('show'); } else { sb.classList.add('show'); ol.classList.add('show'); } }, closeMenu() { document.getElementById('sidebar').classList.remove('show'); document.getElementById('sidebarOverlay').classList.remove('show'); } };
     const Modal = { open(id) { document.getElementById(id).classList.add('open'); }, close(id) { document.getElementById(id).classList.remove('open'); } };
 
     const CoconutMgr = {
@@ -6875,7 +5696,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
   <style>
     body { font-family: sans-serif; padding: 20px; color: #111; max-width: 400px; margin: 0 auto; }
     .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-    .Home-name { font-size: 20px; font-weight: bold; }
+    .shop-name { font-size: 20px; font-weight: bold; }
     .title { font-size: 14px; text-transform: uppercase; margin-top: 5px; color: #555; }
     .info-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
     .table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
@@ -6888,7 +5709,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
 </head>
 <body>
   <div class="header">
-    <div class="Home-name">${esc(S.settings.HomeName || 'ShoppingLK Coconut Wholesaler')}</div>
+    <div class="shop-name">${esc(S.settings.shopName || 'ShoppingLK Coconut Wholesaler')}</div>
     <div class="title">COCONUT PURCHASE VOUCHER</div>
   </div>
   <div class="info-row"><span>Bill ID:</span><strong>${p.billId || p.id}</strong></div>
@@ -7273,7 +6094,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
   <style>
     body { font-family: sans-serif; padding: 20px; color: #111; max-width: 400px; margin: 0 auto; }
     .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-    .Home-name { font-size: 20px; font-weight: bold; }
+    .shop-name { font-size: 20px; font-weight: bold; }
     .title { font-size: 14px; text-transform: uppercase; margin-top: 5px; color: #555; }
     .info-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
     .table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
@@ -7286,7 +6107,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
 </head>
 <body>
   <div class="header">
-    <div class="Home-name">${esc(S.settings.HomeName || 'ShoppingLK Coconut Wholesaler')}</div>
+    <div class="shop-name">${esc(S.settings.shopName || 'ShoppingLK Coconut Wholesaler')}</div>
     <div class="title">COCONUT WHOLESALE INVOICE</div>
   </div>
   <div class="info-row"><span>Invoice ID:</span><strong>${s.billId || s.id}</strong></div>
@@ -8622,6 +7443,22 @@ Difference   : ${cur} ${diff.toFixed(2)}
       remove(i) { S.cart.splice(i, 1); this.render(); },
       updateQty(i, delta) { const ci = S.cart[i]; const isW = ci.unit === 'kg' || ci.unit === 'L'; const nq = Math.max(0.001, ci.qty + delta); ci.qty = nq; ci.price = nq * ci.unitPrice; this.render(); },
       clear() { if (!S.cart.length) return; if (!confirm('Clear cart?')) return; S.cart = []; S.cartDisc = 0; this.render(); },
+      hold() {
+        if (!S.cart.length) { toast('Cart is empty — nothing to hold', 'error'); return; }
+        const note = prompt('Hold note (optional, e.g. customer name):', '') || '';
+        S.heldSales.push({
+          id: Date.now(),
+          note,
+          time: new Date().toLocaleTimeString(),
+          cart: JSON.parse(JSON.stringify(S.cart)),
+          cartDisc: S.cartDisc,
+          cartDiscType: S.cartDiscType,
+          total: this.total()
+        });
+        S.cart = []; S.cartDisc = 0; S.cartDiscType = 'percent';
+        this.render();
+        toast('🔒 Sale held — cart cleared', 'success');
+      },
       sub() { return S.cart.reduce((s, ci) => { const d = ci.discType === 'percent' ? ci.price * (ci.discount || 0) / 100 : (ci.discount || 0); return s + ci.price - d; }, 0); },
       total() { const sub = this.sub(); const d = S.cartDiscType === 'percent' ? sub * S.cartDisc / 100 : S.cartDisc; return Math.max(0, sub - d); },
       render() {
@@ -8630,6 +7467,9 @@ Difference   : ${cur} ${diff.toFixed(2)}
         const btn = document.getElementById('checkoutBtn'); const subEl = document.getElementById('cartSub');
         const totEl = document.getElementById('cartTotal'); const dr = document.getElementById('discRow'); const da = document.getElementById('discAmt');
         count.textContent = S.cart.length;
+        // Sync held badge
+        const hb = document.getElementById('heldBadge');
+        if (hb) { hb.style.display = S.heldSales.length ? 'inline' : 'none'; hb.textContent = S.heldSales.length; }
         const sub = this.sub(); const total = this.total();
         subEl.textContent = `${cur} ${sub.toFixed(2)}`; totEl.textContent = `${cur} ${total.toFixed(2)}`;
         
@@ -8679,6 +7519,66 @@ Difference   : ${cur} ${diff.toFixed(2)}
       }
     };
 
+    // ── HOLD SALE ────────────────────────────
+    const HoldSale = {
+      openList() {
+        const cur = S.settings.currency;
+        const body = document.getElementById('holdSaleBody');
+        if (!body) return;
+        if (!S.heldSales.length && !S.cart.length) { toast('Cart is empty — add items first', 'error'); return; }
+        let html = '';
+        // Hold current cart button (if cart has items)
+        if (S.cart.length) {
+          html += `<button class="btn btn-orange w-full" style="margin-bottom:14px;padding:11px;font-size:14px;" onclick="Cart.hold();HoldSale.openList();">⏸ Hold Current Cart &nbsp;(${S.cart.length} item${S.cart.length !== 1 ? 's' : ''} · ${cur} ${Cart.total().toFixed(2)})</button>`;
+        }
+        // List of held sales
+        if (S.heldSales.length) {
+          html += `<div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">📋 Held Sales (${S.heldSales.length})</div>`;
+          html += S.heldSales.map((h, idx) => `
+            <div style="background:var(--glass);border:1px solid var(--border2);border-radius:var(--r12);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:700;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${h.note ? '👤 ' + esc(h.note) : '🛒 Sale #' + (idx + 1)}</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:2px;">⏱ ${h.time} &nbsp;·&nbsp; ${h.cart.length} item${h.cart.length !== 1 ? 's' : ''}</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--cyan);">${cur} ${h.total.toFixed(2)}</div>
+                <div style="display:flex;gap:4px;margin-top:4px;">
+                  <button class="btn btn-success btn-xs" onclick="HoldSale.resume(${idx})">▶ Resume</button>
+                  <button class="btn btn-danger btn-xs" onclick="HoldSale.delete(${idx})">🗑</button>
+                </div>
+              </div>
+            </div>`).join('');
+        } else {
+          html += `<div style="text-align:center;padding:20px;color:var(--t3);">No held sales</div>`;
+        }
+        body.innerHTML = html;
+        Modal.open('holdSaleModal');
+      },
+      resume(idx) {
+        const h = S.heldSales[idx];
+        if (!h) return;
+        if (S.cart.length) {
+          if (!confirm('Current cart has items. Hold current cart and resume this sale?')) return;
+          // silently hold current cart first
+          S.heldSales.push({ id: Date.now(), note: 'Auto-held', time: new Date().toLocaleTimeString(), cart: JSON.parse(JSON.stringify(S.cart)), cartDisc: S.cartDisc, cartDiscType: S.cartDiscType, total: Cart.total() });
+        }
+        S.cart = JSON.parse(JSON.stringify(h.cart));
+        S.cartDisc = h.cartDisc;
+        S.cartDiscType = h.cartDiscType;
+        S.heldSales.splice(idx, 1);
+        Cart.render();
+        Modal.close('holdSaleModal');
+        toast(`▶ Resumed: ${h.note || 'Sale #' + (idx + 1)}`, 'success');
+      },
+      delete(idx) {
+        if (!confirm('Delete this held sale?')) return;
+        S.heldSales.splice(idx, 1);
+        Cart.render();
+        if (!S.heldSales.length && !S.cart.length) { Modal.close('holdSaleModal'); return; }
+        this.openList();
+      }
+    };
+
     // ── DISCOUNT ────────────────────────────
     const Discount = {
       openCart() {
@@ -8699,18 +7599,18 @@ Difference   : ${cur} ${diff.toFixed(2)}
 
     const ReceiptFormatter = {
       width: 42,
-      HomeName() {
-        const raw = String(S.settings.HomeName || '').trim();
+      shopName() {
+        const raw = String(S.settings.shopName || '').trim();
         if (!raw || /[^\x00-\x7F]/.test(raw)) return '  Chicken Shop';
         return raw;
       },
       footerNote() {
-        const Home = this.HomeName();
+        const shop = this.shopName();
         const raw = String(S.settings.receiptNote || '').replace(/\r/g, '');
         const lines = raw.split('\n')
           .map(line => line.trim())
           .filter(line => line && !/[^\x00-\x7F]/.test(line))
-          .filter(line => line.toLowerCase() !== Home.toLowerCase());
+          .filter(line => line.toLowerCase() !== shop.toLowerCase());
         const ensureLine = (text) => {
           if (!lines.some(line => line.toLowerCase() === text.toLowerCase())) {
             lines.push(text);
@@ -8790,7 +7690,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
       },
       buildText(sale) {
         const lines = [
-          this.center(this.HomeName()),
+          this.center(this.shopName()),
           this.center(`(${this.dateText(sale)})`),
           this.center(this.billId(sale)),
           '-'.repeat(this.width)
@@ -8810,14 +7710,8 @@ Difference   : ${cur} ${diff.toFixed(2)}
           lines.push(this.line('Cash Received', this.money(sale.cashReceived || sale.total)));
           lines.push(this.line('Change Due', this.money(sale.changeDue)));
         }
-        if (sale.customerName && sale.customerName !== 'Walk-in Customer') {
-          lines.push('-'.repeat(this.width));
-          lines.push(this.line('Customer', sale.customerName));
-          if (sale.earnedPoints > 0) lines.push(this.line('Loyalty Points Earned', '+' + sale.earnedPoints));
-          if (sale.updatedPoints !== undefined) lines.push(this.line('Loyalty Balance', sale.updatedPoints));
-        }
         lines.push('');
-        lines.push(this.center(this.HomeName()));
+        lines.push(this.center(this.shopName()));
         this.footerNote().split('\n').forEach(line => {
           this.wrap(line).forEach(part => lines.push(this.center(part)));
         });
@@ -8832,20 +7726,9 @@ Difference   : ${cur} ${diff.toFixed(2)}
               <span class="receipt-amount">${esc(row.amount)}</span>
             </div>
           </div>`).join('');
-          
-        let customerInfoHtml = '';
-        if (sale.customerName && sale.customerName !== 'Walk-in Customer') {
-          customerInfoHtml = `
-            <div style="border-top:1px dashed #94a3b8;margin:8px 0;"></div>
-            <div class="r-line"><span>Customer</span><span>${esc(sale.customerName)}</span></div>
-            ${sale.earnedPoints > 0 ? `<div class="r-line"><span>Points Earned</span><span>+${sale.earnedPoints}</span></div>` : ''}
-            ${sale.updatedPoints !== undefined ? `<div class="r-line"><span>Loyalty Balance</span><span>${sale.updatedPoints}</span></div>` : ''}
-          `;
-        }
-
         return `<div class="receipt">
           <div class="receipt-h">
-            <div class="receipt-title">${esc(this.HomeName())}</div>
+            <div class="receipt-title">${esc(this.shopName())}</div>
             <div class="receipt-sub">(${esc(this.dateText(sale))})</div>
             <div class="receipt-bill">${esc(this.billId(sale))}</div>
           </div>
@@ -8860,10 +7743,9 @@ Difference   : ${cur} ${diff.toFixed(2)}
               <div class="r-line"><span>Cash Received</span><span>${esc(this.money(sale.cashReceived || sale.total))}</span></div>
               <div class="r-line"><span>Change Due</span><span>${esc(this.money(sale.changeDue))}</span></div>
             ` : ''}
-            ${customerInfoHtml}
           </div>
           <div class="r-footer">
-            <div class="receipt-footer-Home">${esc(this.HomeName())}</div>
+            <div class="receipt-footer-shop">${esc(this.shopName())}</div>
             <div>${esc(this.footerNote())}</div>
           </div>
         </div>`;
@@ -9031,6 +7913,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
       async run(silent = false) {
         if (!S.cart.length) return;
         const total = Cart.total(); const sub = Cart.sub(); let profit = 0; const saleItems = [];
+        // Generate human-readable bill ID: date + seq
         const billDate = new Date();
         const billId = 'BILL-' + billDate.getFullYear().toString().slice(-2) + String(billDate.getMonth() + 1).padStart(2, '0') + String(billDate.getDate()).padStart(2, '0') + '-' + String(billDate.getHours()).padStart(2, '0') + String(billDate.getMinutes()).padStart(2, '0') + String(billDate.getSeconds()).padStart(2, '0');
 
@@ -9041,6 +7924,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
           for (let i = 0; i < batches.length && remaining > 0; i++) {
             if ((batches[i].quantity || 0) <= 0) continue;
             const used = Math.min(batches[i].quantity, remaining);
+            // Fix: use batch costPrice, fall back to item costPrice, never 0 if item has cost
             const unitCost = batches[i].costPrice != null && batches[i].costPrice > 0
               ? batches[i].costPrice
               : (item.costPrice || 0);
@@ -9062,8 +7946,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
             itemId: ci.itemId, name: ci.name, qty: ci.qty, unit: ci.unit,
             unitPrice: ci.unitPrice, costPrice: item.costPrice || 0,
             discount: ci.discount || 0, discType: ci.discType || 'percent',
-            price: ci.price - da, saleMode: ci.saleMode || 'retail',
-            serialNumbers: ci.serialNumbers || []
+            price: ci.price - da, saleMode: ci.saleMode || 'retail'
           });
         }
         const cda = S.cartDiscType === 'percent' ? sub * S.cartDisc / 100 : S.cartDisc;
@@ -9094,33 +7977,27 @@ Difference   : ${cur} ${diff.toFixed(2)}
           payMethod: payDetails.payMethod,
           cashReceived: payDetails.cashReceived,
           changeDue: payDetails.changeDue,
-          branchId: S.currentBranchId,
-          customerName: customer ? customer.name : 'Walk-in Customer',
-          earnedPoints,
-          updatedPoints
+          receiptText
         };
         sale.receiptText = ReceiptFormatter.buildText(sale);
-        
         try {
           const id = await DB.push('sales', sale); sale.id = id;
           window._lastSale = sale;
           if (!silent) { Receipt.show(sale); }
           S.cart = []; S.cartDisc = 0; Cart.render(); await loadAll();
-          document.getElementById('cartCustomer').value = '';
-          CustomerMgr.onCartCustomerChange();
           if (!silent) toast('Sale completed! 🎉', 'success');
         } catch (e) { toast('Sale error: ' + e.message, 'error'); }
       },
       async runDirectCheckout() {
         window._lastPaymentDetails = { payMethod: 'cash', cashReceived: Cart.total(), changeDue: 0 };
-        WarrantyMgr.checkSerialsBeforeCheckout();
+        await this.run(false);
       }
     };
 
     // ── RECEIPT ─────────────────────────────
     const Receipt = {
       show(sale) {
-        const cur = S.settings.currency; const Home = S.settings.HomeName;
+        const cur = S.settings.currency; const shop = S.settings.shopName;
         const date = new Date(sale.date).toLocaleString();
         const ih = (sale.items || []).map(si => {
           const qtyVal = si.qty || 0;
@@ -9136,7 +8013,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
         }).join('');
         document.getElementById('receiptBody').innerHTML = `<div class="receipt">
       <div class="receipt-h">
-        <div class="receipt-title">${esc(Home)}</div>
+        <div class="receipt-title">${esc(shop)}</div>
         <div class="receipt-sub">${date}</div>
         <div style="font-size:10px;font-weight:700;color:#333;margin-top:4px;letter-spacing:0.5px;">🧾 ${esc(sale.billId || ('Sale #' + (sale.id || '').slice(-8)))}</div>
       </div>
@@ -9153,7 +8030,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
         ` : ''}
       </div>
       <div class="r-footer">
-        <div style="font-size:12px;font-weight:bold;margin-bottom:2px;word-break:break-word;white-space:normal;text-align:center;">${esc(Home)}</div>
+        <div style="font-size:12px;font-weight:bold;margin-bottom:2px;word-break:break-word;white-space:normal;text-align:center;">${esc(shop)}</div>
         <div style="font-size:11px;margin-top:4px;white-space:pre-wrap;word-break:break-word;">${esc(S.settings.receiptNote || '')}</div>
       </div>
     </div>`;
@@ -9323,19 +8200,6 @@ Difference   : ${cur} ${diff.toFixed(2)}
           }</div>
         <div class="form-group"><label>Unit</label><input id="fUnit" type="text" value="${esc(item?.unit || 'pcs')}" placeholder="pcs / kg / L"></div>
       </div>
-      
-      <!-- Serial and Warranty settings -->
-      <div class="grid-2" style="background:var(--bg3); padding:12px; border-radius:var(--r8); margin-bottom:12px; border:1px solid var(--border);">
-        <div class="form-group" style="display:flex; align-items:center; gap:8px; margin-bottom:0; justify-content:flex-start; height:100%;">
-          <input type="checkbox" id="fTrackSerials" ${item?.trackSerials ? 'checked' : ''} style="width:auto;">
-          <label for="fTrackSerials" style="margin-bottom:0; font-weight:700;">🛡️ Track Serials</label>
-        </div>
-        <div class="form-group" style="margin-bottom:0;">
-          <label>Warranty Duration (months)</label>
-          <input id="fWarranty" type="number" value="${item?.warrantyMonths || 0}" placeholder="0 = No Warranty" min="0">
-        </div>
-      </div>
-
       <div class="grid-2">
         <div class="form-group"><label>Low Stock Alert</label><input id="fThresh" type="number" value="${item?.lowStockThreshold || S.settings.lowStockAlert}" min="0"></div>
         <div class="form-group"><label>Default Discount (%)</label><input id="fDisc" type="number" value="${item?.defaultDiscount || 0}" min="0" max="100"></div>
@@ -9469,23 +8333,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
         if (!name) { toast('Name required', 'error'); return; }
         const type = document.getElementById('fType').value;
         let finalImage = this._tempImageDataUrl || document.getElementById('fImg').value.trim() || null;
-        const data = { 
-          name, 
-          type, 
-          barcode: document.getElementById('fBarcode').value.trim() || null, 
-          categoryId: document.getElementById('fCat').value || null, 
-          price: parseFloat(document.getElementById('fPrice').value) || 0, 
-          costPrice: parseFloat(document.getElementById('fCost').value) || 0, 
-          unit: document.getElementById('fUnit').value || 'pcs', 
-          lowStockThreshold: parseFloat(document.getElementById('fThresh').value) || 5, 
-          defaultDiscount: parseFloat(document.getElementById('fDisc').value) || 0, 
-          image: finalImage, 
-          description: document.getElementById('fDesc').value.trim() || null, 
-          liquidOptions: type === 'liquid' ? this.getLiqOpts() : null, 
-          updatedAt: new Date().toISOString(),
-          trackSerials: document.getElementById('fTrackSerials')?.checked || false,
-          warrantyMonths: parseInt(document.getElementById('fWarranty')?.value) || 0
-        };
+        const data = { name, type, barcode: document.getElementById('fBarcode').value.trim() || null, categoryId: document.getElementById('fCat').value || null, price: parseFloat(document.getElementById('fPrice').value) || 0, costPrice: parseFloat(document.getElementById('fCost').value) || 0, unit: document.getElementById('fUnit').value || 'pcs', lowStockThreshold: parseFloat(document.getElementById('fThresh').value) || 5, defaultDiscount: parseFloat(document.getElementById('fDisc').value) || 0, image: finalImage, description: document.getElementById('fDesc').value.trim() || null, liquidOptions: type === 'liquid' ? this.getLiqOpts() : null, updatedAt: new Date().toISOString() };
         if (!id) { const iq = parseFloat(document.getElementById('fInitStock')?.value) || 0; data.createdAt = new Date().toISOString(); data.stockBatches = iq > 0 ? [{ batchId: 'b_' + Date.now(), quantity: iq, costPrice: data.costPrice, dateAdded: new Date().toISOString().split('T')[0] }] : []; await DB.push('items', data); toast('Product added ✅', 'success'); }
         else { await DB.patch('items/' + id, data); toast('Updated ✅', 'success'); }
         Modal.close('itemModal'); await loadAll();
@@ -9619,7 +8467,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
         const codes = this._getSelectedCodes();
         if (!codes.length) { toast('First generate barcodes, then print.', 'error'); return; }
 
-        const Home = esc(S.settings.HomeName);
+        const shop = esc(S.settings.shopName);
         const cur = S.settings.currency;
 
         let rows = '';
@@ -9629,7 +8477,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
 
           const lbl1 = c1 ? `
         <div class="sticker">
-          <div class="s-Home">${Home}</div>
+          <div class="s-shop">${shop}</div>
           ${c1.price ? `<div class="s-price">${cur} ${parseFloat(c1.price).toFixed(2)}</div>` : `<div class="s-price">&nbsp;</div>`}
           <svg id="sr${i}"></svg>
           <div class="s-num">${c1.code}</div>
@@ -9637,7 +8485,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
 
           const lbl2 = c2 ? `
         <div class="sticker">
-          <div class="s-Home">${Home}</div>
+          <div class="s-shop">${shop}</div>
           ${c2.price ? `<div class="s-price">${cur} ${parseFloat(c2.price).toFixed(2)}</div>` : `<div class="s-price">&nbsp;</div>`}
           <svg id="sr${i + 1}"></svg>
           <div class="s-num">${c2.code}</div>
@@ -9657,7 +8505,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
         pw.document.write(`<!DOCTYPE html>
 <html><head>
 <meta charset="UTF-8">
-<title>Barcodes Roll — ${Home}</title>
+<title>Barcodes Roll — ${shop}</title>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
 <style>
   @page{size: 80mm auto; margin:0;}
@@ -9680,7 +8528,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
     padding: 0 1.5mm;
   }
   .sticker.empty { visibility: hidden; }
-  .s-Home { font-size: 6.5pt; font-weight: bold; margin-bottom: 0.3mm; color:#222; line-height: 1; }
+  .s-shop { font-size: 6.5pt; font-weight: bold; margin-bottom: 0.3mm; color:#222; line-height: 1; }
   .s-price { font-size: 7.5pt; font-weight: 900; margin-bottom: 0.3mm; color:#000; line-height: 1; }
   svg { width: 100%; max-width: 34mm; height: auto; max-height: 9mm; display: block; }
   .s-num { font-family:'Courier New',monospace; font-size: 6pt; font-weight: bold; margin-top: 0.3mm; line-height: 1; }
@@ -9712,13 +8560,13 @@ window.onload=function(){
         const labels = [...codes];
         while (labels.length < 40) labels.push(null);
 
-        const Home = esc(S.settings.HomeName);
+        const shop = esc(S.settings.shopName);
         const cur = S.settings.currency;
 
         const cells = labels.map((item, idx) => {
           if (!item) return `<div class="label empty"></div>`;
           return `<div class="label">
-        <div class="lHome">${Home}</div>
+        <div class="lshop">${shop}</div>
         ${item.price ? `<div class="lprice">${cur} ${parseFloat(item.price).toFixed(2)}</div>` : `<div class="lprice">&nbsp;</div>`}
         <svg id="s${idx}"></svg>
         <div class="lnum">${item.code}</div>
@@ -9736,7 +8584,7 @@ window.onload=function(){
         pw.document.write(`<!DOCTYPE html>
 <html><head>
 <meta charset="UTF-8">
-<title>Barcodes — ${Home}</title>
+<title>Barcodes — ${shop}</title>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
 <style>
   @page{size:A4 portrait;margin:5mm 6mm}
@@ -9757,7 +8605,7 @@ window.onload=function(){
     text-align:center;overflow:hidden;
   }
   .label.empty{border:0.5px dashed #ddd;background:#f9f9f9;}
-  .lHome { font-size: 6pt; font-weight: bold; margin-bottom: 0.5mm; color:#222; }
+  .lshop { font-size: 6pt; font-weight: bold; margin-bottom: 0.5mm; color:#222; }
   .lprice { font-size: 8pt; font-weight: 900; margin-bottom: 0.5mm; color:#000; }
   svg{width:100%;height:auto;display:block;max-height:22mm;}
   .lnum{font-family:'Courier New',monospace;font-size:5.5pt;color:#333;margin-top:1mm;letter-spacing:0.5px;}
@@ -9769,7 +8617,7 @@ window.onload=function(){
 </style>
 </head>
 <body>
-<div class="hdr">${Home} &nbsp;•&nbsp; ${codes.length} barcode stickers &nbsp;•&nbsp; ${new Date().toLocaleDateString()}</div>
+<div class="hdr">${shop} &nbsp;•&nbsp; ${codes.length} barcode stickers &nbsp;•&nbsp; ${new Date().toLocaleDateString()}</div>
 <div class="grid">${cells}</div>
 <script>
 window.onload=function(){
@@ -10483,14 +9331,14 @@ window.onload=function(){
           return;
         }
         const cur = S.settings.currency;
-        const Home = (S.settings.HomeName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.HomeName;
+        const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
         const date = new Date(sale.date).toLocaleString();
         const ESC = 0x1B; const LF = 0x0A; const GS = 0x1D;
 
         const enc = new TextEncoder();
 
         // Header (Centered)
-        let head = `${Home}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
+        let head = `${shop}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
         const headBytes = enc.encode(head);
 
         // Items (Left-aligned)
@@ -10567,9 +9415,9 @@ window.onload=function(){
 
       _buildReceiptText(sale) {
         const cur = S.settings.currency;
-        const Home = (S.settings.HomeName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.HomeName;
+        const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
         const date = new Date(sale.date).toLocaleString();
-        let text = `${Home}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
+        let text = `${shop}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
         (sale.items || []).forEach(si => {
           const m = si.saleMode === 'wholesale' ? '[WS]' : '';
           text += `${si.name} ${m}\n  ${si.qty} x ${si.unitPrice?.toFixed(2)} = ${cur} ${(si.price || 0).toFixed(2)}\n`;
@@ -10578,7 +9426,7 @@ window.onload=function(){
         if (sale.cartDiscount > 0) text += `Discount: -${cur} ${sale.cartDiscount.toFixed(2)}\n`;
         text += `TOTAL: ${cur} ${(sale.total || 0).toFixed(2)}\n\n`;
 
-        let rawNote = S.settings.receiptNote || Home;
+        let rawNote = S.settings.receiptNote || shop;
         if (rawNote.includes('  Chicken Shop')) {
           rawNote = rawNote
             .replace(/  Chicken Shop/g, '  Chicken Shop')
@@ -10640,10 +9488,10 @@ window.onload=function(){
 
         if (type === 'pos') {
           const cur = S.settings.currency;
-          const Home = (S.settings.HomeName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.HomeName;
+          const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
           const date = new Date(data.date).toLocaleString();
 
-          centerText(Home, "4", y); y += 40;
+          centerText(shop, "4", y); y += 40;
           centerText(date, "2", y); y += 24;
           centerText(`Sale #${(data.id || '').slice(-8)}`, "2", y); y += 30;
           drawLine(y); y += 15;
@@ -11008,7 +9856,7 @@ window.onload=function(){
           tx.oncomplete = async () => {
             // 3. Save default settings locally
             const defaultSettings = {
-              HomeName: '  Chicken Shop',
+              shopName: '  Chicken Shop',
               adminPin: '1234',
               currency: 'Rs.',
               lowStockAlert: 5,
@@ -11118,22 +9966,12 @@ window.onload=function(){
     const Settings = {
       open() {
         document.getElementById('settingsBody').innerHTML = `
-      <div class="form-group"><label>Shop Name</label><input id="setName" type="text" value="${esc(S.settings.HomeName)}"></div>
+      <div class="form-group"><label>Shop Name</label><input id="setName" type="text" value="${esc(S.settings.shopName)}"></div>
       <div class="grid-2">
         <div class="form-group"><label>Currency Symbol</label><input id="setCur" type="text" value="${esc(S.settings.currency)}"></div>
         <div class="form-group"><label>Low Stock Alert</label><input id="setLow" type="number" value="${S.settings.lowStockAlert || 5}" min="0"></div>
       </div>
       <div class="form-group"><label>Receipt Footer Note</label><input id="setNote" type="text" value="${esc(S.settings.receiptNote || '')}"></div>
-      
-      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
-      <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px">📡 Firebase Configuration</div>
-      <div class="form-group"><label>API Key</label><input id="setFbApiKey" type="password" value="${esc(S.settings.fbApiKey || '')}" placeholder="AIzaSy..."></div>
-      <div class="grid-2">
-        <div class="form-group"><label>Project ID</label><input id="setFbProjectId" type="text" value="${esc(S.settings.fbProjectId || '')}" placeholder="chicken-shop-2d7b5"></div>
-        <div class="form-group"><label>Auth Domain</label><input id="setFbAuthDomain" type="text" value="${esc(S.settings.fbAuthDomain || '')}" placeholder="chicken-shop-2d7b5.firebaseapp.com"></div>
-      </div>
-      <div class="form-group"><label>Database URL</label><input id="setFbDatabaseURL" type="text" value="${esc(S.settings.fbDatabaseURL || '')}" placeholder="https://..."></div>
-
       <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
       <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px">🔑 Change Admin PIN</div>
       <div class="grid-3">
@@ -11191,17 +10029,10 @@ window.onload=function(){
         toast('PIN changed ✅', 'success');
       },
       async save() {
-        S.settings.HomeName = document.getElementById('setName').value;
+        S.settings.shopName = document.getElementById('setName').value;
         S.settings.currency = document.getElementById('setCur').value;
         S.settings.lowStockAlert = parseInt(document.getElementById('setLow').value) || 5;
         S.settings.receiptNote = document.getElementById('setNote').value;
-        
-        // Save Firebase details
-        S.settings.fbApiKey = document.getElementById('setFbApiKey').value.trim();
-        S.settings.fbProjectId = document.getElementById('setFbProjectId').value.trim();
-        S.settings.fbAuthDomain = document.getElementById('setFbAuthDomain').value.trim();
-        S.settings.fbDatabaseURL = document.getElementById('setFbDatabaseURL').value.trim();
-
         await DB.set('settings/main', S.settings);
         Modal.close('settingsModal'); toast('Settings saved ✅', 'success');
         Sync.pull().then(() => loadAll());
@@ -11385,7 +10216,7 @@ window.onload=function(){
       if (e.key === 'F8') {
         const checkoutBtn = document.getElementById('checkoutBtn');
         if (checkoutBtn && !checkoutBtn.disabled) {
-          WarrantyMgr.checkSerialsBeforeCheckout();
+          Checkout.runDirectCheckout();
           e.preventDefault();
         }
         return;
