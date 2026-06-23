@@ -5254,6 +5254,8 @@
       async init() {
         S.currentUser = { uid: 'local', email: 'admin', role: 'admin', name: 'Admin' };
         S.currentBranchId = 'main';
+        // Hide loader and show app
+        document.getElementById('loader').classList.add('hide');
         SessionMgr.init();
         Sync.start();
       },
@@ -5279,10 +5281,27 @@
       },
 
       promptOpeningCash() {
-        const amount = prompt('💰 Enter Opening Cash for drawer (LKR):', '2000');
-        if (amount === null) return;
-        const val = parseFloat(amount) || 0;
-        
+        // Use a non-blocking modal instead of prompt()
+        const modalHtml = `
+          <div id="openCashModal" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;">
+            <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r16);padding:28px;max-width:340px;width:90%;">
+              <div style="font-size:16px;font-weight:800;margin-bottom:16px;text-align:center">💰 Opening Cash</div>
+              <div style="color:var(--t2);font-size:13px;margin-bottom:12px;">Drawer ඇතුළී ගල්ල නිකළය උනාන්න (රු.) ඇතුළු කරන්න:</div>
+              <input id="openCashAmt" type="number" value="2000" min="0" style="margin-bottom:16px;font-size:16px;font-weight:700;text-align:center;">
+              <div style="display:flex;gap:10px;">
+                <button onclick="SessionMgr._openCashConfirm()" style="flex:1;padding:12px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#000;font-weight:700;border:none;border-radius:var(--r8);cursor:pointer;font-size:14px;">✅ Start Session</button>
+                <button onclick="document.getElementById('openCashModal').remove()" style="padding:12px 16px;background:var(--glass);border:1px solid var(--border2);color:var(--t2);border-radius:var(--r8);cursor:pointer;">❌</button>
+              </div>
+            </div>
+          </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        setTimeout(() => document.getElementById('openCashAmt')?.focus(), 100);
+      },
+
+      _openCashConfirm() {
+        const el = document.getElementById('openCashAmt');
+        const val = parseFloat(el?.value) || 0;
+        document.getElementById('openCashModal')?.remove();
         const session = {
           id: 'SESS_' + Date.now(),
           openingCash: val,
@@ -5294,7 +5313,6 @@
           userId: S.currentUser.email,
           branchId: S.currentBranchId
         };
-        
         DB.set(`sessions/${session.id}`, session);
         S.session = session;
         this.updateUI();
