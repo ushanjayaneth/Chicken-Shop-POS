@@ -20,9 +20,6 @@
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="html5-qrcode.min.js"></script>
-  <!-- Firebase App & Auth SDK (v9 compat) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -3644,117 +3641,7 @@
     html body { margin-top: 0 !important; }
 
     /* ── Enterprise Additions ── */
-    #loginScreen {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(11, 14, 36, 0.96) 0%, rgba(6, 8, 20, 0.99) 100%);
-      backdrop-filter: blur(25px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    #loginScreen.hide {
-      opacity: 0;
-      pointer-events: none;
-      transform: scale(1.05);
-    }
-    .login-card {
-      width: 100%;
-      max-width: 400px;
-      padding: 30px;
-      border-radius: var(--r20);
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border2);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      position: relative;
-    }
-    .login-brand {
-      text-align: center;
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      color: var(--t1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .login-brand span {
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .login-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .login-group label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--t2);
-    }
-    .login-group input {
-      padding: 12px;
-      border-radius: var(--r8);
-      border: 1px solid var(--border2);
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--t1);
-      font-family: inherit;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-    .login-group input:focus {
-      outline: none;
-      border-color: var(--cyan);
-      background: rgba(255, 255, 255, 0.06);
-      box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
-    }
-    .login-options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-    }
-    .login-remember {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--t2);
-      cursor: pointer;
-    }
-    .login-forgot {
-      color: var(--cyan);
-      text-decoration: none;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .login-forgot:hover {
-      text-decoration: underline;
-    }
-    .login-btn {
-      padding: 12px;
-      border-radius: var(--r8);
-      border: none;
-      background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan2) 100%);
-      color: #000;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: var(--glow-cyan);
-    }
-    .login-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
-    }
-    
+
     /* Session bar */
     .session-bar {
       display: flex;
@@ -3885,46 +3772,7 @@
 </head>
 <body>
 
-  <!-- Fullscreen Login Screen -->
-  <div id="loginScreen">
-    <div class="login-card">
-      <div class="login-brand">
-        <svg width="48" height="48" viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id="rcmLoginGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00f2fe" />
-              <stop offset="100%" stop-color="#d946ef" />
-            </linearGradient>
-          </defs>
-          <rect width="100" height="100" rx="22" fill="#0b0e24" stroke="url(#rcmLoginGrad)" stroke-width="5" />
-          <g transform="translate(15, 15) scale(0.7)">
-            <path d="M40,10 C35,0 45,0 50,8 C55,0 65,0 60,10 C65,10 70,15 65,22 L35,22 Z" fill="#ef4444" />
-            <path d="M75,35 L62,30 L62,40 Z" fill="#fbbf24" />
-            <path d="M30,30 C30,22 42,20 50,20 C58,20 70,22 70,30 C70,38 65,45 65,52 C65,65 58,75 50,75 C42,75 35,65 35,52 C35,45 30,38 30,30 Z" fill="none" stroke="url(#rcmLoginGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-            <circle cx="58" cy="32" r="3" fill="#f8fafc" />
-            <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
-          </g>
-        </svg>
-        <span>Chicken House <span>POS</span></span>
-      </div>
-      <div class="login-group">
-        <label>Email Address</label>
-        <input type="email" id="loginEmail" placeholder="admin@chickenpos.com" autofocus>
-      </div>
-      <div class="login-group">
-        <label>Password</label>
-        <input type="password" id="loginPassword" placeholder="••••••••">
-      </div>
-      <div class="login-options">
-        <label class="login-remember">
-          <input type="checkbox" id="loginRemember" checked style="width:auto;"> Remember me
-        </label>
-        <span class="login-forgot" onclick="AuthMgr.forgotPassword()">Forgot Password?</span>
-      </div>
-      <button class="login-btn" onclick="AuthMgr.login()">🔑 Sign In</button>
-      <div id="loginError" style="color:var(--red); font-size:12px; text-align:center; display:none;"></div>
-    </div>
-  </div>
+
 
   <div id="loader">
     <div class="loader-brand" style="display:flex;align-items:center;gap:12px;justify-content:center;">
@@ -4042,13 +3890,7 @@
         <div class="sync-dot" id="syncDot" title="Firebase sync"></div>
         <div class="clock-display" id="clock">00:00:00</div>
         
-        <!-- User Badge & Logout -->
-        <div class="user-avatar-badge" id="navUserBadge" style="display:none; margin-right:8px;">
-          <div class="user-avatar" id="navUserInitials">A</div>
-          <span id="navUserName" style="font-weight:600;">Admin</span>
-          <span id="navBranchName" class="badge badge-purple" style="font-size:10px;">Main</span>
-          <button class="btn btn-ghost btn-xs" onclick="AuthMgr.logout()" title="Logout" style="padding:2px 6px; border:none; background:transparent;">🚪</button>
-        </div>
+
         <!-- Google Translate Button -->
         <button class="gt-btn" id="gtNavBtn" onclick="GT.toggle()" title="Translate App">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -5407,137 +5249,16 @@
       return `/api/data/branches/${branchId}/${path}`;
     }
 
-    // ── FIREBASE AUTH MANAGER ──
+    // ── NO AUTH (direct access) ──
     const AuthMgr = {
       async init() {
-        const config = {
-          apiKey: S.settings.fbApiKey || "AIzaSyFakeKeyPlaceholderForStart",
-          authDomain: S.settings.fbAuthDomain,
-          databaseURL: S.settings.fbDatabaseURL,
-          projectId: S.settings.fbProjectId
-        };
-        
-        if (!firebase.apps.length) {
-          try {
-            firebase.initializeApp(config);
-          } catch (e) {
-            console.error("Firebase init failed:", e);
-          }
-        }
-
-        firebase.auth().onAuthStateChanged(async (user) => {
-          if (user) {
-            S.currentUser = user;
-            try {
-              const uSnap = await DB.get(`users/${user.uid}`);
-              if (uSnap && Object.keys(uSnap).length) {
-                S.currentUser.role = uSnap.role || 'cashier';
-                S.currentBranchId = uSnap.branchId || 'main';
-              } else {
-                const uCount = await DB.get('users');
-                const isFirst = !uCount || Object.keys(uCount).length === 0;
-                const role = isFirst ? 'admin' : 'cashier';
-                const branchId = 'main';
-                
-                const profile = { email: user.email, role, branchId, createdAt: new Date().toISOString() };
-                await DB.set(`users/${user.uid}`, profile);
-                S.currentUser.role = role;
-                S.currentBranchId = branchId;
-              }
-            } catch (e) {
-              S.currentUser.role = 'admin';
-              S.currentBranchId = 'main';
-            }
-
-            this.applyPermissions();
-            document.getElementById('loginScreen').classList.add('hide');
-            document.getElementById('navUserBadge').style.display = 'flex';
-            document.getElementById('navUserInitials').textContent = (user.email || 'A').charAt(0).toUpperCase();
-            document.getElementById('navUserName').textContent = (user.email || '').split('@')[0];
-            
-            const branches = await DB.get('global/branches') || {};
-            const branch = branches[S.currentBranchId];
-            document.getElementById('navBranchName').textContent = branch ? branch.name : 'Main Branch';
-
-            SessionMgr.init();
-            Sync.start();
-          } else {
-            S.currentUser = null;
-            document.getElementById('loginScreen').classList.remove('hide');
-            document.getElementById('navUserBadge').style.display = 'none';
-            document.getElementById('loader').classList.add('hide');
-          }
-        });
+        S.currentUser = { uid: 'local', email: 'admin', role: 'admin', name: 'Admin' };
+        S.currentBranchId = 'main';
+        SessionMgr.init();
+        Sync.start();
       },
-
-      async login() {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        const errEl = document.getElementById('loginError');
-        errEl.style.display = 'none';
-        
-        if (!email || !password) {
-          errEl.textContent = 'Please enter email and password.';
-          errEl.style.display = 'block';
-          return;
-        }
-
-        try {
-          toast('Signing in...', 'info');
-          const remember = document.getElementById('loginRemember').checked;
-          const persistence = remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
-          await firebase.auth().setPersistence(persistence);
-          await firebase.auth().signInWithEmailAndPassword(email, password);
-          toast('Signed in successfully! 🔑', 'success');
-        } catch (e) {
-          console.error(e);
-          errEl.textContent = e.message;
-          errEl.style.display = 'block';
-          toast('Sign in failed ❌', 'error');
-        }
-      },
-
-      async logout() {
-        if (confirm('Are you sure you want to sign out?')) {
-          try {
-            await firebase.auth().signOut();
-            toast('Logged out successfully', 'info');
-            setTimeout(() => window.location.reload(), 500);
-          } catch (e) {
-            toast('Logout failed: ' + e.message, 'error');
-          }
-        }
-      },
-
-      async forgotPassword() {
-        const email = prompt('Enter your email to receive password reset link:');
-        if (!email) return;
-        try {
-          await firebase.auth().sendPasswordResetEmail(email);
-          toast('Password reset link sent to email! ✉️', 'success');
-        } catch (e) {
-          toast('Error: ' + e.message, 'error');
-        }
-      },
-
       applyPermissions() {
-        const role = S.currentUser ? S.currentUser.role : 'cashier';
-        if (role === 'cashier') {
-          document.querySelectorAll('.nav-tab').forEach(el => {
-            if (el.dataset.tab !== 'pos') el.style.display = 'none';
-          });
-          Nav.go('pos');
-        } else if (role === 'manager') {
-          document.querySelectorAll('.nav-tab').forEach(el => {
-            if (el.dataset.tab === 'admin') el.style.display = 'none';
-            else el.style.display = 'flex';
-          });
-          if (document.querySelector('.tab-panel.active')?.id === 'adminTab') Nav.go('pos');
-        } else if (role === 'admin') {
-          document.querySelectorAll('.nav-tab').forEach(el => {
-            el.style.display = 'flex';
-          });
-        }
+        document.querySelectorAll('.nav-tab').forEach(el => { el.style.display = 'flex'; });
       }
     };
 
@@ -6637,7 +6358,7 @@ Difference   : ${cur} ${diff.toFixed(2)}
           }
         } catch (e) { }
 
-        // Enforce Firebase Auth
+        // Direct startup - no auth required
         await AuthMgr.init();
 
         startClock(); startPoll(); setupPWA();
