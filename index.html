@@ -3735,7 +3735,7 @@
             <path d="M60,42 C60,48 55,48 55,42 Z" fill="#ef4444" />
           </g>
         </svg>
-          Chicken Shop
+          Mr. Chicken House
       </div>
       <div class="nav-tabs">
         <div class="nav-tab active" data-tab="pos" onclick="Nav.go('pos')" data-lang="pos">🛒 POS</div>
@@ -3772,7 +3772,7 @@
           <div class="pos-topbar">
             <div class="pos-search">
               <span class="pos-search-icon">🔍</span>
-              <input type="text" id="posSearch" placeholder="Search products... (fuzzy)" oninput="POS.filter()">
+              <input type="text" id="posSearch" placeholder="Search products... (fuzzy)" oninput="POS.filter()" inputmode="search" autocomplete="off" autocorrect="off" autocapitalize="none">
             </div>
             <button class="btn btn-ghost btn-sm" id="posCustomBtn" onclick="POS.addCustomItemPrompt()"
               style="border-color:var(--purple);color:var(--purple);font-weight:bold;" data-lang="addCustomItem">➕
@@ -3780,7 +3780,7 @@
             <div class="barcode-wrap">
               <button class="barcode-cam-btn" onclick="Scanner.openPOS()" title="Camera Scan">📷</button>
               <input type="text" id="barcodeInput" class="barcode-input" placeholder="Scan barcode..."
-                onkeypress="if(event.key==='Enter'){POS.scanBarcode(this.value);this.value='';}">
+                onkeypress="if(event.key==='Enter'){POS.scanBarcode(this.value);this.value='';}" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="none">
             </div>
           </div>
           <div class="cat-scroll" id="catBar"></div>
@@ -3855,7 +3855,7 @@
       <div class="tab-panel" id="inventoryTab">
         <div class="inv-bar">
           <h2>📦 Inventory</h2>
-          <input type="text" class="inv-search" id="invSearch" placeholder="🔍 Search..." oninput="InvTable.render()">
+          <input type="text" class="inv-search" id="invSearch" placeholder="🔍 Search..." oninput="InvTable.render()" inputmode="search" autocomplete="off" autocorrect="off" autocapitalize="none">
           <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" onclick="CatMgr.open()">🗂️ Categories</button>
             <button class="btn btn-primary btn-sm" onclick="ItemForm.open(null)">+ Add Product</button>
@@ -3892,7 +3892,7 @@
             <h3>Admin Panel</h3>
             <p>Enter PIN to unlock</p>
             <input type="password" id="pinInput" class="pin-input" maxlength="6" placeholder="••••"
-              onkeypress="if(event.key==='Enter')Admin.unlock()">
+              onkeypress="if(event.key==='Enter')Admin.unlock()" inputmode="numeric" pattern="[0-9]*">
             <button class="btn btn-primary w-full mt-8" onclick="Admin.unlock()">🔓 Unlock</button>
           </div>
         </div>
@@ -3925,7 +3925,7 @@
             <h3>📋 Recent Sales</h3>
             <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
               <input type="text" id="billSearchInput" placeholder="🔍 Search by Bill ID (e.g. BILL-260320-105529)..."
-                style="flex:1;font-family:'JetBrains Mono',monospace;font-size:11px;" oninput="Admin.searchBill()">
+                style="flex:1;font-family:'JetBrains Mono',monospace;font-size:11px;" oninput="Admin.searchBill()" inputmode="search" autocomplete="off" autocorrect="off" autocapitalize="none">
             </div>
             <div id="billSearchResult"></div>
             <div id="salesDiv"></div>
@@ -3975,18 +3975,18 @@
                 <div class="form-group" style="margin:0;flex:1;">
                   <label>Prefix (optional)</label>
                   <input type="text" id="bcPrefix" placeholder="RCM" maxlength="8" value="RCM"
-                    style="padding:6px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;">
+                    style="padding:6px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="none">
                 </div>
                 <div class="form-group" style="margin:0;width:70px;">
                   <label>Count</label>
                   <input type="number" id="bcGenCount" value="40" min="1" max="40"
-                    style="padding:6px 8px;font-size:12px;text-align:center;">
+                    style="padding:6px 8px;font-size:12px;text-align:center;" inputmode="numeric">
                 </div>
               </div>
               <div class="form-group" style="margin:0;margin-bottom:8px;">
                 <label>Price to Print (Optional)</label>
                 <input type="number" id="bcManualPrice" placeholder="e.g. 1500"
-                  style="padding:6px 10px;font-size:12px;">
+                  style="padding:6px 10px;font-size:12px;" inputmode="decimal">
               </div>
               <button class="btn btn-primary w-full" style="padding:11px;font-size:14px;font-weight:800;"
                 onclick="BarcodeTab.generateBatch()">
@@ -4019,7 +4019,7 @@
         <div class="loan-topbar">
           <h2>💳 Loan Management</h2>
           <input type="text" id="loanSearch" placeholder="🔍 Search customer name / phone..." oninput="LoanMgr.filter()"
-            style="flex:1;max-width:300px;">
+            style="flex:1;max-width:300px;" inputmode="search" autocomplete="off" autocorrect="off" autocapitalize="none">
           <div style="display:flex;gap:6px;margin-left:auto;">
             <button class="btn btn-ghost btn-sm" onclick="LoanMgr.openCustomerForm()">👤 Add Customer</button>
             <button class="btn btn-primary btn-sm" onclick="LoanMgr.openNewLoan()">➕ New Loan</button>
@@ -4094,11 +4094,11 @@
                   <div class="grid-2" style="margin-top:10px;">
                     <div class="form-group">
                       <label>Expense Item / Description</label>
-                      <input type="text" id="ccExpenseDesc" placeholder="e.g. Fuel, Lunch, Repairs">
+                      <input type="text" id="ccExpenseDesc" placeholder="e.g. Fuel, Lunch, Repairs" inputmode="text">
                     </div>
                     <div class="form-group">
                       <label>Amount (Rs.)</label>
-                      <input type="number" id="ccExpenseAmt" placeholder="0.00" step="0.01">
+                      <input type="number" id="ccExpenseAmt" placeholder="0.00" step="0.01" inputmode="decimal">
                     </div>
                   </div>
                   <button class="btn btn-primary w-full btn-sm" onclick="CoconutMgr.saveOperatingExpense()">💾 Save Expense</button>
@@ -4154,27 +4154,27 @@
                 </div>
                 <div class="form-group">
                   <label>Estate / Supplier</label>
-                  <input type="text" id="ccBuyEstate" placeholder="Estate/Supplier name">
+                  <input type="text" id="ccBuyEstate" placeholder="Estate/Supplier name" inputmode="text">
                 </div>
                 <div class="form-group">
                   <label>Large Count</label>
-                  <input type="number" id="ccBuyLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()">
+                  <input type="number" id="ccBuyLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()" inputmode="numeric">
                 </div>
                 <div class="form-group">
                   <label>Large Price (Rs.)</label>
-                  <input type="number" id="ccBuyLargePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()">
+                  <input type="number" id="ccBuyLargePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Small Count</label>
-                  <input type="number" id="ccBuySmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()">
+                  <input type="number" id="ccBuySmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()" inputmode="numeric">
                 </div>
                 <div class="form-group">
                   <label>Small Price (Rs.)</label>
-                  <input type="number" id="ccBuySmallPrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()">
+                  <input type="number" id="ccBuySmallPrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Transportation Cost (Rs.)</label>
-                  <input type="number" id="ccBuyTransport" placeholder="0.00" step="0.01" value="0" oninput="CoconutMgr.calcBuyTotal()">
+                  <input type="number" id="ccBuyTransport" placeholder="0.00" step="0.01" value="0" oninput="CoconutMgr.calcBuyTotal()" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Payment Method</label>
@@ -4187,7 +4187,7 @@
               </div>
               <div class="form-group">
                 <label>Optional Note</label>
-                <input type="text" id="ccBuyNotes" placeholder="Special notes about purchase...">
+                <input type="text" id="ccBuyNotes" placeholder="Special notes about purchase..." inputmode="text">
               </div>
               <div class="grid-2">
                 <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
@@ -4196,7 +4196,7 @@
                 </div>
                 <div class="form-group" style="margin-bottom:10px;">
                   <label>Paid from Drawer (Cash)</label>
-                  <input type="number" id="ccBuyPaidDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--red);">
+                  <input type="number" id="ccBuyPaidDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--red);" inputmode="decimal">
                 </div>
               </div>
               <button class="btn btn-primary w-full" onclick="CoconutMgr.savePurchase()">💾 Save Purchase</button>
@@ -4225,16 +4225,16 @@
                 <div class="grid-2">
                   <div class="form-group">
                     <label>Large Count Husked</label>
-                    <input type="number" id="ccHuskLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcHuskTotal()">
+                    <input type="number" id="ccHuskLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcHuskTotal()" inputmode="numeric">
                   </div>
                   <div class="form-group">
                     <label>Small Count Husked</label>
-                    <input type="number" id="ccHuskSmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcHuskTotal()">
+                    <input type="number" id="ccHuskSmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcHuskTotal()" inputmode="numeric">
                   </div>
                 </div>
                 <div class="form-group">
                   <label>Rate per nut (Rs.)</label>
-                  <input type="number" id="ccHuskRate" placeholder="3.00" value="3.00" step="0.01" oninput="CoconutMgr.calcHuskTotal()">
+                  <input type="number" id="ccHuskRate" placeholder="3.00" value="3.00" step="0.01" oninput="CoconutMgr.calcHuskTotal()" inputmode="decimal">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px;margin-bottom:10px;">
                   <span style="font-size:12px;color:var(--t2);">Total Earned</span>
@@ -4242,7 +4242,7 @@
                 </div>
                 <div class="form-group">
                   <label>Paid from Drawer (Immediate)</label>
-                  <input type="number" id="ccHuskPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);">
+                  <input type="number" id="ccHuskPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);" inputmode="decimal">
                 </div>
                 <button class="btn btn-primary w-full" onclick="CoconutMgr.saveHusking()">💾 Save Husking Session</button>
               </div>
@@ -4256,19 +4256,19 @@
                 </div>
                 <div class="form-group">
                   <label>Peeled Coconuts Used (Nuts)</label>
-                  <input type="number" id="ccCopraNuts" placeholder="0" min="0">
+                  <input type="number" id="ccCopraNuts" placeholder="0" min="0" inputmode="numeric">
                 </div>
                 <div class="form-group">
                   <label>Labor / Drying Cost (Rs.)</label>
-                  <input type="number" id="ccCopraCost" placeholder="0.00" step="0.01" value="0">
+                  <input type="number" id="ccCopraCost" placeholder="0.00" step="0.01" value="0" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Cost Paid from Drawer (Rs.)</label>
-                  <input type="number" id="ccCopraPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);" value="0">
+                  <input type="number" id="ccCopraPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);" value="0" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Optional Note</label>
-                  <input type="text" id="ccCopraNotes" placeholder="e.g. drying agent cost, labor notes...">
+                  <input type="text" id="ccCopraNotes" placeholder="e.g. drying agent cost, labor notes..." inputmode="text">
                 </div>
                 <button class="btn btn-primary w-full" onclick="CoconutMgr.saveCopra()">💾 Save Copra Registry</button>
               </div>
@@ -4282,23 +4282,23 @@
                 </div>
                 <div class="form-group">
                   <label>Copra Milled (kg)</label>
-                  <input type="number" id="ccOilCopra" placeholder="0.0" step="0.1">
+                  <input type="number" id="ccOilCopra" placeholder="0.0" step="0.1" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Oil Extracted (Liters)</label>
-                  <input type="number" id="ccOilQty" placeholder="0.0" step="0.1">
+                  <input type="number" id="ccOilQty" placeholder="0.0" step="0.1" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Poonac Produced (kg)</label>
-                  <input type="number" id="ccOilPoonac" placeholder="0.0" step="0.1">
+                  <input type="number" id="ccOilPoonac" placeholder="0.0" step="0.1" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Milling Cost (Rs.)</label>
-                  <input type="number" id="ccOilCost" placeholder="0.00" step="0.01" value="0">
+                  <input type="number" id="ccOilCost" placeholder="0.00" step="0.01" value="0" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Cost Paid from Drawer (Rs.)</label>
-                  <input type="number" id="ccOilPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);" value="0">
+                  <input type="number" id="ccOilPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);" value="0" inputmode="decimal">
                 </div>
                 <button class="btn btn-primary w-full" onclick="CoconutMgr.saveOil()">💾 Save Oil Registry</button>
               </div>
@@ -4356,19 +4356,19 @@
                   <div class="grid-2">
                     <div class="form-group">
                       <label>Large Count (ලොකු ගෙඩි ගණන)</label>
-                      <input type="number" id="ccSaleLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcSaleTotal()">
+                      <input type="number" id="ccSaleLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcSaleTotal()" inputmode="numeric">
                     </div>
                     <div class="form-group">
                       <label>Large Price per Nut (Rs.)</label>
-                      <input type="number" id="ccSaleLargePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()">
+                      <input type="number" id="ccSaleLargePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()" inputmode="decimal">
                     </div>
                     <div class="form-group">
                       <label>Small Count (පොඩි ගෙඩි ගණන)</label>
-                      <input type="number" id="ccSaleSmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcSaleTotal()">
+                      <input type="number" id="ccSaleSmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcSaleTotal()" inputmode="numeric">
                     </div>
                     <div class="form-group">
                       <label>Small Price per Nut (Rs.)</label>
-                      <input type="number" id="ccSaleSmallPrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()">
+                      <input type="number" id="ccSaleSmallPrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()" inputmode="decimal">
                     </div>
                   </div>
                 </div>
@@ -4378,11 +4378,11 @@
                   <div class="grid-2">
                     <div class="form-group">
                       <label id="ccSaleQtyLabel">Quantity</label>
-                      <input type="number" id="ccSaleCount" placeholder="0" min="0" step="any" oninput="CoconutMgr.calcSaleTotal()">
+                      <input type="number" id="ccSaleCount" placeholder="0" min="0" step="any" oninput="CoconutMgr.calcSaleTotal()" inputmode="decimal">
                     </div>
                     <div class="form-group">
                       <label id="ccSalePriceLabel">Price per Unit (Rs.)</label>
-                      <input type="number" id="ccSalePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()">
+                      <input type="number" id="ccSalePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()" inputmode="decimal">
                     </div>
                   </div>
                 </div>
@@ -4398,15 +4398,15 @@
                 </div>
                 <div class="form-group">
                   <label>Transportation Cost (paid by us)</label>
-                  <input type="number" id="ccSaleTransport" placeholder="0.00" step="0.01" value="0" oninput="CoconutMgr.calcSaleTotal()">
+                  <input type="number" id="ccSaleTransport" placeholder="0.00" step="0.01" value="0" oninput="CoconutMgr.calcSaleTotal()" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Transport Paid from Drawer</label>
-                  <input type="number" id="ccSaleTransportPaidDrawer" placeholder="0" min="0" step="0.01" value="0">
+                  <input type="number" id="ccSaleTransportPaidDrawer" placeholder="0" min="0" step="0.01" value="0" inputmode="decimal">
                 </div>
                 <div class="form-group">
                   <label>Optional Note</label>
-                  <input type="text" id="ccSaleNotes" placeholder="e.g. wholesale customer details, truck driver name...">
+                  <input type="text" id="ccSaleNotes" placeholder="e.g. wholesale customer details, truck driver name..." inputmode="text">
                 </div>
               </div>
               <div class="grid-2">
@@ -4746,7 +4746,7 @@
               <label style="font-size:14px; font-weight:bold;" data-lang="cashReceived">Cash Received</label>
               <input type="number" id="checkoutCashReceived"
                 style="font-family:'JetBrains Mono',monospace; font-size:24px; font-weight:700; padding:10px; color:var(--t1); background:var(--bg3); border:1px solid var(--border2); border-radius:var(--r8);"
-                placeholder="0.00" oninput="CheckoutPayment.calcChange()" autofocus>
+                placeholder="0.00" oninput="CheckoutPayment.calcChange()" autofocus inputmode="decimal">
             </div>
             <div class="form-group" id="changeDueGroup">
               <label style="font-size:14px; font-weight:bold;" data-lang="changeDue">Change Due</label>
@@ -4817,7 +4817,7 @@
       coconut_purchases: [], coconut_husking: [], coconut_sales: [], cash_movements: [], day_ends: [],
       coconut_copra: [], coconut_oil: [], coconut_workers: [], coconut_worker_payments: [],
       loans: [], loan_customers: [],
-      settings: { shopName: '  Chicken Shop', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.', apiServerUrl: '' },
+      settings: { shopName: 'Mr. Chicken House', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'No.97 Kalawewa Road, Damunumulla, Galewela\nTel: 077 4903964 / 072 1723349\nThank You! Come Again.', apiServerUrl: '' },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
       heldSales: [],
       activeCat: 'all', adminUnlocked: false, pollTimer: null,
@@ -5209,16 +5209,26 @@
         let st = await DB.get('settings/main');
         if (!st || !Object.keys(st).length) {
           st = {
-            shopName: '  Chicken Shop',
+            shopName: 'Mr. Chicken House',
             adminPin: '1234',
             currency: 'Rs.',
             lowStockAlert: 5,
-            receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.'
+            receiptNote: 'No.97 Kalawewa Road, Damunumulla, Galewela\nTel: 077 4903964 / 072 1723349\nThank You! Come Again.'
           };
           await DB.set('settings/main', st);
-        } else if (st && st.receiptNote && st.receiptNote.startsWith('  Chicken Shop\n')) {
-          st.receiptNote = st.receiptNote.replace('  Chicken Shop\n', '');
-          await DB.set('settings/main', st);
+        } else {
+          let migrated = false;
+          if (st.shopName === '  Chicken Shop') {
+            st.shopName = 'Mr. Chicken House';
+            migrated = true;
+          }
+          if (st.receiptNote === 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.') {
+            st.receiptNote = 'No.97 Kalawewa Road, Damunumulla, Galewela\nTel: 077 4903964 / 072 1723349\nThank You! Come Again.';
+            migrated = true;
+          }
+          if (migrated) {
+            await DB.set('settings/main', st);
+          }
         }
         Object.assign(S.settings, st);
 
@@ -5243,7 +5253,7 @@
         }
 
         // Sync dot controlled by Sync engine
-        toast('  Chicken Shop POS Active ✅', 'success');
+        toast('Mr. Chicken House POS Active ✅', 'success');
       } catch (e) {
         txt('❌ ' + e.message);
         toast('System initialization error: ' + e.message, 'error');
@@ -6277,11 +6287,11 @@
           <div class="modal-head"><div class="modal-title">${title}</div><button class="modal-x" onclick="Modal.close('optModal')">✕</button></div>
           <div class="form-group" style="margin-top:10px;">
             <label>${label}</label>
-            <input type="number" id="ccDrawerMoveAmt" placeholder="0.00" min="0.01" step="0.01" autofocus>
+            <input type="number" id="ccDrawerMoveAmt" placeholder="0.00" min="0.01" step="0.01" autofocus inputmode="decimal">
           </div>
           <div class="form-group">
             <label>Note / Reason</label>
-            <input type="text" id="ccDrawerMoveNote" placeholder="e.g. Owner deposit, bank cash withdraw...">
+            <input type="text" id="ccDrawerMoveNote" placeholder="e.g. Owner deposit, bank cash withdraw..." inputmode="text">
           </div>
           <div class="modal-foot">
             <button class="btn btn-ghost" onclick="Modal.close('optModal')">Cancel</button>
@@ -6289,6 +6299,8 @@
           </div>
         `;
         Modal.open('optModal');
+        const moveAmtInput = document.getElementById('ccDrawerMoveAmt');
+        if (moveAmtInput) moveAmtInput.focus();
         setTimeout(() => document.getElementById('ccDrawerMoveAmt')?.focus(), 200);
       },
 
@@ -7325,17 +7337,26 @@
       <div class="modal-head"><div class="modal-title">⚖️ ${esc(item.name)}</div><button class="modal-x" onclick="Modal.close('optModal')">✕</button></div>
       <div class="opt-tabs"><div class="opt-tab active" id="wt1" onclick="POS.wTab(1)">💰 By Amount (${cur})</div><div class="opt-tab" id="wt2" onclick="POS.wTab(2)">⚖️ By ${item.unit === 'kg' ? 'Kg' : 'Qty'}</div></div>
       <div id="wBody1">
-        <div class="form-group"><label>Customer pays (${cur})</label><input type="number" id="wAmt" placeholder="100.00" min="0" step="0.5" autofocus></div>
+        <div class="form-group"><label>Customer pays (${cur})</label><input type="number" id="wAmt" placeholder="100.00" min="0" step="0.5" autofocus inputmode="decimal"></div>
         <p style="font-size:11px;color:var(--t2);margin-bottom:12px">${cur} ${item.price} / ${item.unit} — weight auto calculated</p>
         <button class="btn btn-primary w-full" onclick="POS.confirmWAmt('${item.id}')">Next →</button>
       </div>
       <div id="wBody2" style="display:none">
-        <div class="form-group"><label>${item.unit === 'kg' ? 'Weight (kg)' : 'Quantity'}</label><input type="number" id="wQty" placeholder="1.0" min="0.001" step="0.001"></div>
+        <div class="form-group"><label>${item.unit === 'kg' ? 'Weight (kg)' : 'Quantity'}</label><input type="number" id="wQty" placeholder="1.0" min="0.001" step="0.001" inputmode="decimal"></div>
         <button class="btn btn-primary w-full" onclick="POS.confirmWQty('${item.id}')">Next →</button>
       </div>`;
         Modal.open('optModal');
+        const el = document.getElementById('wAmt');
+        if (el) el.focus();
       },
-      wTab(n) { document.getElementById('wt1').classList.toggle('active', n === 1); document.getElementById('wt2').classList.toggle('active', n === 2); document.getElementById('wBody1').style.display = n === 1 ? '' : 'none'; document.getElementById('wBody2').style.display = n === 2 ? '' : 'none'; },
+      wTab(n) {
+        document.getElementById('wt1').classList.toggle('active', n === 1);
+        document.getElementById('wt2').classList.toggle('active', n === 2);
+        document.getElementById('wBody1').style.display = n === 1 ? '' : 'none';
+        document.getElementById('wBody2').style.display = n === 2 ? '' : 'none';
+        const el = document.getElementById(n === 1 ? 'wAmt' : 'wQty');
+        if (el) el.focus();
+      },
       confirmWAmt(id) { const item = S.items.find(i => i.id === id); const amt = parseFloat(document.getElementById('wAmt').value); if (!amt || amt <= 0) { toast('Enter amount', 'error'); return; } const qty = amt / item.price; Modal.close('optModal'); this.showSaleTypePicker(item, qty, null, amt); },
       confirmWQty(id) { const item = S.items.find(i => i.id === id); const qty = parseFloat(document.getElementById('wQty').value); if (!qty || qty <= 0) { toast('Enter quantity', 'error'); return; } Modal.close('optModal'); this.showSaleTypePicker(item, qty); },
       showLiquidModal(item) {
@@ -7346,8 +7367,10 @@
       <p style="color:var(--t2);font-size:12px;margin-bottom:10px">Select option:</p>
       <div class="liq-grid">${oh}</div>
       <hr class="divider">
-      <div class="form-group"><label>Custom (${item.unit})</label><div class="flex gap-8"><input type="number" id="custLiq" placeholder="0.5" step="0.01" style="flex:1"><button class="btn btn-ghost btn-sm" onclick="POS.custLiq('${item.id}')">Next →</button></div></div>`;
+      <div class="form-group"><label>Custom (${item.unit})</label><div class="flex gap-8"><input type="number" id="custLiq" placeholder="0.5" step="0.01" style="flex:1" inputmode="decimal"><button class="btn btn-ghost btn-sm" onclick="POS.custLiq('${item.id}')">Next →</button></div></div>`;
         Modal.open('optModal');
+        const el = document.getElementById('custLiq');
+        if (el) el.focus();
       },
       selectLiq(id, idx) { const item = S.items.find(i => i.id === id); const o = item.liquidOptions[idx]; Modal.close('optModal'); this.showSaleTypePicker(item, o.amount, o.label, o.price); },
       custLiq(id) { const item = S.items.find(i => i.id === id); const amt = parseFloat(document.getElementById('custLiq').value); if (!amt || amt <= 0) { toast('Enter amount', 'error'); return; } Modal.close('optModal'); this.showSaleTypePicker(item, amt, null, amt * item.price); },
@@ -7376,11 +7399,11 @@
       </div>
       <div class="form-group">
         <label>Item Name *</label>
-        <input id="customItemName" type="text" placeholder="e.g. Loose Vegetables, Extra Bags" autofocus style="background:var(--bg3); border:1px solid var(--border2); color:var(--t1); border-radius:var(--r8);">
+        <input id="customItemName" type="text" placeholder="e.g. Loose Vegetables, Extra Bags" autofocus inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="words" style="background:var(--bg3); border:1px solid var(--border2); color:var(--t1); border-radius:var(--r8);">
       </div>
       <div class="form-group">
         <label>Price *</label>
-        <input id="customItemPrice" type="number" placeholder="100.00" min="0" step="0.5" style="background:var(--bg3); border:1px solid var(--border2); color:var(--t1); border-radius:var(--r8);">
+        <input id="customItemPrice" type="number" placeholder="100.00" min="0" step="0.5" inputmode="decimal" style="background:var(--bg3); border:1px solid var(--border2); color:var(--t1); border-radius:var(--r8);">
       </div>
       <div class="modal-foot">
         <button class="btn btn-ghost" onclick="Modal.close('optModal')">Cancel</button>
@@ -7388,10 +7411,8 @@
       </div>
     `;
         Modal.open('optModal');
-        setTimeout(() => {
-          const el = document.getElementById('customItemName');
-          if (el) el.focus();
-        }, 300);
+        const el = document.getElementById('customItemName');
+        if (el) el.focus();
       },
       confirmCustomItem() {
         const name = document.getElementById('customItemName').value.trim();
@@ -7584,15 +7605,17 @@
       openCart() {
         const cur = S.settings.currency;
         document.getElementById('discTitle').textContent = '💰 Cart Discount';
-        document.getElementById('discBody').innerHTML = `<div class="form-group"><label>Type</label><select id="dType"><option value="percent" ${S.cartDiscType === 'percent' ? 'selected' : ''}>% Percentage</option><option value="fixed" ${S.cartDiscType === 'fixed' ? 'selected' : ''}>Fixed (${cur})</option></select></div><div class="form-group"><label>Value</label><input type="number" id="dVal" value="${S.cartDisc}" min="0" step="0.5"></div><div class="modal-foot"><button class="btn btn-ghost" onclick="S.cartDisc=0;Cart.render();Modal.close('discModal')">Remove</button><button class="btn btn-primary" onclick="S.cartDiscType=document.getElementById('dType').value;S.cartDisc=parseFloat(document.getElementById('dVal').value)||0;Cart.render();Modal.close('discModal');toast('Discount applied','success')">Apply</button></div>`;
+        document.getElementById('discBody').innerHTML = `<div class="form-group"><label>Type</label><select id="dType"><option value="percent" ${S.cartDiscType === 'percent' ? 'selected' : ''}>% Percentage</option><option value="fixed" ${S.cartDiscType === 'fixed' ? 'selected' : ''}>Fixed (${cur})</option></select></div><div class="form-group"><label>Value</label><input type="number" id="dVal" value="${S.cartDisc}" min="0" step="0.5" inputmode="decimal"></div><div class="modal-foot"><button class="btn btn-ghost" onclick="S.cartDisc=0;Cart.render();Modal.close('discModal')">Remove</button><button class="btn btn-primary" onclick="S.cartDiscType=document.getElementById('dType').value;S.cartDisc=parseFloat(document.getElementById('dVal').value)||0;Cart.render();Modal.close('discModal');toast('Discount applied','success')">Apply</button></div>`;
         Modal.open('discModal');
+        const dv = document.getElementById('dVal');
+        if (dv) dv.focus();
       },
       openItem() {
         if (!S.cart.length) { toast('Cart empty', 'error'); return; }
         const cur = S.settings.currency;
         document.getElementById('discTitle').textContent = '🏷️ Item Discount';
         const opts = S.cart.map((c, i) => `<option value="${i}">${esc(c.name)} [${c.saleMode}]</option>`).join('');
-        document.getElementById('discBody').innerHTML = `<div class="form-group"><label>Item</label><select id="dItem">${opts}</select></div><div class="form-group"><label>Type</label><select id="dIT"><option value="percent">%</option><option value="fixed">Fixed</option></select></div><div class="form-group"><label>Value</label><input type="number" id="dIV" value="0" min="0" step="0.5"></div><div class="modal-foot"><button class="btn btn-ghost" onclick="Modal.close('discModal')">Cancel</button><button class="btn btn-primary" onclick="const i=parseInt(document.getElementById('dItem').value);S.cart[i].discount=parseFloat(document.getElementById('dIV').value)||0;S.cart[i].discType=document.getElementById('dIT').value;Cart.render();Modal.close('discModal');toast('Applied','success')">Apply</button></div>`;
+        document.getElementById('discBody').innerHTML = `<div class="form-group"><label>Item</label><select id="dItem">${opts}</select></div><div class="form-group"><label>Type</label><select id="dIT"><option value="percent">%</option><option value="fixed">Fixed</option></select></div><div class="form-group"><label>Value</label><input type="number" id="dIV" value="0" min="0" step="0.5" inputmode="decimal"></div><div class="modal-foot"><button class="btn btn-ghost" onclick="Modal.close('discModal')">Cancel</button><button class="btn btn-primary" onclick="const i=parseInt(document.getElementById('dItem').value);S.cart[i].discount=parseFloat(document.getElementById('dIV').value)||0;S.cart[i].discType=document.getElementById('dIT').value;Cart.render();Modal.close('discModal');toast('Applied','success')">Apply</button></div>`;
         Modal.open('discModal');
       }
     };
@@ -7601,7 +7624,7 @@
       width: 42,
       shopName() {
         const raw = String(S.settings.shopName || '').trim();
-        if (!raw || /[^\x00-\x7F]/.test(raw)) return '  Chicken Shop';
+        if (!raw || /[^\x00-\x7F]/.test(raw)) return 'Mr. Chicken House';
         return raw;
       },
       footerNote() {
@@ -7771,6 +7794,7 @@
 
         this.calcChange();
         Modal.open('checkoutPaymentModal');
+        cashInput.focus();
         setTimeout(() => cashInput.focus(), 150);
       },
       onPayMethodChange() {
@@ -8092,7 +8116,7 @@
       <div class="form-group">
         <label>Qty (${item.unit})</label>
         <div style="display:flex;gap:8px;">
-          <input type="number" id="saQ" placeholder="10" min="0.001" step="0.001" style="flex:1" autofocus>
+          <input type="number" id="saQ" placeholder="10" min="0.001" step="0.001" style="flex:1" autofocus inputmode="decimal">
           <button id="saScanBtn" class="btn btn-ghost btn-sm" style="border:1px solid var(--border);" onclick="StockAdd.toggleScanner()">📷 Scan Barcodes</button>
           <button id="saCamBtn" class="btn btn-ghost btn-sm" style="border:1px solid var(--border);" onclick="Scanner.openStockAdd()" title="Use Camera">📱 Camera</button>
         </div>
@@ -8101,8 +8125,10 @@
          <div style="margin-bottom:4px; font-weight:bold;">Scanner Active (Scanned: <span id="saBcCount">0</span>)</div>
          <div id="saBcList" style="max-height:60px; overflow-y:auto; color:var(--t2);"></div>
       </div>
-      <div class="form-group"><label>Cost Price (${cur}/${item.unit})</label><input type="number" id="saC" value="${item.costPrice || ''}" placeholder="0.00" min="0" step="0.5"></div><div class="form-group"><label>Date Received</label><input type="date" id="saD" value="${new Date().toISOString().split('T')[0]}"></div><div class="modal-foot"><button class="btn btn-ghost" onclick="StockAdd.close()">Cancel</button><button class="btn btn-primary" onclick="StockAdd.confirm('${id}')">➕ Add Stock</button></div>`;
+      <div class="form-group"><label>Cost Price (${cur}/${item.unit})</label><input type="number" id="saC" value="${item.costPrice || ''}" placeholder="0.00" min="0" step="0.5" inputmode="decimal"></div><div class="form-group"><label>Date Received</label><input type="date" id="saD" value="${new Date().toISOString().split('T')[0]}"></div><div class="modal-foot"><button class="btn btn-ghost" onclick="StockAdd.close()">Cancel</button><button class="btn btn-primary" onclick="StockAdd.confirm('${id}')">➕ Add Stock</button></div>`;
         Modal.open('discModal');
+        const saQEl = document.getElementById('saQ');
+        if (saQEl) saQEl.focus();
       },
       toggleScanner() {
         this.isScanning = !this.isScanning;
@@ -8170,18 +8196,20 @@
         if (item?.liquidOptions?.length) this.renderLiqOpts(item.liquidOptions);
         this.setupImageUpload(item);
         Modal.open('itemModal');
+        const fName = document.getElementById('fName');
+        if (fName) fName.focus();
       },
       getHTML(item) {
         const cur = S.settings.currency;
         const catOpts = S.categories.map(c => `<option value="${c.id}" ${item?.categoryId === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
         return `
       <div class="grid-2">
-        <div class="form-group"><label>Product Name *</label><input id="fName" type="text" value="${esc(item?.name || '')}" placeholder="e.g. Samsung Galaxy A55 Case" autofocus></div>
+        <div class="form-group"><label>Product Name *</label><input id="fName" type="text" value="${esc(item?.name || '')}" placeholder="e.g. Samsung Galaxy A55 Case" autofocus inputmode="text" autocomplete="off" autocapitalize="words"></div>
         <div class="form-group">
           <label>Barcode</label>
           <div style="position:relative;">
             <button type="button" style="position:absolute;left:0;top:0;bottom:0;width:34px;background:var(--glass2);border:none;border-right:1px solid var(--border2);border-radius:var(--r8) 0 0 var(--r8);cursor:pointer;color:var(--cyan);font-size:14px;display:flex;align-items:center;justify-content:center;z-index:1;" onclick="Scanner.openFormScan()" title="Scan barcode">📷</button>
-            <input id="fBarcode" type="text" value="${esc(item?.barcode || '')}" placeholder="Scan or type barcode..." style="padding-left:38px;" oninput="ItemForm.previewBarcode()">
+            <input id="fBarcode" type="text" value="${esc(item?.barcode || '')}" placeholder="Scan or type barcode..." style="padding-left:38px;" oninput="ItemForm.previewBarcode()" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="none">
           </div>
           <div id="bcPreviewWrap" style="display:${item?.barcode ? 'block' : 'none'}">
             <div class="bc-preview" id="bcPreview"></div>
@@ -8193,16 +8221,16 @@
         <div class="form-group"><label>Item Type</label><select id="fType" onchange="ItemForm.toggleType()"><option value="unit" ${!item?.type || item?.type === 'unit' ? 'selected' : ''}>📦 Unit (pcs)</option><option value="weighted" ${item?.type === 'weighted' ? 'selected' : ''}>⚖️ Weighted (kg/g)</option><option value="liquid" ${item?.type === 'liquid' ? 'selected' : ''}>🫙 Liquid (L/ml)</option></select></div>
       </div>
       <div class="grid-4">
-        <div class="form-group"><label>Retail Price (${cur})</label><input id="fPrice" type="number" value="${item?.price || ''}" placeholder="0.00" min="0" step="0.5"></div>
+        <div class="form-group"><label>Retail Price (${cur})</label><input id="fPrice" type="number" value="${item?.price || ''}" placeholder="0.00" min="0" step="0.5" inputmode="decimal"></div>
         <div class="form-group">${S.adminUnlocked
-            ? `<label>Cost Price (${cur}) 🔐</label><input id="fCost" type="number" value="${item?.costPrice || ''}" placeholder="0.00" min="0" step="0.5">`
+            ? `<label>Cost Price (${cur}) 🔐</label><input id="fCost" type="number" value="${item?.costPrice || ''}" placeholder="0.00" min="0" step="0.5" inputmode="decimal">`
             : `<label style="color:var(--t3)">Cost Price</label><div style="padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);font-size:12px;color:var(--t3);display:flex;align-items:center;gap:5px;">🔐 Admin only<input type="hidden" id="fCost" value="${item?.costPrice || 0}"></div>`
           }</div>
-        <div class="form-group"><label>Unit</label><input id="fUnit" type="text" value="${esc(item?.unit || 'pcs')}" placeholder="pcs / kg / L"></div>
+        <div class="form-group"><label>Unit</label><input id="fUnit" type="text" value="${esc(item?.unit || 'pcs')}" placeholder="pcs / kg / L" inputmode="text"></div>
       </div>
       <div class="grid-2">
-        <div class="form-group"><label>Low Stock Alert</label><input id="fThresh" type="number" value="${item?.lowStockThreshold || S.settings.lowStockAlert}" min="0"></div>
-        <div class="form-group"><label>Default Discount (%)</label><input id="fDisc" type="number" value="${item?.defaultDiscount || 0}" min="0" max="100"></div>
+        <div class="form-group"><label>Low Stock Alert</label><input id="fThresh" type="number" value="${item?.lowStockThreshold || S.settings.lowStockAlert}" min="0" inputmode="numeric"></div>
+        <div class="form-group"><label>Default Discount (%)</label><input id="fDisc" type="number" value="${item?.defaultDiscount || 0}" min="0" max="100" inputmode="decimal"></div>
       </div>
       <div id="fWeightHint" style="display:none"><div class="info-hint">⚖️ Weighted: In POS you can enter by amount (Rs.) or weight (kg/g). Stock tracked by weight.</div></div>
       <div id="fLiquidFields" style="display:none">
@@ -8212,7 +8240,7 @@
           <button class="btn btn-ghost btn-sm mt-8" onclick="ItemForm.addLiqRow()">+ Add Option</button>
         </div>
       </div>
-      ${!item ? `<div class="form-group"><label>Initial Stock Quantity</label><input id="fInitStock" type="number" value="0" min="0" step="0.001"></div>` : ''}
+      ${!item ? `<div class="form-group"><label>Initial Stock Quantity</label><input id="fInitStock" type="number" value="0" min="0" step="0.001" inputmode="decimal"></div>` : ''}
       <div class="form-group">
         <label>Product Image</label>
         <div id="imageUploadArea" style="border:2px dashed var(--border);border-radius:var(--r8);padding:20px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;background:var(--bg2);">
@@ -8228,8 +8256,8 @@
           </div>
         </div>
       </div>
-      <div class="form-group"><label style="font-size:11px;color:var(--t3);">Or use Image URL (optional)</label><input id="fImg" type="text" value="${esc(item?.image || '')}" placeholder="https://..."></div>
-      <div class="form-group"><label>Description</label><textarea id="fDesc" rows="2">${esc(item?.description || '')}</textarea></div>
+      <div class="form-group"><label style="font-size:11px;color:var(--t3);">Or use Image URL (optional)</label><input id="fImg" type="text" value="${esc(item?.image || '')}" placeholder="https://..." inputmode="url" autocapitalize="none"></div>
+      <div class="form-group"><label>Description</label><textarea id="fDesc" rows="2" inputmode="text">${esc(item?.description || '')}</textarea></div>
       <div class="modal-foot">
         <button class="btn btn-ghost" onclick="Modal.close('itemModal')">Cancel</button>
         <button class="btn btn-primary" onclick="ItemForm.save(${item ? `'${item.id}'` : null})">💾 ${item ? 'Update' : 'Save'} Product</button>
@@ -8748,6 +8776,116 @@ window.onload=function(){
           <button class="btn btn-primary btn-sm" onclick="LoanMgr.openNewLoan('${cust.id}')">➕ New Loan</button>
           <button class="btn btn-ghost btn-sm" onclick="LoanMgr.openCustomerForm('${cust.id}')">✏️ Edit</button>
           <button class="btn btn-danger btn-sm" onclick="LoanMgr.deleteCustomer('${cust.id}')">🗑️</button>
+        </div>
+      </div>
+      <!-- Loans -->
+      <div style="font-size:12px;font-weight:700;color:var(--t2);padding:4px 0 2px;">LOANS (${loans.length})</div>
+      ${loans.length ? loans.map(l => this._loanCard(l, cur)).join('')
+            : `<div style="text-align:center;color:var(--t3);padding:30px;font-size:12px;">No loans yet for this customer.</div>`}`;
+      },
+
+      _loanCard(loan, cur) {
+        const pct = loan.totalAmount > 0 ? Math.min(100, (loan.paidAmount / loan.totalAmount) * 100) : 0;
+        const remaining = loan.totalAmount - loan.paidAmount;
+        const isCleared = loan.status === 'cleared' || remaining <= 0;
+        const overdue = this._isOverdue(loan);
+        const borderColor = isCleared ? 'rgba(16,185,129,0.3)' : overdue ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.1)';
+        const instHTML = loan.installments?.length ? `
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+        <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px;">📅 Installment Schedule</div>
+        ${loan.installments.map((inst, i) => {
+          const due = new Date(inst.dueDate); const now = new Date();
+          const daysLeft = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
+          let cls = 'upcoming', dotCls = 'upcoming', info = '';
+          if (inst.paid) { cls = 'paid-inst'; dotCls = 'paid-inst'; info = `✓ Paid ${inst.paidDate ? new Date(inst.paidDate).toLocaleDateString() : ''}`; }
+          else if (daysLeft < 0) { cls = 'overdue'; dotCls = 'overdue'; info = `⚠ ${Math.abs(daysLeft)}d overdue`; }
+          else if (daysLeft <= 7) { cls = 'due'; dotCls = 'due'; info = `⏰ Due in ${daysLeft}d`; }
+          else info = `${due.toLocaleDateString()}`;
+          return `<div class="loan-installment-row ${cls}">
+            <div class="inst-dot ${dotCls}"></div>
+            <div style="flex:1;font-size:11px;">Installment ${i + 1} — ${cur} ${(inst.amount || 0).toFixed(2)}</div>
+            <div style="font-size:10px;color:var(--t2);">${info}</div>
+            ${!inst.paid ? `<button class="btn btn-success btn-xs" onclick="LoanMgr.markInstallmentPaid('${loan.id}',${i})">✓</button>` : ''}
+          </div>`;
+        }).join('')}
+      </div>`: '';
+        return `<div class="loan-card" style="border-color:${borderColor};">
+      <div class="loan-card-head">
+        <div>
+          <div class="loan-card-title">${esc(loan.description || 'Loan')} ${isCleared ? '<span class="badge badge-green">Cleared ✓</span>' : overdue ? '<span class="badge badge-red">⚠ Overdue</span>' : ''}</div>
+          <div class="loan-card-date">📅 ${new Date(loan.createdAt).toLocaleDateString()} &nbsp;|&nbsp; ${loan.installments?.length ? `${loan.installments.length} installments` : 'No installment plan'}</div>
+          ${loan.items ? `<div style="font-size:11px;color:var(--t2);margin-top:3px;">🛍 ${esc(loan.items)}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:5px;align-items:flex-start;flex-shrink:0;">
+          ${!isCleared ? `<button class="btn btn-primary btn-xs" onclick="LoanMgr.openPayment('${loan.id}')">💰 Pay</button>` : ''}
+          ${isCleared ? `<button class="btn btn-danger btn-xs" onclick="LoanMgr.clearLoan('${loan.id}')">🗑 Remove</button>` : `<button class="btn btn-success btn-xs" onclick="LoanMgr.markCleared('${loan.id}')">✓ Clear</button>`}
+        </div>
+      </div>
+      <div class="loan-amounts">
+        <div class="loan-amt-block"><div class="loan-amt-lbl">Total</div><div class="loan-amt-val" style="color:var(--t1);">${cur} ${(loan.totalAmount || 0).toFixed(2)}</div></div>
+        <div class="loan-amt-block"><div class="loan-amt-lbl">Paid</div><div class="loan-amt-val" style="color:var(--green);">${cur} ${(loan.paidAmount || 0).toFixed(2)}</div></div>
+        <div class="loan-amt-block"><div class="loan-amt-lbl">Remaining</div><div class="loan-amt-val" style="color:${remaining > 0 ? 'var(--red)' : 'var(--green)'};">${cur} ${Math.max(0, remaining).toFixed(2)}</div></div>
+      </div>
+      <div class="loan-progress"><div class="loan-progress-fill" style="width:${pct.toFixed(1)}%"></div></div>
+      <div style="font-size:10px;color:var(--t3);text-align:right;">${pct.toFixed(0)}% paid</div>
+      ${loan.paymentHistory?.length ? `
+        <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
+          <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:4px;">Payment History</div>
+          ${loan.paymentHistory.slice(-5).reverse().map(p => `
+            <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border);">
+              <span style="color:var(--t2);">${new Date(p.date).toLocaleDateString()} ${p.note ? `— ${esc(p.note)}` : ''}</span>
+              <span style="font-family:'JetBrains Mono',monospace;color:var(--green);font-weight:700;">+${cur} ${(p.amount || 0).toFixed(2)}</span>
+            </div>`).join('')}
+        </div>`: ''}
+      ${instHTML}
+    </div>`;
+      },
+
+      _isOverdue(loan) {
+        if (loan.status === 'cleared' || (loan.totalAmount - loan.paidAmount) <= 0) return false;
+        if (!loan.installments?.length) {
+          if (loan.dueDate && new Date(loan.dueDate) < new Date()) return true;
+          return false;
+        }
+        return loan.installments.some(i => !i.paid && new Date(i.dueDate) < new Date());
+      },
+
+      _checkDueNotifications() {
+        const cur = S.settings.currency;
+        const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+        const soonLoans = [];
+        this._loans.filter(l => l.status !== 'cleared').forEach(loan => {
+          const cust = this._customers.find(c => c.id === loan.customerId);
+          if (!cust) return;
+          (loan.installments || []).forEach((inst, i) => {
+            if (inst.paid) return;
+            const due = new Date(inst.dueDate);
+            const daysLeft = Math.ceil((due - new Date()) / (1000 * 60 * 60 * 24));
+            if (daysLeft >= 0 && daysLeft <= 3) {
+              soonLoans.push({ name: cust.name, amount: inst.amount, daysLeft, loanDesc: loan.description || 'Loan' });
+            } else if (daysLeft < 0) {
+              soonLoans.push({ name: cust.name, amount: inst.amount, daysLeft, loanDesc: loan.description || 'Loan', overdue: true });
+            }
+          });
+          // Simple due date (no installments)
+          if (!loan.installments?.length && loan.dueDate) {
+            const daysLeft = Math.ceil((new Date(loan.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+            if (daysLeft >= 0 && daysLeft <= 3) soonLoans.push({ name: cust.name, amount: loan.totalAmount - loan.paidAmount, daysLeft, loanDesc: loan.description || 'Loan' });
+            else if (daysLeft < 0) soonLoans.push({ name: cust.name, amount: loan.totalAmount - loan.paidAmount, daysLeft, loanDesc: loan.description || 'Loan', overdue: true });
+          }
+        });
+        soonLoans.forEach(n => {
+          if (n.overdue) { toast(`⚠️ OVERDUE: ${n.name} — ${cur} ${(n.amount || 0).toFixed(2)} (${n.loanDesc})`, 'error'); }
+          else { toast(`⏰ Due in ${n.daysLeft}d: ${n.name} — ${cur} ${(n.amount || 0).toFixed(2)} (${n.loanDesc})`, 'info'); }
+        });
+      },
+
+      openCustomerForm(id = null) {
+        const cust = id ? this._customers.find(c => c.id === id) : null;
+        // Photos state (up to 2 base64 strings)
+        window._custPhotos = [cust?.photo1 || null, cust?.photo2 || null];
+        document.getElementById('loanCustTitle').textContent = cust ? '✏️ Edit Customer' : '👤 Add Customer';
+        document.getElementById('loanCustBody').innerHTML = `
       <div class="cust-photo-zone">
         <div class="cust-photo-slot" id="cps0"
           ondragover="event.preventDefault();this.classList.add('drag-over')"
@@ -8776,10 +8914,10 @@ window.onload=function(){
           }</div>
         </div>
       </div>
-      <div class="form-group"><label>Full Name *</label><input id="lcName" type="text" value="${esc(cust?.name || '')}" placeholder="Customer name" autofocus></div>
-      <div class="form-group"><label>Phone</label><input id="lcPhone" type="tel" value="${esc(cust?.phone || '')}" placeholder="07X XXXXXXX"></div>
-      <div class="form-group"><label>Address</label><input id="lcAddr" type="text" value="${esc(cust?.address || '')}" placeholder="Address"></div>
-      <div class="form-group"><label>Notes</label><textarea id="lcNotes" rows="2">${esc(cust?.notes || '')}</textarea></div>
+      <div class="form-group"><label>Full Name *</label><input id="lcName" type="text" value="${esc(cust?.name || '')}" placeholder="Customer name" autofocus inputmode="text" autocomplete="off" autocapitalize="words"></div>
+      <div class="form-group"><label>Phone</label><input id="lcPhone" type="tel" value="${esc(cust?.phone || '')}" placeholder="07X XXXXXXX" inputmode="tel"></div>
+      <div class="form-group"><label>Address</label><input id="lcAddr" type="text" value="${esc(cust?.address || '')}" placeholder="Address" inputmode="text"></div>
+      <div class="form-group"><label>Notes</label><textarea id="lcNotes" rows="2" inputmode="text">${esc(cust?.notes || '')}</textarea></div>
       <div class="modal-foot">
         <button class="btn btn-ghost" onclick="Modal.close('loanCustomerModal')">Cancel</button>
         <button class="btn btn-primary" onclick="LoanMgr.saveCustomer(${id ? `'${id}'` : null})">💾 Save</button>
@@ -8792,6 +8930,8 @@ window.onload=function(){
           });
         }, 100);
         Modal.open('loanCustomerModal');
+        const lcNameEl = document.getElementById('lcName');
+        if (lcNameEl) lcNameEl.focus();
       },
 
       _photoSlotUpdate(idx) {
@@ -8916,26 +9056,26 @@ window.onload=function(){
             </div>
           </div>
           <div class="grid-2">
-            <div class="form-group" style="margin-bottom:8px;"><label>Full Name *</label><input id="lnNewName" type="text" placeholder="Customer name"></div>
-            <div class="form-group" style="margin-bottom:8px;"><label>Phone</label><input id="lnNewPhone" type="tel" placeholder="07X XXXXXXX"></div>
+            <div class="form-group" style="margin-bottom:8px;"><label>Full Name *</label><input id="lnNewName" type="text" placeholder="Customer name" inputmode="text" autocomplete="off" autocapitalize="words"></div>
+            <div class="form-group" style="margin-bottom:8px;"><label>Phone</label><input id="lnNewPhone" type="tel" placeholder="07X XXXXXXX" inputmode="tel"></div>
           </div>
-          <div class="form-group" style="margin-bottom:8px;"><label>Address</label><input id="lnNewAddr" type="text" placeholder="Address"></div>
-          <div class="form-group" style="margin-bottom:8px;"><label>Notes</label><textarea id="lnNewNotes" rows="1" style="min-height:36px;"></textarea></div>
+          <div class="form-group" style="margin-bottom:8px;"><label>Address</label><input id="lnNewAddr" type="text" placeholder="Address" inputmode="text"></div>
+          <div class="form-group" style="margin-bottom:8px;"><label>Notes</label><textarea id="lnNewNotes" rows="1" style="min-height:36px;" inputmode="text"></textarea></div>
           <button class="btn btn-primary btn-sm w-full" onclick="LoanMgr.saveInlineCustomer()">✅ Save Customer &amp; Continue</button>
         </div>
       </div>
-      <div class="form-group"><label>Description / Item(s)</label><input id="lnDesc" type="text" value="${esc(prefill?.desc || '')}" placeholder="e.g. Samsung A55, charger..."></div>
-      <div class="form-group"><label>Items borrowed (details)</label><textarea id="lnItems" rows="2">${esc(prefill?.itemDetails || '')}</textarea></div>
+      <div class="form-group"><label>Description / Item(s)</label><input id="lnDesc" type="text" value="${esc(prefill?.desc || '')}" placeholder="e.g. Samsung A55, charger..." inputmode="text"></div>
+      <div class="form-group"><label>Items borrowed (details)</label><textarea id="lnItems" rows="2" inputmode="text">${esc(prefill?.itemDetails || '')}</textarea></div>
       <div class="grid-2">
-        <div class="form-group"><label>Total Loan Amount (${S.settings.currency}) *</label><input id="lnTotal" type="number" min="0" step="0.5" value="${prefill?.total || ''}" placeholder="0.00" oninput="LoanMgr._previewInstallments()"></div>
-        <div class="form-group"><label>Initial Payment (${S.settings.currency})</label><input id="lnInit" type="number" min="0" step="0.5" value="0" placeholder="0.00"></div>
+        <div class="form-group"><label>Total Loan Amount (${S.settings.currency}) *</label><input id="lnTotal" type="number" min="0" step="0.5" value="${prefill?.total || ''}" placeholder="0.00" oninput="LoanMgr._previewInstallments()" inputmode="decimal"></div>
+        <div class="form-group"><label>Initial Payment (${S.settings.currency})</label><input id="lnInit" type="number" min="0" step="0.5" value="0" placeholder="0.00" inputmode="decimal"></div>
       </div>
       <div class="form-group"><label>Simple Due Date (optional)</label><input id="lnDue" type="date"></div>
       <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
       <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px;">📅 Installment Plan (optional)</div>
       <div class="grid-2">
-        <div class="form-group"><label>Number of Installments</label><input id="lnInstCount" type="number" min="0" max="60" value="0" placeholder="0 = no plan" oninput="LoanMgr._previewInstallments()"></div>
-        <div class="form-group"><label>Every (months)</label><input id="lnInstEvery" type="number" min="1" max="12" value="1" oninput="LoanMgr._previewInstallments()"></div>
+        <div class="form-group"><label>Number of Installments</label><input id="lnInstCount" type="number" min="0" max="60" value="0" placeholder="0 = no plan" oninput="LoanMgr._previewInstallments()" inputmode="numeric"></div>
+        <div class="form-group"><label>Every (months)</label><input id="lnInstEvery" type="number" min="1" max="12" value="1" oninput="LoanMgr._previewInstallments()" inputmode="numeric"></div>
       </div>
       <div class="form-group"><label>First Installment Date</label><input id="lnInstStart" type="date" value="${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}" oninput="LoanMgr._previewInstallments()"></div>
       <div id="lnInstPreview" style="font-size:11px;color:var(--t2);margin-bottom:8px;"></div>
@@ -8958,6 +9098,8 @@ window.onload=function(){
           }
         }, 80);
         Modal.open('loanNewModal');
+        const lnCustSelect = document.getElementById('lnCust');
+        if (lnCustSelect) lnCustSelect.focus();
       },
 
       _onLnCustChange() {
@@ -9074,14 +9216,16 @@ window.onload=function(){
         <div style="font-size:13px;font-weight:700;">${esc(loan.description || 'Loan')}</div>
         <div style="font-size:12px;color:var(--t2);margin-top:4px;">Remaining: <strong style="color:var(--red)">${cur} ${remaining.toFixed(2)}</strong></div>
       </div>
-      <div class="form-group"><label>Payment Amount (${cur}) *</label><input id="lpAmt" type="number" min="0.01" step="0.5" max="${remaining}" placeholder="${remaining.toFixed(2)}" autofocus></div>
-      <div class="form-group"><label>Note (optional)</label><input id="lpNote" type="text" placeholder="e.g. Cash, Bank transfer..."></div>
+      <div class="form-group"><label>Payment Amount (${cur}) *</label><input id="lpAmt" type="number" min="0.01" step="0.5" max="${remaining}" placeholder="${remaining.toFixed(2)}" autofocus inputmode="decimal"></div>
+      <div class="form-group"><label>Note (optional)</label><input id="lpNote" type="text" placeholder="e.g. Cash, Bank transfer..." inputmode="text"></div>
       <div class="form-group"><label>Date</label><input id="lpDate" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
       <div class="modal-foot">
         <button class="btn btn-ghost" onclick="Modal.close('loanPayModal')">Cancel</button>
         <button class="btn btn-success" onclick="LoanMgr.recordPayment('${loanId}')">✅ Record Payment</button>
       </div>`;
         Modal.open('loanPayModal');
+        const lpAmt = document.getElementById('lpAmt');
+        if (lpAmt) lpAmt.focus();
       },
 
       async recordPayment(loanId) {
@@ -9331,7 +9475,7 @@ window.onload=function(){
           return;
         }
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
+        const shop = S.settings.shopName || 'Mr. Chicken House';
         const date = new Date(sale.date).toLocaleString();
         const ESC = 0x1B; const LF = 0x0A; const GS = 0x1D;
 
@@ -9363,9 +9507,9 @@ window.onload=function(){
 
         // Footer & Note (Centered)
         let rawNote = S.settings.receiptNote || '';
-        if (rawNote.includes('  Chicken Shop')) {
+        if (rawNote.includes('Mr. Chicken House') || rawNote.includes('  Chicken Shop')) {
           rawNote = rawNote
-            .replace(/  Chicken Shop/g, '  Chicken Shop')
+            .replace(/  Chicken Shop/g, 'Mr. Chicken House')
             .replace(/Thank You!\s*Come\s*Again\./g, 'Thank You! Come Again.');
         }
         let foot = `${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n\n`;
@@ -9415,7 +9559,7 @@ window.onload=function(){
 
       _buildReceiptText(sale) {
         const cur = S.settings.currency;
-        const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
+        const shop = S.settings.shopName || 'Mr. Chicken House';
         const date = new Date(sale.date).toLocaleString();
         let text = `${shop}\n${date}\nSale #${(sale.id || '').slice(-8)}\n${'-'.repeat(32)}\n`;
         (sale.items || []).forEach(si => {
@@ -9427,9 +9571,9 @@ window.onload=function(){
         text += `TOTAL: ${cur} ${(sale.total || 0).toFixed(2)}\n\n`;
 
         let rawNote = S.settings.receiptNote || shop;
-        if (rawNote.includes('  Chicken Shop')) {
+        if (rawNote.includes('Mr. Chicken House') || rawNote.includes('  Chicken Shop')) {
           rawNote = rawNote
-            .replace(/  Chicken Shop/g, '  Chicken Shop')
+            .replace(/  Chicken Shop/g, 'Mr. Chicken House')
             .replace(/Thank You!\s*Come\s*Again\./g, 'Thank You! Come Again.');
         }
         text += `${rawNote.replace(/[^\x00-\x7F\n]/g, '')}\n`;
@@ -9488,7 +9632,7 @@ window.onload=function(){
 
         if (type === 'pos') {
           const cur = S.settings.currency;
-          const shop = (S.settings.shopName === '  Chicken Shop') ? '  Chicken Shop' : S.settings.shopName;
+          const shop = S.settings.shopName || 'Mr. Chicken House';
           const date = new Date(data.date).toLocaleString();
 
           centerText(shop, "4", y); y += 40;
@@ -9515,9 +9659,9 @@ window.onload=function(){
           drawLine(y); y += 15;
 
           let rawNote = S.settings.receiptNote || 'Thank You!';
-          if (rawNote.includes('  Chicken Shop')) {
+          if (rawNote.includes('Mr. Chicken House') || rawNote.includes('  Chicken Shop')) {
             rawNote = rawNote
-              .replace(/  Chicken Shop/g, '  Chicken Shop')
+              .replace(/  Chicken Shop/g, 'Mr. Chicken House')
               .replace(/Thank You!\s*Come\s*Again\./g, 'Thank You! Come Again.');
           }
           centerText(rawNote.replace(/[^\x00-\x7F\n]/g, ''), "2", y); y += 30;
@@ -9856,11 +10000,11 @@ window.onload=function(){
           tx.oncomplete = async () => {
             // 3. Save default settings locally
             const defaultSettings = {
-              shopName: '  Chicken Shop',
+              shopName: 'Mr. Chicken House',
               adminPin: '1234',
               currency: 'Rs.',
               lowStockAlert: 5,
-              receiptNote: 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.'
+              receiptNote: 'No.97 Kalawewa Road, Damunumulla, Galewela\nTel: 077 4903964 / 072 1723349\nThank You! Come Again.'
             };
             
             await IDB.cacheSet('settings/main', defaultSettings);
@@ -9966,18 +10110,18 @@ window.onload=function(){
     const Settings = {
       open() {
         document.getElementById('settingsBody').innerHTML = `
-      <div class="form-group"><label>Shop Name</label><input id="setName" type="text" value="${esc(S.settings.shopName)}"></div>
+      <div class="form-group"><label>Shop Name</label><input id="setName" type="text" value="${esc(S.settings.shopName)}" inputmode="text"></div>
       <div class="grid-2">
-        <div class="form-group"><label>Currency Symbol</label><input id="setCur" type="text" value="${esc(S.settings.currency)}"></div>
-        <div class="form-group"><label>Low Stock Alert</label><input id="setLow" type="number" value="${S.settings.lowStockAlert || 5}" min="0"></div>
+        <div class="form-group"><label>Currency Symbol</label><input id="setCur" type="text" value="${esc(S.settings.currency)}" inputmode="text"></div>
+        <div class="form-group"><label>Low Stock Alert</label><input id="setLow" type="number" value="${S.settings.lowStockAlert || 5}" min="0" inputmode="numeric"></div>
       </div>
-      <div class="form-group"><label>Receipt Footer Note</label><input id="setNote" type="text" value="${esc(S.settings.receiptNote || '')}"></div>
+      <div class="form-group"><label>Receipt Footer Note</label><input id="setNote" type="text" value="${esc(S.settings.receiptNote || '')}" inputmode="text"></div>
       <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
       <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px">🔑 Change Admin PIN</div>
       <div class="grid-3">
-        <div class="form-group"><label>Current PIN</label><input id="curPin" type="password" maxlength="6" placeholder="••••"></div>
-        <div class="form-group"><label>New PIN</label><input id="newPin" type="password" maxlength="6" placeholder="New PIN"></div>
-        <div class="form-group"><label>Confirm PIN</label><input id="confPin" type="password" maxlength="6" placeholder="Confirm"></div>
+        <div class="form-group"><label>Current PIN</label><input id="curPin" type="password" maxlength="6" placeholder="••••" inputmode="numeric" pattern="[0-9]*"></div>
+        <div class="form-group"><label>New PIN</label><input id="newPin" type="password" maxlength="6" placeholder="New PIN" inputmode="numeric" pattern="[0-9]*"></div>
+        <div class="form-group"><label>Confirm PIN</label><input id="confPin" type="password" maxlength="6" placeholder="Confirm" inputmode="numeric" pattern="[0-9]*"></div>
       </div>
       <button class="btn btn-orange btn-sm mb-12" onclick="Settings.changePin()">🔑 Change PIN</button>
       <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
@@ -10015,6 +10159,8 @@ window.onload=function(){
         <button class="btn btn-primary" onclick="Settings.save()">💾 Save Settings</button>
       </div>`;
         Modal.open('settingsModal');
+        const setNameInput = document.getElementById('setName');
+        if (setNameInput) setNameInput.focus();
         HW.updateUI();
       },
       changePin() {
