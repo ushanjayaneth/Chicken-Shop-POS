@@ -8046,6 +8046,27 @@
 
     // ── CHECKOUT ────────────────────────────
     const Checkout = {
+      async deductStockForCartItems(cartItems) {
+        for (const ci of cartItems || []) {
+          const item = S.items.find(i => i.id === ci.itemId);
+          if (!item) continue;
+          let remaining = Number(ci.qty) || 0;
+          const batches = [...(item.stockBatches || [])];
+          for (let i = 0; i < batches.length && remaining > 0; i++) {
+            if ((batches[i].quantity || 0) <= 0) continue;
+            const used = Math.min(batches[i].quantity, remaining);
+            batches[i] = { ...batches[i], quantity: batches[i].quantity - used };
+            if (batches[i].barcodes && ci.label) {
+              const bIdx = batches[i].barcodes.indexOf(ci.label);
+              if (bIdx >= 0) batches[i].barcodes.splice(bIdx, 1);
+            }
+            remaining -= used;
+          }
+          item.stockBatches = batches;
+          await DB.patch('items/' + item.id, { stockBatches: batches });
+        }
+      },
+
       async runWithLoan() {
         // Separate loan items, process non-loan normally, redirect loan items to Loans tab
         const loanItems = S.cart.filter(ci => ci.saleMode === 'loan');
@@ -8065,9 +8086,15 @@
         const desc = loanItems.map(ci => ci.name).join(', ');
         const itemDetails = loanItems.map(ci => `${ci.name} x${ci.qty} (${cur} ${ci.price.toFixed(2)})`).join('\n');
         const total = loanItems.reduce((s, ci) => s + ci.price, 0);
+        const stockItems = loanItems.map(ci => ({
+          itemId: ci.itemId,
+          name: ci.name,
+          qty: ci.qty,
+          label: ci.label || null
+        }));
 
         // Store prefill in session
-        window._loanPrefill = { desc, itemDetails, total };
+        window._loanPrefill = { desc, itemDetails, total, stockItems };
 
         // Clear loan items from cart
         S.cart = S.cart.filter(ci => ci.saleMode !== 'loan');
@@ -9375,7 +9402,11 @@ window.onload=function(){
           status: 'active',
           createdAt: new Date().toISOString()
         };
+        if (window._loanPrefill?.stockItems?.length) {
+          await Checkout.deductStockForCartItems(window._loanPrefill.stockItems);
+        }
         await DB.push('loans', loan);
+        window._loanPrefill = null;
         Modal.close('loanNewModal');
         toast('Loan created ✅', 'success');
         this._activeCustomerId = custId;
