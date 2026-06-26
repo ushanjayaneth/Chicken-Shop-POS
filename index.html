@@ -9207,25 +9207,31 @@ window.onload=function(){
         };
         const newId = await DB.push('loan_customers', data);
         toast(`✅ Customer "${name}" added!`, 'success');
-        // reload customers list
-        await this.loadData();
-        // update the select dropdown
+
+        // ── FIX: Immediately update S.loan_customers so loadData() sees the new customer
+        // without waiting for next loadAll() / sync cycle
+        if (!S.loan_customers) S.loan_customers = [];
+        S.loan_customers.push({ id: newId, ...data });
+
+        // Reload internal list from updated S
+        this.loadData();
+
+        // ── FIX: Rebuild dropdown from this._customers (which now includes the new customer)
+        // Previously newOpt was created but never appended — new customer never showed up
         const sel = document.getElementById('lnCust');
         if (sel) {
-          // remove __new__ option, add new customer, re-add __new__ at end
-          const newOpt = document.createElement('option');
-          newOpt.value = newId; newOpt.textContent = `${name} — ${data.phone || ''}`;
-          const newOpt2 = document.createElement('option');
-          newOpt2.value = '__new__'; newOpt2.textContent = '➕ Add New Customer…';
-          // replace select content
           sel.innerHTML = `<option value="">— Select customer —</option>`;
           this._customers.forEach(c => {
             const o = document.createElement('option');
-            o.value = c.id; o.textContent = `${c.name} — ${c.phone || ''}`;
+            o.value = c.id;
+            o.textContent = `${esc(c.name)} — ${c.phone || ''}`;
             sel.appendChild(o);
           });
-          sel.appendChild(newOpt2);
-          sel.value = newId;
+          const addNewOpt = document.createElement('option');
+          addNewOpt.value = '__new__';
+          addNewOpt.textContent = '➕ Add New Customer…';
+          sel.appendChild(addNewOpt);
+          sel.value = newId; // Auto-select the newly added customer
         }
         // hide panel
         const panel = document.getElementById('lnNewCustPanel');
