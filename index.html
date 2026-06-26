@@ -4989,24 +4989,29 @@
         const parentPath = parts.slice(0, -1).join('/');
         const key = parts[parts.length - 1];
         const parent = await this.cacheGet(parentPath);
-        if (parent === null) return;
-        if (parent && typeof parent === 'object') {
-          await this.cacheSet(parentPath, { ...parent, [key]: data });
+        if (!parent || typeof parent === 'object') {
+          await this.cacheSet(parentPath, { ...(parent || {}), [key]: data });
         }
       },
       async cachePatch(path, patch) {
-        // merge patch into cached object
-        const existing = await this.cacheGet(path) || {};
+        const parts = path.split('/');
+        let parent = null;
+        let parentPath = '';
+        let key = '';
+        if (parts.length >= 2) {
+          parentPath = parts.slice(0, -1).join('/');
+          key = parts[parts.length - 1];
+          parent = await this.cacheGet(parentPath);
+        }
+
+        // Merge patches with the full parent record when the child path was not cached separately.
+        const child = await this.cacheGet(path);
+        const existing = child || (parent && typeof parent === 'object' ? parent[key] : null) || {};
         const merged = { ...existing, ...patch };
         await this.cacheSet(path, merged);
         // Also update the parent collection so DB.get('parentPath') returns fresh data immediately
         // e.g. patching 'items/abc123' must also update the 'items' object in cache
-        const parts = path.split('/');
         if (parts.length >= 2) {
-          const parentPath = parts.slice(0, -1).join('/');
-          const key = parts[parts.length - 1];
-          const parent = await this.cacheGet(parentPath);
-          if (parent === null) return;
           if (!parent || typeof parent === 'object') {
             await this.cacheSet(parentPath, { ...(parent || {}), [key]: merged });
           }
@@ -8815,6 +8820,23 @@ window.onload=function(){
         this._loans = S.loans || [];
       },
 
+      _num(value) {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : 0;
+      },
+
+      _total(loan) {
+        return this._num(loan?.totalAmount);
+      },
+
+      _paid(loan) {
+        return this._num(loan?.paidAmount);
+      },
+
+      _remaining(loan) {
+        return Math.max(0, this._total(loan) - this._paid(loan));
+      },
+
       render() {
         this.loadData();
         this._renderStats();
@@ -8826,10 +8848,10 @@ window.onload=function(){
       _renderStats() {
         const el = document.getElementById('loanStats'); if (!el) return;
         const cur = S.settings.currency;
-        const activeLoans = this._loans.filter(l => l.status !== 'cleared');
-        const totalOwed = activeLoans.reduce((s, l) => s + (l.totalAmount - l.paidAmount), 0);
-        const totalGiven = this._loans.reduce((s, l) => s + (l.totalAmount || 0), 0);
-        const totalRecovered = this._loans.reduce((s, l) => s + (l.paidAmount || 0), 0);
+        const activeLoans = this._loans.filter(l => l.status !== 'cleared' && this._remaining(l) > 0);
+        const totalOwed = activeLoans.reduce((s, l) => s + this._remaining(l), 0);
+        const totalGiven = this._loans.reduce((s, l) => s + this._total(l), 0);
+        const totalRecovered = this._loans.reduce((s, l) => s + this._paid(l), 0);
         const overdueLoans = activeLoans.filter(l => this._isOverdue(l)).length;
         el.innerHTML = `
       <div class="loan-stat"><div class="loan-stat-lbl">Total Outstanding</div><div class="loan-stat-val" style="color:var(--red)">${cur} ${totalOwed.toFixed(2)}</div></div>
@@ -8854,8 +8876,8 @@ window.onload=function(){
           el.innerHTML = `<div style="text-align:center;color:var(--t3);padding:40px 12px;font-size:12px;">${this._customers.length ? 'No results.' : 'No customers yet.<br>Add a customer to start.'}</div>`; return;
         }
         el.innerHTML = custs.map(c => {
-          const loans = this._loans.filter(l => l.customerId === c.id && l.status !== 'cleared');
-          const owed = loans.reduce((s, l) => s + (l.totalAmount - l.paidAmount), 0);
+          const loans = this._loans.filter(l => l.customerId === c.id && l.status !== 'cleared' && this._remaining(l) > 0);
+          const owed = loans.reduce((s, l) => s + this._remaining(l), 0);
           const hasOverdue = loans.some(l => this._isOverdue(l));
           const initial = (c.name || '?')[0].toUpperCase();
           const active = this._activeCustomerId === c.id;
@@ -8891,7 +8913,7 @@ window.onload=function(){
         const cust = this._customers.find(c => c.id === customerId);
         if (!cust) { el.innerHTML = ''; return; }
         const loans = this._loans.filter(l => l.customerId === customerId).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        const totalOwed = loans.filter(l => l.status !== 'cleared').reduce((s, l) => s + (l.totalAmount - l.paidAmount), 0);
+        const totalOwed = loans.filter(l => l.status !== 'cleared').reduce((s, l) => s + this._remaining(l), 0);
         el.innerHTML = `
       <!-- Mobile back button -->
       <div class="mobile-only" onclick="LoanMgr._selectCustomer(null)" style="display:none;align-items:center;gap:6px;margin-bottom:12px;padding:10px 12px;background:var(--cyan3);border:1px solid rgba(0, 242, 254, 0.25);border-radius:var(--r8);color:var(--cyan);font-weight:bold;cursor:pointer;width:100%;font-size:12.5px;">
@@ -8930,8 +8952,10 @@ window.onload=function(){
       },
 
       _loanCard(loan, cur) {
-        const pct = loan.totalAmount > 0 ? Math.min(100, (loan.paidAmount / loan.totalAmount) * 100) : 0;
-        const remaining = loan.totalAmount - loan.paidAmount;
+        const total = this._total(loan);
+        const paid = this._paid(loan);
+        const remaining = this._remaining(loan);
+        const pct = total > 0 ? Math.min(100, (paid / total) * 100) : 0;
         const isCleared = loan.status === 'cleared' || remaining <= 0;
         const overdue = this._isOverdue(loan);
         const borderColor = isCleared ? 'rgba(16,185,129,0.3)' : overdue ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.1)';
@@ -8967,8 +8991,8 @@ window.onload=function(){
         </div>
       </div>
       <div class="loan-amounts">
-        <div class="loan-amt-block"><div class="loan-amt-lbl">Total</div><div class="loan-amt-val" style="color:var(--t1);">${cur} ${(loan.totalAmount || 0).toFixed(2)}</div></div>
-        <div class="loan-amt-block"><div class="loan-amt-lbl">Paid</div><div class="loan-amt-val" style="color:var(--green);">${cur} ${(loan.paidAmount || 0).toFixed(2)}</div></div>
+        <div class="loan-amt-block"><div class="loan-amt-lbl">Total</div><div class="loan-amt-val" style="color:var(--t1);">${cur} ${total.toFixed(2)}</div></div>
+        <div class="loan-amt-block"><div class="loan-amt-lbl">Paid</div><div class="loan-amt-val" style="color:var(--green);">${cur} ${paid.toFixed(2)}</div></div>
         <div class="loan-amt-block"><div class="loan-amt-lbl">Remaining</div><div class="loan-amt-val" style="color:${remaining > 0 ? 'var(--red)' : 'var(--green)'};">${cur} ${Math.max(0, remaining).toFixed(2)}</div></div>
       </div>
       <div class="loan-progress"><div class="loan-progress-fill" style="width:${pct.toFixed(1)}%"></div></div>
@@ -8987,7 +9011,7 @@ window.onload=function(){
       },
 
       _isOverdue(loan) {
-        if (loan.status === 'cleared' || (loan.totalAmount - loan.paidAmount) <= 0) return false;
+        if (loan.status === 'cleared' || this._remaining(loan) <= 0) return false;
         if (!loan.installments?.length) {
           if (loan.dueDate && new Date(loan.dueDate) < new Date()) return true;
           return false;
@@ -9361,7 +9385,7 @@ window.onload=function(){
       openPayment(loanId) {
         const loan = this._loans.find(l => l.id === loanId); if (!loan) return;
         const cur = S.settings.currency;
-        const remaining = loan.totalAmount - loan.paidAmount;
+        const remaining = this._remaining(loan);
         document.getElementById('loanPayBody').innerHTML = `
       <div style="margin-bottom:14px;padding:10px;background:var(--glass);border-radius:var(--r8);">
         <div style="font-size:13px;font-weight:700;">${esc(loan.description || 'Loan')}</div>
@@ -9385,9 +9409,10 @@ window.onload=function(){
         if (!amt || amt <= 0) { toast('Enter payment amount', 'error'); return; }
         const note = document.getElementById('lpNote').value.trim();
         const date = document.getElementById('lpDate').value || new Date().toISOString().split('T')[0];
-        const newPaid = loan.paidAmount + amt;
+        const total = this._total(loan);
+        const newPaid = this._paid(loan) + amt;
         const history = [...(loan.paymentHistory || []), { date: new Date(date).toISOString(), amount: amt, note }];
-        const cleared = newPaid >= loan.totalAmount;
+        const cleared = total > 0 && newPaid >= total;
         await DB.patch('loans/' + loanId, { paidAmount: newPaid, paymentHistory: history, status: cleared ? 'cleared' : 'active' });
         Modal.close('loanPayModal');
         toast(`✅ ${S.settings.currency} ${amt.toFixed(2)} recorded!${cleared ? ' Loan fully cleared! 🎉' : ''}`, 'success');
@@ -9399,9 +9424,10 @@ window.onload=function(){
         const inst = loan.installments[idx]; if (!inst || inst.paid) return;
         const insts = [...loan.installments];
         insts[idx] = { ...inst, paid: true, paidDate: new Date().toISOString().split('T')[0] };
-        const newPaid = (loan.paidAmount || 0) + inst.amount;
+        const newPaid = this._paid(loan) + this._num(inst.amount);
         const history = [...(loan.paymentHistory || []), { date: new Date().toISOString(), amount: inst.amount, note: `Installment ${idx + 1} paid` }];
-        const cleared = newPaid >= loan.totalAmount;
+        const total = this._total(loan);
+        const cleared = total > 0 && newPaid >= total;
         await DB.patch('loans/' + loanId, { installments: insts, paidAmount: newPaid, paymentHistory: history, status: cleared ? 'cleared' : 'active' });
         toast(`Installment ${idx + 1} marked paid ✅`, 'success');
         await loadAll();
@@ -9410,7 +9436,7 @@ window.onload=function(){
       async markCleared(loanId) {
         if (!confirm('Mark this loan as fully cleared?')) return;
         const loan = this._loans.find(l => l.id === loanId); if (!loan) return;
-        await DB.patch('loans/' + loanId, { status: 'cleared', paidAmount: loan.totalAmount });
+        await DB.patch('loans/' + loanId, { status: 'cleared', paidAmount: this._total(loan) });
         toast('Loan cleared ✅', 'success');
         await loadAll();
       },
