@@ -5228,11 +5228,13 @@
           };
           await DB.set('settings/main', st);
         } else {
+          // Migrate old settings to new values
           let migrated = false;
           if (st.shopName === '  Chicken Shop') {
             st.shopName = 'Mr. Chicken House';
             migrated = true;
           }
+          // Auto-migrate old address to correct shop address
           if (st.receiptNote === 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.') {
             st.receiptNote = 'No.97 Kalawewa Road, Damunumulla, Galewela\nTel: 077 4903964 / 072 1723349\nThank You! Come Again.';
             migrated = true;
@@ -7720,8 +7722,7 @@
             lines.push(text);
           }
         };
-        ensureLine('Maneruwa, negampaha');
-        ensureLine('Tel: 0767771517');
+
         if (!lines.some(line => /thank\s*you|come\s*again/i.test(line))) {
           lines.push('Thank You! Come Again.');
         }
