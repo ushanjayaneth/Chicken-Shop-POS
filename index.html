@@ -4811,13 +4811,49 @@
   <script>
     'use strict';
 
+    const DEFAULT_RECEIPT_NOTE = 'No.97 Kalawewa Road, Damunumulla, Galewela\nTel: 077 4903964 / 072 1723349\nThank You! Come Again.';
+    const RESET_DATA_PATHS = [
+      'categories',
+      'items',
+      'sales',
+      'loan_customers',
+      'loans',
+      'coconut_purchases',
+      'coconut_husking',
+      'coconut_sales',
+      'coconut_copra',
+      'coconut_oil',
+      'coconut_workers',
+      'coconut_worker_payments',
+      'cash_movements',
+      'day_ends',
+      'settings'
+    ];
+
+    function hasRemovedShopDetails(text) {
+      const compact = String(text || '').toLowerCase().replace(/[\s,.-]/g, '');
+      return compact.includes('maneruwa')
+        || compact.includes('manneruwa')
+        || compact.includes('mannewa')
+        || compact.includes('negampaha')
+        || compact.includes('nagampaha')
+        || compact.includes('0767771517');
+    }
+
+    function normalizeReceiptNote(note) {
+      const raw = String(note || '').replace(/\r/g, '').trim();
+      if (!raw) return DEFAULT_RECEIPT_NOTE;
+      if (hasRemovedShopDetails(raw)) return DEFAULT_RECEIPT_NOTE;
+      return raw;
+    }
+
     // 100% Offline-only POS Config
     const S = {
       categories: [], items: [], sales: [],
       coconut_purchases: [], coconut_husking: [], coconut_sales: [], cash_movements: [], day_ends: [],
       coconut_copra: [], coconut_oil: [], coconut_workers: [], coconut_worker_payments: [],
       loans: [], loan_customers: [],
-      settings: { shopName: 'Mr. Chicken House', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: 'No.97 Kalawewa Road, Damunumulla, Galewela\nTel: 077 4903964 / 072 1723349\nThank You! Come Again.', apiServerUrl: '' },
+      settings: { shopName: 'Mr. Chicken House', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: DEFAULT_RECEIPT_NOTE, apiServerUrl: '' },
       cart: [], cartDisc: 0, cartDiscType: 'percent',
       heldSales: [],
       activeCat: 'all', adminUnlocked: false, pollTimer: null,
@@ -4946,6 +4982,18 @@
           tx.onerror = () => res();
         });
       },
+      async cacheSetWithParent(path, data) {
+        await this.cacheSet(path, data);
+        const parts = path.split('/');
+        if (parts.length < 2) return;
+        const parentPath = parts.slice(0, -1).join('/');
+        const key = parts[parts.length - 1];
+        const parent = await this.cacheGet(parentPath);
+        if (parent === null) return;
+        if (parent && typeof parent === 'object') {
+          await this.cacheSet(parentPath, { ...parent, [key]: data });
+        }
+      },
       async cachePatch(path, patch) {
         // merge patch into cached object
         const existing = await this.cacheGet(path) || {};
@@ -4958,8 +5006,9 @@
           const parentPath = parts.slice(0, -1).join('/');
           const key = parts[parts.length - 1];
           const parent = await this.cacheGet(parentPath);
-          if (parent && typeof parent === 'object') {
-            await this.cacheSet(parentPath, { ...parent, [key]: merged });
+          if (parent === null) return;
+          if (!parent || typeof parent === 'object') {
+            await this.cacheSet(parentPath, { ...(parent || {}), [key]: merged });
           }
         }
       },
@@ -5107,6 +5156,7 @@
             if (remoteDb['settings'] && remoteDb['settings']['main']) {
               const remoteSettings = remoteDb['settings']['main'];
               const merged = { ...localSettings, ...remoteSettings };
+              merged.receiptNote = normalizeReceiptNote(merged.receiptNote);
               store.put({ path: 'settings/main', data: merged, ts: Date.now() });
               Object.assign(S.settings, merged);
             }
@@ -5188,25 +5238,29 @@
         await IDB.cachePush(path, data, localId);
         await IDB.queueAdd({ type: 'set', path: path + '/' + localId, data });
         Sync.flush();
+        scheduleDataRefresh();
         return localId;
       },
 
       async set(path, data) {
-        await IDB.cacheSet(path, data);
+        await IDB.cacheSetWithParent(path, data);
         await IDB.queueAdd({ type: 'set', path, data });
         Sync.flush();
+        scheduleDataRefresh();
       },
 
       async patch(path, data) {
         await IDB.cachePatch(path, data);
         await IDB.queueAdd({ type: 'patch', path, data });
         Sync.flush();
+        scheduleDataRefresh();
       },
 
       async del(path) {
         await IDB.cacheDel(path);
         await IDB.queueAdd({ type: 'del', path });
         Sync.flush();
+        scheduleDataRefresh();
       },
 
       obj2arr(o) { if (!o) return []; return Object.entries(o).map(([id, v]) => ({ id, ...v })); }
@@ -5224,7 +5278,7 @@
             adminPin: '1234',
             currency: 'Rs.',
             lowStockAlert: 5,
-            receiptNote: 'No.97 Kalawewa Road, Damunumulla, Galewela\nTel: 077 4903964 / 072 1723349\nThank You! Come Again.'
+            receiptNote: DEFAULT_RECEIPT_NOTE
           };
           await DB.set('settings/main', st);
         } else {
@@ -5234,9 +5288,9 @@
             st.shopName = 'Mr. Chicken House';
             migrated = true;
           }
-          // Auto-migrate old address to correct shop address
-          if (st.receiptNote === 'Maneruwa, negampaha\nTel: 0767771517\nThank You! Come Again.') {
-            st.receiptNote = 'No.97 Kalawewa Road, Damunumulla, Galewela\nTel: 077 4903964 / 072 1723349\nThank You! Come Again.';
+          const cleanedReceiptNote = normalizeReceiptNote(st.receiptNote);
+          if (cleanedReceiptNote !== st.receiptNote) {
+            st.receiptNote = cleanedReceiptNote;
             migrated = true;
           }
           if (migrated) {
@@ -5299,7 +5353,16 @@
     }
 
     let _lastDataStr = "";
-    async function loadAll() {
+    let _dataRefreshTimer = null;
+    function scheduleDataRefresh() {
+      clearTimeout(_dataRefreshTimer);
+      _dataRefreshTimer = setTimeout(() => {
+        _dataRefreshTimer = null;
+        loadAll(true).catch(e => console.error('Scheduled UI refresh failed:', e));
+      }, 0);
+    }
+
+    async function loadAll(forceRender = false) {
       const [cats, items, sales, cp, ch, cs, cm, de, loans, custs, c_copra, c_oil, c_workers, c_payments] = await Promise.all([
         DB.get('categories'),
         DB.get('items'),
@@ -5368,9 +5431,9 @@
       S.loan_customers = DB.obj2arr(custs);
 
       // Console logging to satisfy "confirm if the database is loading"
-      console.log(`[Database Telemetry] Sync complete. Categories: ${S.categories.length}, Products: ${S.items.length}, Sales: ${S.sales.length}. Changed since last poll: ${!isUnchanged}`);
+      console.log(`[Database Telemetry] Sync complete. Categories: ${S.categories.length}, Products: ${S.items.length}, Sales: ${S.sales.length}. Changed since last poll: ${!isUnchanged || forceRender}`);
 
-      if (!isUnchanged) {
+      if (!isUnchanged || forceRender) {
         POS.renderCats(); POS.renderGrid(); InvTable.render();
         if (S.adminUnlocked) Admin.render();
         if (document.getElementById('barcodesTab')?.classList.contains('active')) { BarcodeTab.render(); }
@@ -7712,7 +7775,7 @@
       },
       footerNote() {
         const shop = this.shopName();
-        const raw = String(S.settings.receiptNote || '').replace(/\r/g, '');
+        const raw = normalizeReceiptNote(S.settings.receiptNote);
         const lines = raw.split('\n')
           .map(line => line.trim())
           .filter(line => line && !/[^\x00-\x7F]/.test(line))
@@ -9594,7 +9657,7 @@ window.onload=function(){
         const itemsBytes = enc.encode(items);
 
         // Footer & Note (Centered)
-        let rawNote = S.settings.receiptNote || '';
+        let rawNote = normalizeReceiptNote(S.settings.receiptNote);
         if (rawNote.includes('Mr. Chicken House') || rawNote.includes('  Chicken Shop')) {
           rawNote = rawNote
             .replace(/  Chicken Shop/g, 'Mr. Chicken House')
@@ -9658,7 +9721,7 @@ window.onload=function(){
         if (sale.cartDiscount > 0) text += `Discount: -${cur} ${sale.cartDiscount.toFixed(2)}\n`;
         text += `TOTAL: ${cur} ${(sale.total || 0).toFixed(2)}\n\n`;
 
-        let rawNote = S.settings.receiptNote || shop;
+        let rawNote = normalizeReceiptNote(S.settings.receiptNote || shop);
         if (rawNote.includes('Mr. Chicken House') || rawNote.includes('  Chicken Shop')) {
           rawNote = rawNote
             .replace(/  Chicken Shop/g, 'Mr. Chicken House')
@@ -9746,7 +9809,7 @@ window.onload=function(){
           leftText("TOTAL:", "3", y); rightText(`${cur} ${(data.total || 0).toFixed(2)}`, "3", y); y += 40;
           drawLine(y); y += 15;
 
-          let rawNote = S.settings.receiptNote || 'Thank You!';
+          let rawNote = normalizeReceiptNote(S.settings.receiptNote || 'Thank You!');
           if (rawNote.includes('Mr. Chicken House') || rawNote.includes('  Chicken Shop')) {
             rawNote = rawNote
               .replace(/  Chicken Shop/g, 'Mr. Chicken House')
@@ -10092,7 +10155,7 @@ window.onload=function(){
               adminPin: '1234',
               currency: 'Rs.',
               lowStockAlert: 5,
-              receiptNote: 'No.97 Kalawewa Road, Damunumulla, Galewela\nTel: 077 4903964 / 072 1723349\nThank You! Come Again.'
+              receiptNote: DEFAULT_RECEIPT_NOTE
             };
             
             await IDB.cacheSet('settings/main', defaultSettings);
@@ -10197,6 +10260,7 @@ window.onload=function(){
     // ── SETTINGS ────────────────────────────
     const Settings = {
       open() {
+        S.settings.receiptNote = normalizeReceiptNote(S.settings.receiptNote);
         document.getElementById('settingsBody').innerHTML = `
       <div class="form-group"><label>Shop Name</label><input id="setName" type="text" value="${esc(S.settings.shopName)}" inputmode="text"></div>
       <div class="grid-2">
@@ -10266,7 +10330,7 @@ window.onload=function(){
         S.settings.shopName = document.getElementById('setName').value;
         S.settings.currency = document.getElementById('setCur').value;
         S.settings.lowStockAlert = parseInt(document.getElementById('setLow').value) || 5;
-        S.settings.receiptNote = document.getElementById('setNote').value;
+        S.settings.receiptNote = normalizeReceiptNote(document.getElementById('setNote').value);
         await DB.set('settings/main', S.settings);
         Modal.close('settingsModal'); toast('Settings saved ✅', 'success');
         Sync.pull().then(() => loadAll());
