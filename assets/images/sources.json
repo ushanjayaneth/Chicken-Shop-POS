@@ -1,0 +1,25 @@
+{
+  "description": "Representative product photographs used when a product has no uploaded photo.",
+  "sources": [
+    {
+      "file": "chicken.jpg",
+      "url": "https://images.pexels.com/photos/10842246/pexels-photo-10842246.jpeg?auto=compress&cs=tinysrgb&w=720",
+      "page": "https://www.pexels.com/photo/close-up-of-a-raw-whole-chicken-10842246/"
+    },
+    {
+      "file": "breast.jpg",
+      "url": "https://images.pexels.com/photos/6107734/pexels-photo-6107734.jpeg?auto=compress&cs=tinysrgb&w=720",
+      "page": "https://www.pexels.com/photo/close-up-photo-of-a-raw-chicken-meat-6107734/"
+    },
+    {
+      "file": "fish.jpg",
+      "url": "https://images.pexels.com/photos/8352014/pexels-photo-8352014.jpeg?auto=compress&cs=tinysrgb&w=720",
+      "page": "https://www.pexels.com/photo/slicing-of-raw-tuna-8352014/"
+    },
+    {
+      "file": "eggs.jpg",
+      "page": "https://www.pexels.com/photo/close-up-photo-of-eggs-on-egg-carton-1631180/",
+      "url": "https://images.pexels.com/photos/1631180/pexels-photo-1631180.jpeg?auto=compress&cs=tinysrgb&w=480"
+    }
+  ]
+}

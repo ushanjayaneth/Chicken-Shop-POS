@@ -1,41 +1,32 @@
-# Rangana Communication POS (RCM POS)
+# Mr. Chicken House POS
 
-RCM POS is an offline-first, progressive web app (PWA) designed for retail shops. It works 100% offline using IndexedDB, and automatically synchronizes with a remote Firebase Realtime Database when an active internet connection is available.
+A responsive point of sale for Chicken House and a separate Coconut Business workspace.
 
-## Key Features
+- Billing, weighted quantities, retail and wholesale prices, discounts, receipts, returns and exchange credits
+- Stock receipts, low-stock alerts, barcode labels, product photos and recorded stock adjustments
+- Customer loans with deposits and partial repayments
+- Coconut purchases, processing yields, sales, worker payments and day-end reconciliation
 
-- **Offline-First Resilience**: All sales, inventory, category edits, and loan transactions are saved locally in IndexedDB instantly. The system is functional without internet.
-- **Background Sync Engine**: Modifications are queued locally and automatically uploaded to the remote database in a FIFO (First-In, First-Out) queue when online.
-- **Automatic Hydration**: Pulls remote database changes on startup/reconnect to keep all client devices in sync.
-- **Secure Startup Login Screen**: Protects the system from unauthorized access. The login PIN pad is verified against the cached configuration in IndexedDB, meaning it works 100% offline even if the system is closed and reopened.
-- **Secure API Gateway (Node.js)**: Requests are proxied via serverless Node.js endpoints (`/api/data/*`) on Vercel to securely tunnel data to Firebase Realtime Database, protecting database credentials from frontend exposure.
+## Run locally
 
----
+Use Node.js 20 or later. Install dependencies with npm ci. Start the workspace with npm start and open http://localhost:4188.
 
-## Technical Architecture
+For a disposable sample database, run node tests/fixture-server.mjs and open http://127.0.0.1:4189. This sample keeps test transactions in memory.
 
-### 1. Frontend Sync Engine
-The frontend uses two IndexedDB stores (`RanganaCommPOS_DB`):
-1. `cache`: Stores the full snapshot of remote data (categories, items, sales, loans, settings).
-2. `queue`: A transaction queue storing offline modifications (`set`, `patch`, `del`) that need to be synced.
+Run npm run build for syntax checks, npm test for data tests and npm run test:e2e for browser tests. Install Playwright Chromium with npx playwright install chromium if needed.
 
-When online:
-- The `Sync.flush()` task runs to process the `queue` sequentially.
-- The `Sync.pull()` task runs to download the latest state from the database and hydrate the local cache.
+## Data and offline operation
 
-### 2. Node.js Backend Proxy
-Instead of calling Firebase directly from the browser, all data syncs go through `/api/data/*`.
-On Vercel, this is handled by `api/data.js`, which proxies the request to `https://chicken-shop-2d7b5-default-rtdb.firebaseio.com/` using server-side fetching.
+Open the app online once to download your workspace and prepare the offline shell. The same URL works in a browser and as an installed app. Install from your browser menu if you want a home screen or desktop shortcut.
 
----
+The app saves completed transactions and their pending uploads together in IndexedDB. The status dots show network and cloud status separately. On reconnect, pending transactions upload first and the app then loads current shared records. A cloud conflict keeps the pending change on the device for review.
 
-## Configuration
+Settings contains JSON backup export and restore. Restore replaces the selected workspace data and queues those records for the shared database. Keep a current export before restoring an older snapshot.
 
-### API Server URL
-By default, the POS communicates with the relative `/api` path (running as Vercel serverless functions).
-If you want to run a custom local backend:
-1. Open the POS app.
-2. Go to the **Settings** modal (Gear icon ⚙️ in top right).
-3. Under **API Server URL**, enter your local server URL (e.g. `http://localhost:8080` or `http://192.168.1.100:3000`).
-4. Click **Save Settings**. The frontend will automatically route all sync operations through your custom URL.
-5. Leave this field blank to use Vercel default serverless functions.
+## Server and printing
+
+The browser calls the same-origin /api/data/ endpoint. The Vercel API uses FIREBASE_DATABASE_URL when set. Use the environment variable for a separate workspace database. Protect production access at the deployment and database layers. The admin PIN controls features in the interface.
+
+Receipt and label printing use the system print dialog or compatible browser-connected hardware. Install network printers in the operating system for system printing. Keyboard-style scanners send barcodes directly to the POS. Camera scanning requires browser permission.
+
+Representative product photo sources are recorded in assets/images/sources.json. The font and bundled library licenses are included with the assets.

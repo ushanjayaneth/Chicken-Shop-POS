@@ -1,82 +1,30 @@
-const CACHE_NAME = 'rcm-pos-v6';
-const STATIC = [
-  './',
-  './index.html',
-  './manifest.json',
-  './html5-qrcode.min.js',
-  'https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Sinhala:wght@400;600;700;800&display=swap',
-  'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js',
-  'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js'
-];
-
-self.addEventListener('install', event => {
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(STATIC).catch(err => console.log('Some static assets failed to cache', err));
-    })
-  );
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      );
-    })
-  );
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', event => {
-  const url = event.request.url;
-  
-  // Ignore any hot-reloads, external telemetry, or local API requests
-  if (url.includes('googleapis.com/v1beta') || url.includes('generativelanguage') || url.includes('/api/')) return;
-  
-  // Cache-first for static CDN assets; network-first for everything else
-  if (url.includes('cdn.jsdelivr.net') || url.includes('fonts.googleapis') || url.includes('fonts.gstatic') || url.includes('unpkg.com')) {
-    event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-        if (cachedResponse) return cachedResponse;
-        return fetch(event.request).then(networkResponse => {
-          if (networkResponse && (networkResponse.status === 200 || networkResponse.status === 0)) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
-          }
-          return networkResponse;
-        }).catch(() => new Response('', {status: 503}));
-      })
-    );
+const CACHE_NAME = 'chicken-workspace-v8';
+const STATIC = ['./','./index.html','./manifest.json','./logo.png','./assets/images/chicken.jpg','./assets/images/breast.jpg','./assets/images/fish.jpg','./assets/images/eggs.jpg','./html5-qrcode.min.js','./data-core.js','./coconut.js','./sales.js','./returns.js','./workspace.css','./workspace.js','./vendor/fuse.min.js','./vendor/JsBarcode.all.min.js','./assets/fonts/inter-latin-variable.woff2','./assets/fonts/noto-sans-sinhala-400.woff2','./assets/fonts/noto-sans-sinhala-600.woff2','./pwa.js','./backup.js','./inventory.js','./settings.js','./assets/icons/icon-180.png','./assets/icons/icon-192.png','./assets/icons/icon-maskable-512.png','./logo.ico'];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(STATIC))));
+self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')self.skipWaiting();});
+self.addEventListener('activate',event=>event.waitUntil((async()=>{
+  const names=await caches.keys();
+  await Promise.all(names.filter(name=>(name.startsWith('rcm-pos-')||name.startsWith('chicken-workspace-'))&&name!==CACHE_NAME).map(name=>caches.delete(name)));
+  await self.clients.claim();
+})()));
+self.addEventListener('fetch',event=>{
+  const request=event.request;
+  const url=new URL(request.url);
+  if(request.method!=='GET'||url.pathname.startsWith('/api/')||!['http:','https:'].includes(url.protocol))return;
+  if(request.mode==='navigate'){
+    event.respondWith(caches.open(CACHE_NAME).then(async cache => {
+      const shell = await cache.match('./index.html');
+      return shell || fetch(request);
+    }));
     return;
   }
-  
-  // For navigation requests (the app HTML) — network first, fallback to cache
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).then(networkResponse => {
-        if (networkResponse && networkResponse.status === 200) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
-        }
-        return networkResponse;
-      }).catch(() => caches.match(event.request).then(c => c || caches.match('./index.html')))
-    );
-    return;
-  }
-
-  // Generic fallback for local assets
-  event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      if (cachedResponse) return cachedResponse;
-      return fetch(event.request).then(networkResponse => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
-        }
-        return networkResponse;
-      }).catch(() => new Response('', {status: 503}));
-    })
-  );
+  if(url.origin===self.location.origin||request.destination==='image'||request.destination==='font')event.respondWith((async()=>{
+    const cached=await caches.match(request);
+    if(cached)return cached;
+    try{
+      const response=await fetch(request);
+      if(response.ok||response.type==='opaque'){const cache=await caches.open(CACHE_NAME);await cache.put(request,response.clone());}
+      return response;
+    }catch{return new Response('',{status:503});}
+  })());
 });
