@@ -31,9 +31,9 @@ For shared cloud records, set the following server environment variables. For lo
 
 - FIREBASE_DATABASE_URL is the Realtime Database instance URL.
 - FIREBASE_SERVICE_ACCOUNT_JSON is the JSON for a Google service account with access to that instance.
-- POS_ACCESS_KEY is a random key of at least 24 characters. Share it privately with operators who may use the workspace.
+- POS_ACCESS_KEY is a random key of at least 24 characters. Keep it on the server. It signs device sessions and protects the stored PIN digest.
 
-Keep the service account credentials in the server environment. The app asks for the workspace access key when a new browser connects. Its signed session expires after 30 days. Changing the key revokes previous sessions. Cached records stay available for offline work on that device. The separate admin PIN controls features in the app interface.
+Keep the service account credentials in the server environment. The starter workspace PIN is 1234 on the shop PC at localhost. Set a new 6–12 digit Workspace PIN in Settings while online to enable browser access on other devices. Sign-in attempts are limited on the server. Existing devices keep their signed sessions for up to 30 days. New sign-ins use the updated PIN. Cached records stay available offline. The separate Admin PIN controls features in the app interface.
 
 Without Firebase configuration, sales and other transactions stay on the current device. Use Settings to download a backup before moving to another computer. The browser treats each address and port as a different workspace.
 

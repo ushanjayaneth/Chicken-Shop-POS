@@ -1245,7 +1245,7 @@ const CoconutMgr = {
 
         rangeSales.forEach(s => {
           salesTransport += this._value(s.transportCost);
-          const total = s.total || 0;
+          const total = this._value(s.total);
           if (s.type === 'unhusked') salesUnhusked += total;
           else if (s.type === 'husked') salesHusked += total;
           else if (s.type === 'husks') salesHusks += total;

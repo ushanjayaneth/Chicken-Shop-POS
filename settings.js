@@ -31,6 +31,21 @@
       </div>
       <button class="btn btn-orange btn-sm mb-12" onclick="Settings.changePin()">🔑 Change PIN</button>
       <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
+      <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px">Workspace PIN</div>
+      <div class="cloud-access-description">Controls access to shared cloud records. Set a new 6–12 digit PIN while online.</div>
+      <form id="workspacePinForm">
+        <div class="grid-3">
+          <div class="form-group"><label for="workspaceCurrentPin">Current PIN</label>
+            <input id="workspaceCurrentPin" type="password" required pattern="[0-9]{4,12}" maxlength="12" inputmode="numeric" autocomplete="current-password"></div>
+          <div class="form-group"><label for="workspaceNextPin">New PIN</label>
+            <input id="workspaceNextPin" type="password" required pattern="[0-9]{6,12}" maxlength="12" inputmode="numeric" autocomplete="new-password"></div>
+          <div class="form-group"><label for="workspaceConfirmPin">Confirm PIN</label>
+            <input id="workspaceConfirmPin" type="password" required pattern="[0-9]{6,12}" maxlength="12" inputmode="numeric" autocomplete="new-password"></div>
+        </div>
+        <div id="workspacePinStatus" role="status" aria-live="polite"></div>
+        <button type="submit" class="btn btn-ghost btn-sm" id="workspacePinSubmit">Change workspace PIN</button>
+      </form>
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
       <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px">⚙️ Hardware Connections (USB / Bluetooth)</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         ${['scanner', 'receipt', 'bcPrint', 'drawer'].map(id => `
@@ -64,6 +79,10 @@
         <button class="btn btn-ghost" onclick="Modal.close('settingsModal')">Cancel</button>
         <button class="btn btn-primary" onclick="Settings.save()">💾 Save Settings</button>
       </div>`;
+        document.getElementById('workspacePinForm').addEventListener('submit', event => {
+          event.preventDefault();
+          void CloudAccess.changePin();
+        });
         Modal.open('settingsModal');
         const setNameInput = document.getElementById('setName');
         if (setNameInput) setNameInput.focus();
