@@ -1,12 +1,11 @@
-export default function handler(req, res) {
-  // Set headers to prevent caching of status checks
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
+import {cloudKey} from '../lib/cloud-session.mjs';
+import {firebaseConfigured} from '../lib/firebase-transport.mjs';
 
-  res.status(200).json({
-    blocked: false,
-    message: 'ok'
+export default function handler(_req, res) {
+  res.setHeader('Cache-Control', 'no-store');
+  return res.status(200).json({
+    ok:true,
+    cloudConfigured:Boolean(cloudKey() && firebaseConfigured()),
+    build:process.env.VERCEL_GIT_COMMIT_SHA || null
   });
 }

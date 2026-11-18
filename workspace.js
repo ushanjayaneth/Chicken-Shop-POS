@@ -157,10 +157,11 @@
     const sync = document.getElementById("syncDot");
     const status = document.getElementById("workspaceSyncText");
     if (sync && status) {
-      const labels = {connected:"Cloud connected", pending:"Sync pending", syncing:"Syncing", offline:"Cloud offline", error:"Cloud unavailable", conflict:"Sync needs review"};
+      const labels = {connected:"Cloud connected", pending:"Sync pending", syncing:"Syncing", offline:"Cloud offline", error:"Cloud unavailable", locked:"Connect device", setup:"Cloud setup pending", conflict:"Sync needs review"};
       const label = labels[sync.dataset.state] || labels.pending;
       if (status.textContent !== label) status.textContent = label;
       status.parentElement.title = sync.title;
+      status.disabled = sync.dataset.state !== "locked";
       const network = document.getElementById("workspaceNetwork");
       if (network) {
         const online = navigator.onLine !== false;
@@ -281,8 +282,10 @@
       cloud.className = "workspace-status-row";
       cloud.append(sync);
       status.append(cloud);
-      const text = document.createElement("span");
+      const text = document.createElement("button");
+      text.type = "button";
       text.id = "workspaceSyncText";
+      text.addEventListener("click", () => CloudAccess.open());
       cloud.append(text);
     }
     document.getElementById("toasts")?.setAttribute("aria-live", "polite");

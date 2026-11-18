@@ -611,3 +611,9 @@
 @media screen {.return-search-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}.return-search-row small{display:block;margin-top:5px;color:var(--t2)}.exchange-credit-line{display:flex;gap:12px;align-items:center;padding:14px;border:1px solid var(--green);border-radius:12px;margin:10px 0}.exchange-credit-line>div{flex:1}@media(max-width:600px){.return-search-row{align-items:flex-start;flex-direction:column}.exchange-credit-line{flex-wrap:wrap}}}
 
 @media(max-width:390px){.workspace-status-row{gap:4px}.workspace-status{max-width:100px}.workspace-status-row span{overflow:hidden;text-overflow:ellipsis}}
+
+#workspaceSyncText { font: inherit; color: inherit; background: transparent; padding: 0; border: 0; min-width: 0; text-align: left; }
+#workspaceSyncText:not(:disabled) { color: var(--cyan); cursor: pointer; text-decoration: underline; }
+#workspaceSyncText:disabled { opacity: 1; }
+.cloud-access-description { margin: 0 0 18px; color: var(--t2); }
+#cloudAccessError:not(:empty) { margin-top: 10px; color: var(--red); }

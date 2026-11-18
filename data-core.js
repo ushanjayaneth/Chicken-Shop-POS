@@ -208,7 +208,7 @@ const Sync = {
   },
   async _request(path, options = {}) {
     const response = await fetch(getApiUrl(path), {...options, signal: AbortSignal.timeout(15000)});
-    if (!response.ok) {let data={};try{data=await response.json();}catch{}const error=new Error(data.error||`Cloud request failed with HTTP ${response.status}.`);error.status=response.status;throw error;}
+    if (!response.ok) {let data={};try{data=await response.json();}catch{}const error=new Error(data.error||`Cloud request failed with HTTP ${response.status}.`);error.status=response.status;error.code=data.code;throw error;}
     if (!/application\/json/i.test(response.headers.get('content-type') || '')) throw new Error('The cloud API did not return JSON. Device data is retained for retry.');
     return await response.json();
   },
@@ -237,7 +237,7 @@ const Sync = {
       return true;
     } catch (error) {
       console.warn('Cloud sync pending', error.message);
-      this._updateBadge(navigator.onLine === false ? 'offline' : error.status === 409 ? 'conflict' : 'error', error.message);
+      this._showFailure(error);
       return false;
     } finally {this._running = false;}
   },
@@ -283,14 +283,22 @@ const Sync = {
         if (applied) {this._lastContact = Date.now();await loadAll();this._updateBadge('connected');}
         else this._updateBadge('pending');
         return applied;
-      } catch (error) {console.warn('Cloud refresh pending', error.message);this._updateBadge('error');return false;}
+      } catch (error) {console.warn('Cloud refresh pending', error.message);this._showFailure(error);return false;}
     }).catch(error => {this._updateBadge('error');console.warn('Cloud refresh pending', error.message);return false;}).finally(() => {this._pullPromise = null;});
     return this._pullPromise;
+  },
+  _showFailure(error) {
+    const state = navigator.onLine === false ? 'offline'
+      : error.code === 'CLOUD_SIGN_IN_REQUIRED' ? 'locked'
+      : error.code === 'CLOUD_SETUP_REQUIRED' ? 'setup'
+      : error.status === 409 ? 'conflict' : 'error';
+    this._updateBadge(state, error.message);
+    if (state === 'locked' && typeof CloudAccess !== 'undefined') CloudAccess.needsSignIn();
   },
   _updateBadge(state, detail) {
     const dot = document.getElementById('syncDot');
     if (!dot) return;
-    const labels = {connected: 'Cloud connected', pending: 'Changes pending', syncing: 'Syncing changes', offline: 'Offline, saved on this device', error: 'Cloud unavailable, retrying', conflict: 'Sync needs review. Changes are saved on this device.'};
+    const labels = {connected: 'Cloud connected', pending: 'Changes pending', syncing: 'Syncing changes', offline: 'Offline, saved on this device', error: 'Cloud unavailable, retrying', locked: 'Connect this device', setup: 'Cloud setup pending', conflict: 'Sync needs review. Changes are saved on this device.'};
     dot.dataset.state = state;
     dot.className = 'sync-dot' + (state === 'connected' ? '' : state === 'syncing' || state === 'pending' ? ' syncing' : ' offline');
     dot.title = detail && state !== 'offline' ? detail : labels[state] || labels.pending;

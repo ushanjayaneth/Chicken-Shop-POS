@@ -9,11 +9,11 @@ A responsive point of sale for Chicken House and a separate Coconut Business wor
 
 ## Run locally
 
-Use Node.js 20 or later. Install dependencies with npm ci. Start the workspace with npm start and open http://localhost:4188.
+Use Node.js 24. Install dependencies with npm ci. Start the workspace with npm start and open http://localhost:4188.
 
 For a disposable sample database, run node tests/fixture-server.mjs and open http://127.0.0.1:4189. This sample keeps test transactions in memory.
 
-Run npm run build for syntax checks, npm test for data tests and npm run test:e2e for browser tests. Install Playwright Chromium with npx playwright install chromium if needed.
+Run npm run build to validate the app and prepare the public/ directory. Run npm test for data tests and npm run test:e2e for browser tests. Install Playwright Chromium with npx playwright install chromium if needed.
 
 ## Data and offline operation
 
@@ -25,7 +25,17 @@ Settings contains JSON backup export and restore. Restore replaces the selected 
 
 ## Server and printing
 
-The browser calls the same-origin /api/data/ endpoint. The Vercel API uses FIREBASE_DATABASE_URL when set. Use the environment variable for a separate workspace database. Protect production access at the deployment and database layers. The admin PIN controls features in the interface.
+The browser calls the same-origin /api/data/ endpoint. The hosted app serves browser assets from public/ and runs the handlers in api/. The local Node.js server can serve the same workspace on a shop computer.
+
+For shared cloud records, set the following server environment variables. For local development, use .env.local.
+
+- FIREBASE_DATABASE_URL is the Realtime Database instance URL.
+- FIREBASE_SERVICE_ACCOUNT_JSON is the JSON for a Google service account with access to that instance.
+- POS_ACCESS_KEY is a random key of at least 24 characters. Share it privately with operators who may use the workspace.
+
+Keep the service account credentials in the server environment. The app asks for the workspace access key when a new browser connects. Its signed session expires after 30 days. Changing the key revokes previous sessions. Cached records stay available for offline work on that device. The separate admin PIN controls features in the app interface.
+
+Without Firebase configuration, sales and other transactions stay on the current device. Use Settings to download a backup before moving to another computer. The browser treats each address and port as a different workspace.
 
 Receipt and label printing use the system print dialog or compatible browser-connected hardware. Install network printers in the operating system for system printing. Keyboard-style scanners send barcodes directly to the POS. Camera scanning requires browser permission.
 

@@ -3883,7 +3883,7 @@
             <div class="lock-icon">🔐</div>
             <h3>Admin Panel</h3>
             <p>Enter PIN to unlock</p>
-            <input type="password" id="pinInput" class="pin-input" maxlength="6" placeholder="••••"
+            <input type="password" id="pinInput" class="pin-input" maxlength="12" placeholder="••••"
               onkeypress="if(event.key==='Enter')Admin.unlock()" inputmode="numeric" pattern="[0-9]*">
             <button class="btn btn-primary w-full mt-8" onclick="Admin.unlock()">🔓 Unlock</button>
           </div>
@@ -4802,6 +4802,7 @@
   </div>
 
   <script src="data-core.js"></script>
+  <script src="cloud-access.js"></script>
   <script src="coconut.js"></script>
   <script src="sales.js"></script>
   <script src="returns.js"></script>
