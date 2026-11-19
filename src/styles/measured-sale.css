@@ -1,0 +1,19 @@
+.measured-rate {margin-bottom:12px;color:var(--muted);font-size:14px;text-align:center;font-variant-numeric:tabular-nums}
+.measured-mode {display:flex;gap:4px;padding:4px;margin-bottom:16px;border:1px solid var(--line);border-radius:12px;background:var(--panel-raised)}
+.measured-mode button {flex:1;min-height:44px;border:0;border-radius:8px;background:transparent;color:var(--muted);font:inherit;font-weight:600;touch-action:manipulation}
+.measured-mode button[aria-selected=true] {background:#b7f67a20;color:var(--text)}
+.measured-entry {display:flex;gap:12px;align-items:end;margin-bottom:12px}
+.measured-entry .field {flex:1;min-width:0;margin:0}
+.measured-entry .field:last-child:not(:first-child) {flex:0 0 92px}
+.measured-entry .input {width:100%;min-height:52px;font-size:20px;font-variant-numeric:tabular-nums}
+.measured-summary {padding:12px;margin-bottom:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-raised)}
+.measured-summary > div {display:flex;justify-content:space-between;gap:12px;align-items:center}
+.measured-summary > div + div {margin-top:8px}
+.measured-summary span {color:var(--muted);font-size:13px}
+.measured-summary output {display:inline;padding:0;margin:0;border:0;border-radius:0;font-size:19px;font-weight:650;overflow-wrap:anywhere;text-align:right}
+.measured-summary small {display:block;margin:5px 0 8px;color:var(--muted);font-size:12px;line-height:1.5}
+@media(max-width:600px) {
+  .measured-sale .number-pad-grid {gap:7px}
+  .measured-sale .number-pad-grid button {min-height:48px;font-size:23px}
+  .measured-sale .number-pad-actions {margin-top:12px}
+}

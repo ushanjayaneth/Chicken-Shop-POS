@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101613">
+  <link rel="icon" href="/icons/favicon.ico">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <title>Coconut workspace · Mr. Chicken House</title>
+</head>
+<body class="coconut-app">
+  <header class="workspace-header">
+    <div class="coconut-brand"><img src="/icons/app-icon-192.png" alt="" width="44" height="44"><div><strong>Mr. Chicken House</strong><small>Coconut workspace</small></div></div>
+    <nav aria-label="Workspaces"><a href="/">Shop POS</a><span aria-current="page">Coconut</span></nav>
+    <button type="button" id="ccSignOut" class="btn btn-ghost" hidden>Sign out</button>
+  </header>
+  <main>
+    <div id="ccConnection" role="status" class="connection" data-state="offline">Opening workspace…</div>
+    <form id="ccLogin" class="admin-section login" hidden>
+      <h1>Coconut workspace</h1>
+      <p>Enter the PIN for coconut operations.</p>
+      <label for="ccPin">Coconut PIN</label>
+      <input id="ccPin" type="password" inputmode="numeric" pattern="[0-9]{6,16}" minlength="6" maxlength="16" autocomplete="current-password" required>
+      <button class="btn btn-primary">Open workspace</button>
+    </form>
+    <div id="ccWorkspace" hidden>
+      <div class="tab-panel" id="coconutTab">
+        <div class="inv-bar">
+          <h2>Coconut operations</h2>
+          <div style="display:flex;gap:6px;align-items:center;margin-left:auto;">
+            <input type="date" id="coconutDate" style="padding:5px 10px;font-size:12px;max-width:160px;" onchange="CoconutMgr.switchTab(CoconutMgr._tab)">
+            <button class="btn btn-primary btn-sm" onclick="syncCoconut()">Refresh</button>
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px;">
+
+          <!-- Sub tabs -->
+          <div class="opt-tabs" style="margin-bottom:4px;">
+            <button type="button" class="opt-tab active" id="ccTab_summary" onclick="CoconutMgr.switchTab('summary')">Summary & Reports</button>
+            <button type="button" class="opt-tab" id="ccTab_buy" onclick="CoconutMgr.switchTab('buy')">Purchases</button>
+            <button type="button" class="opt-tab" id="ccTab_processing" onclick="CoconutMgr.switchTab('processing')">Processing</button>
+            <button type="button" class="opt-tab" id="ccTab_sale" onclick="CoconutMgr.switchTab('sale')">Sales</button>
+            <button type="button" class="opt-tab" id="ccTab_payroll" onclick="CoconutMgr.switchTab('payroll')">Workers & Payroll</button>
+          </div>
+
+          <!-- SUMMARY SECTION -->
+          <div id="ccSection_summary">
+            <!-- Stock Summary Grid -->
+            <div class="stats-row" id="ccSummaryStats" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px;"></div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+
+              <!-- Left Column: Cash Drawer & Daily Expenses -->
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <!-- Drawer Cash Reconciliation -->
+                <div class="admin-section">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h3 style="margin:0;">Coconut Drawer Cash Balance</h3>
+                    <div style="display:flex; gap:6px;">
+                      <button class="btn btn-success btn-xs" onclick="CoconutMgr.openDrawerMoveModal('in')">Deposit Cash</button>
+                      <button class="btn btn-danger btn-xs" onclick="CoconutMgr.openDrawerMoveModal('out')">Withdraw Cash</button>
+                    </div>
+                  </div>
+                  <div id="ccCashRegister"></div>
+                </div>
+
+                <!-- Daily Expenses Widget -->
+                <div class="admin-section">
+                  <h3>Record Operating Expense</h3>
+                  <div class="grid-2" style="margin-top:10px;">
+                    <div class="form-group">
+                      <label>Expense Item / Description</label>
+                      <input type="text" id="ccExpenseDesc" placeholder="e.g. Fuel, Lunch, Repairs" inputmode="text">
+                    </div>
+                    <div class="form-group">
+                      <label>Amount (Rs.)</label>
+                      <input type="number" id="ccExpenseAmt" placeholder="0.00" step="0.01" inputmode="decimal">
+                    </div>
+                  </div>
+                  <button class="btn btn-primary w-full btn-sm" onclick="CoconutMgr.saveOperatingExpense()">Save Expense</button>
+
+                  <h4 style="margin-top:14px; margin-bottom:6px; color:var(--cyan); font-size:12px;">Today's Operating Expenses</h4>
+                  <div id="ccExpensesList"></div>
+                </div>
+              </div>
+
+              <!-- Right Column: Financial reports & summaries -->
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <!-- Date Range Profit/Loss Report -->
+                <div class="admin-section">
+                  <h3>Revenue & Recorded Costs</h3>
+                  <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px; background:var(--bg2); padding:10px; border-radius:var(--r8); flex-wrap:wrap;">
+                    <div class="form-group" style="margin:0; display:flex; align-items:center; gap:5px;">
+                      <label style="margin:0; font-size:12px;">Start Date:</label>
+                      <input type="date" id="ccPLStartDate" style="padding:4px 8px; font-size:12px; width:130px;">
+                    </div>
+                    <div class="form-group" style="margin:0; display:flex; align-items:center; gap:5px;">
+                      <label style="margin:0; font-size:12px;">End Date:</label>
+                      <input type="date" id="ccPLEndDate" style="padding:4px 8px; font-size:12px; width:130px;">
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="CoconutMgr.renderPLReport()">Generate Report</button>
+                  </div>
+                  <div id="ccPLReportResult"></div>
+                </div>
+
+                <!-- Transportation Analyzer Section -->
+                <div class="admin-section">
+                  <h3>Transportation Costs Analyzer</h3>
+                  <div id="ccTransportAnalyzer"></div>
+                </div>
+
+                <!-- Details Summary -->
+                <div class="admin-section">
+                  <h3>Daily Details</h3>
+                  <div id="ccSumHusk"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- PURCHASE SECTION -->
+          <div id="ccSection_buy" style="display:none;">
+            <div class="admin-section" style="margin-bottom:12px;">
+              <h3>Purchase from Estates Registry</h3>
+              <div class="grid-2" style="margin-top:10px;">
+                <div class="form-group">
+                  <label>Date</label>
+                  <input type="date" id="ccBuyDate">
+                </div>
+                <div class="form-group">
+                  <label>Estate / Supplier</label>
+                  <input type="text" id="ccBuyEstate" placeholder="Estate/Supplier name" inputmode="text">
+                </div>
+                <div class="form-group">
+                  <label>Large Count</label>
+                  <input type="number" id="ccBuyLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()" inputmode="numeric">
+                </div>
+                <div class="form-group">
+                  <label>Large Price (Rs.)</label>
+                  <input type="number" id="ccBuyLargePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Small Count</label>
+                  <input type="number" id="ccBuySmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcBuyTotal()" inputmode="numeric">
+                </div>
+                <div class="form-group">
+                  <label>Small Price (Rs.)</label>
+                  <input type="number" id="ccBuySmallPrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcBuyTotal()" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Transportation Cost (Rs.)</label>
+                  <input type="number" id="ccBuyTransport" placeholder="0.00" step="0.01" value="0" oninput="CoconutMgr.calcBuyTotal()" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Payment Method</label>
+                  <select id="ccBuyPayMethod" onchange="CoconutMgr.calcBuyTotal()">
+                    <option value="cash">Cash from Drawer</option>
+                    <option value="bank">Bank Transfer</option>
+                    <option value="credit">Supplier Credit / Loan</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Optional Note</label>
+                <input type="text" id="ccBuyNotes" placeholder="Special notes about purchase..." inputmode="text">
+              </div>
+              <div class="grid-2">
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
+                  <span style="font-size:13px;color:var(--t2);">Total Cost</span>
+                  <span class="mono" style="font-size:18px;font-weight:700;color:var(--orange);" id="ccBuyTotal">Rs. 0.00</span>
+                </div>
+                <div class="form-group" style="margin-bottom:10px;">
+                  <label>Paid from Drawer (Cash)</label>
+                  <input type="number" id="ccBuyPaidDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--red);" inputmode="decimal">
+                </div>
+              </div>
+              <button class="btn btn-primary w-full" onclick="CoconutMgr.savePurchase()">Save Purchase</button>
+            </div>
+            <div class="admin-section">
+              <h3>Purchases List for Selected Date</h3>
+              <div id="ccBuyList" style="margin-top:10px;"></div>
+            </div>
+          </div>
+
+          <!-- PROCESSING SECTION -->
+          <div id="ccSection_processing" style="display:none;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-bottom:12px;">
+
+              <!-- HUSKING WIDGET -->
+              <div class="admin-section">
+                <h3>⚒️ Worker Husking Registry</h3>
+                <div class="form-group" style="margin-top:10px;">
+                  <label>Date</label>
+                  <input type="date" id="ccHuskDate">
+                </div>
+                <div class="form-group">
+                  <label>Worker</label>
+                  <select id="ccHuskWorkerSelect" style="width:100%;"></select>
+                </div>
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label>Large Count Husked</label>
+                    <input type="number" id="ccHuskLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcHuskTotal()" inputmode="numeric">
+                  </div>
+                  <div class="form-group">
+                    <label>Small Count Husked</label>
+                    <input type="number" id="ccHuskSmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcHuskTotal()" inputmode="numeric">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Rate per nut (Rs.)</label>
+                  <input type="number" id="ccHuskRate" placeholder="3.00" value="3.00" step="0.01" oninput="CoconutMgr.calcHuskTotal()" inputmode="decimal">
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px;margin-bottom:10px;">
+                  <span style="font-size:12px;color:var(--t2);">Total Earned</span>
+                  <span class="mono" style="font-size:16px;font-weight:700;color:var(--red);" id="ccHuskTotal">Rs. 0.00</span>
+                </div>
+                <div class="form-group">
+                  <label>Paid from Drawer (Immediate)</label>
+                  <input type="number" id="ccHuskPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);" inputmode="decimal">
+                </div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveHusking()">Save Husking Session</button>
+              </div>
+
+              <div class="admin-section">
+                <h3>Sort Peeled Coconuts</h3>
+                <div class="form-group"><label for="ccGradeDate">Date</label><input type="date" id="ccGradeDate" onchange="CoconutMgr.renderGradeAvailability()"></div>
+                <p id="ccGradeAvailable" class="info-hint"></p>
+                <div class="form-group"><label for="ccGradeLarge">Large nuts</label><input type="number" id="ccGradeLarge" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                <div class="form-group"><label for="ccGradeSmall">Small nuts</label><input type="number" id="ccGradeSmall" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                <div class="form-group"><label for="ccGradeDrying">Nuts set aside for drying</label><input type="number" id="ccGradeDrying" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveGrading()">Save Sorting</button>
+              </div>
+
+              <!-- COPRA PRODUCTION WIDGET -->
+              <div class="admin-section">
+                <h3>Copra Production Registry</h3>
+                <div class="form-group" style="margin-top:10px;">
+                  <label>Date</label>
+                  <input type="date" id="ccCopraDate">
+                </div>
+                <div class="form-group">
+                  <label>Unsorted Peeled Coconuts Used (Nuts)</label>
+                  <input type="number" id="ccCopraNuts" placeholder="0" min="0" inputmode="numeric">
+                </div>
+
+                <details class="form-group">
+                  <summary>Use sorted coconuts</summary>
+                  <div class="form-group"><label for="ccCopraLarge">Large nuts used</label><input type="number" id="ccCopraLarge" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                  <div class="form-group"><label for="ccCopraSmall">Small nuts used</label><input type="number" id="ccCopraSmall" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                  <div class="form-group"><label for="ccCopraDrying">Nuts set aside for drying used</label><input type="number" id="ccCopraDrying" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                </details>
+                <div class="form-group"><label for="ccCopraKg">Copra output (kg)</label><input type="number" id="ccCopraKg" min="0.001" step="0.001" inputmode="decimal" placeholder="0.000"></div>
+                <div class="form-group">
+                  <label>Labor / Drying Cost (Rs.)</label>
+                  <input type="number" id="ccCopraCost" placeholder="0.00" step="0.01" value="0" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Cost Paid from Drawer (Rs.)</label>
+                  <input type="number" id="ccCopraPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);" value="0" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Optional Note</label>
+                  <input type="text" id="ccCopraNotes" placeholder="e.g. drying agent cost, labor notes..." inputmode="text">
+                </div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveCopra()">Save Copra Registry</button>
+              </div>
+
+              <!-- OIL EXTRACTION WIDGET -->
+              <div class="admin-section">
+                <h3>Oil Extraction Registry</h3>
+                <div class="form-group" style="margin-top:10px;">
+                  <label>Date</label>
+                  <input type="date" id="ccOilDate">
+                </div>
+                <div class="form-group">
+                  <label>Copra Milled (kg)</label>
+                  <input type="number" id="ccOilCopra" placeholder="0.0" step="0.1" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Oil Extracted (Liters)</label>
+                  <input type="number" id="ccOilQty" placeholder="0.0" step="0.1" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Poonac Produced (kg)</label>
+                  <input type="number" id="ccOilPoonac" placeholder="0.0" step="0.1" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Milling Cost (Rs.)</label>
+                  <input type="number" id="ccOilCost" placeholder="0.00" step="0.01" value="0" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Cost Paid from Drawer (Rs.)</label>
+                  <input type="number" id="ccOilPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);" value="0" inputmode="decimal">
+                </div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveOil()">Save Oil Registry</button>
+              </div>
+            </div>
+
+            <!-- List of processing runs -->
+            <div class="admin-section" style="margin-top:14px;">
+              <h3>Processing Logs for Selected Date</h3>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top:10px;">
+                <div>
+                  <h4 style="margin-bottom:6px; color:var(--cyan);">⚒️ Husking Records</h4>
+                  <div id="ccHuskList"></div>
+                  <h4 style="margin:14px 0 6px;">Sorting Records</h4>
+                  <div id="ccGradingList"></div>
+                </div>
+                <div>
+                  <h4 style="margin-bottom:6px; color:var(--cyan);">Copra Records</h4>
+                  <div id="ccCopraList"></div>
+                </div>
+                <div>
+                  <h4 style="margin-bottom:6px; color:var(--cyan);">Oil Milling Records</h4>
+                  <div id="ccOilList"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SALES SECTION -->
+          <div id="ccSection_sale" style="display:none;">
+            <div class="admin-section" style="margin-bottom:12px;">
+              <h3>Coconut Wholesale Sales Registry</h3>
+              <div class="grid-2" style="margin-top:10px;">
+                <div class="form-group">
+                  <label>Date</label>
+                  <input type="date" id="ccSaleDate">
+                </div>
+                <div class="form-group">
+                  <label>Customer / Buyer Name</label>
+                  <input type="text" id="ccSaleBuyer" placeholder="e.g. wholesale buyer, customer">
+                </div>
+                <div class="form-group">
+                  <label>Product Type</label>
+                  <select id="ccSaleType" onchange="CoconutMgr.updateSaleLabels()">
+                    <option value="unhusked">Unhusked Coconuts (Nuts)</option>
+                    <option value="husked">Husked Coconuts (Nuts)</option>
+                    <option value="husks">Coconut Husks (Pcs)</option>
+                    <option value="shells">Coconut Shells (kg)</option>
+                    <option value="copra">Copra (kg)</option>
+                    <option value="oil">Coconut Oil (Liters)</option>
+                    <option value="poonac">Poonac (kg)</option>
+                  </select>
+                </div>
+
+
+                <div class="form-group" id="ccSaleGradeGroup" style="display:none">
+                  <label for="ccSaleGrade">Peeled stock</label>
+                  <select id="ccSaleGrade" onchange="CoconutMgr.updateSaleLabels()">
+                    <option value="unsorted">Unsorted</option>
+                    <option value="large">Large</option>
+                    <option value="small">Small</option>
+                    <option value="drying">Set aside for drying</option>
+                  </select>
+                  <p id="ccSaleGradeAvailable" class="info-hint"></p>
+                </div>
+                <!-- Itemized (for Raw / Unsorted Peeled Coconuts) -->
+                <div id="ccSaleItemizedContainer" style="grid-column: span 2; display: block; border: 1px solid var(--border2); padding: 12px; border-radius: var(--r8); background: var(--bg3); margin-top: 5px;">
+                  <div style="font-size: 12px; font-weight: bold; color: var(--cyan); margin-bottom: 8px;">Coconut Details</div>
+                  <div class="grid-2">
+                    <div class="form-group">
+                      <label>Large Count</label>
+                      <input type="number" id="ccSaleLargeCount" placeholder="0" min="0" oninput="CoconutMgr.calcSaleTotal()" inputmode="numeric">
+                    </div>
+                    <div class="form-group">
+                      <label>Large Price per Nut (Rs.)</label>
+                      <input type="number" id="ccSaleLargePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()" inputmode="decimal">
+                    </div>
+                    <div class="form-group">
+                      <label>Small Count</label>
+                      <input type="number" id="ccSaleSmallCount" placeholder="0" min="0" oninput="CoconutMgr.calcSaleTotal()" inputmode="numeric">
+                    </div>
+                    <div class="form-group">
+                      <label>Small Price per Nut (Rs.)</label>
+                      <input type="number" id="ccSaleSmallPrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()" inputmode="decimal">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Single (for Husks, Shells, Copra, Oil, Poonac) -->
+                <div id="ccSaleSingleContainer" style="grid-column: span 2; display: none; border: 1px solid var(--border2); padding: 12px; border-radius: var(--r8); background: var(--bg3); margin-top: 5px;">
+                  <div class="grid-2">
+                    <div class="form-group">
+                      <label id="ccSaleQtyLabel">Quantity</label>
+                      <input type="number" id="ccSaleCount" placeholder="0" min="0" step="any" oninput="CoconutMgr.calcSaleTotal()" inputmode="decimal">
+                    </div>
+                    <div class="form-group">
+                      <label id="ccSalePriceLabel">Price per Unit (Rs.)</label>
+                      <input type="number" id="ccSalePrice" placeholder="0.00" step="0.01" oninput="CoconutMgr.calcSaleTotal()" inputmode="decimal">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Payment Method</label>
+                  <select id="ccSalePayMethod" onchange="CoconutMgr.calcSaleTotal()">
+                    <option value="cash">Cash</option>
+                    <option value="card">Card</option>
+                    <option value="online">Online Transfer</option>
+                    <option value="credit">Credit / Customer Loan</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Transportation Cost (paid by us)</label>
+                  <input type="number" id="ccSaleTransport" placeholder="0.00" step="0.01" value="0" oninput="CoconutMgr.calcSaleTotal()" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Transport Paid from Drawer</label>
+                  <input type="number" id="ccSaleTransportPaidDrawer" placeholder="0" min="0" step="0.01" value="0" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                  <label>Optional Note</label>
+                  <input type="text" id="ccSaleNotes" placeholder="e.g. wholesale customer details, truck driver name..." inputmode="text">
+                </div>
+              </div>
+              <div class="grid-2">
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--glass2);border:1px solid var(--border2);border-radius:var(--r8);padding:10px 14px;margin-bottom:10px;">
+                  <span style="font-size:13px;color:var(--t2);">Total Revenue</span>
+                  <span class="mono" style="font-size:18px;font-weight:700;color:var(--green);" id="ccSaleTotal">Rs. 0.00</span>
+                </div>
+                <div class="form-group" style="margin-bottom:10px;">
+                  <label>Received to Drawer (Cash)</label>
+                  <input type="number" id="ccSaleRecDrawer" placeholder="0" min="0" style="font-size:14px;font-weight:bold;color:var(--green);">
+                </div>
+              </div>
+              <button class="btn btn-primary w-full" onclick="CoconutMgr.saveSale()">Save Sale</button>
+            </div>
+            <div class="admin-section">
+              <h3>Sales List for Selected Date</h3>
+              <div id="ccSaleList" style="margin-top:10px;"></div>
+            </div>
+          </div>
+
+          <!-- PAYROLL SECTION -->
+          <div id="ccSection_payroll" style="display:none;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+              <!-- Add Worker Form -->
+              <div class="admin-section">
+                <h3>Add New Worker</h3>
+                <div class="form-group" style="margin-top:10px;">
+                  <label>Worker Name</label>
+                  <input type="text" id="ccWorkerName" placeholder="e.g. Kamal, Siripala">
+                </div>
+                <div class="form-group">
+                  <label>Phone Number</label>
+                  <input type="text" id="ccWorkerPhone" placeholder="Optional phone number">
+                </div>
+                <div class="form-group">
+                  <label>Notes</label>
+                  <input type="text" id="ccWorkerNotes" placeholder="Optional notes">
+                </div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveWorker()">Add Worker</button>
+              </div>
+
+              <!-- Pay Worker Form -->
+              <div class="admin-section">
+                <h3>Record Wage Payment</h3>
+                <div class="form-group" style="margin-top:10px;">
+                  <label>Date</label>
+                  <input type="date" id="ccPayDate">
+                </div>
+                <div class="form-group">
+                  <label>Select Worker</label>
+                  <select id="ccPayWorkerSelect" style="width:100%;"></select>
+                </div>
+                <div class="form-group">
+                  <label>Amount Paid (Rs.)</label>
+                  <input type="number" id="ccPayAmount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                  <label>Paid from Drawer (Cash)</label>
+                  <input type="number" id="ccPayPaidDrawer" placeholder="0" min="0" style="font-weight:bold;color:var(--red);">
+                </div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveWorkerPayment()">Save Payment</button>
+              </div>
+
+              <!-- Worker Ledger Table -->
+              <div class="admin-section" style="grid-column: span 2;">
+                <h3>Workers Ledger & Balance Sheet</h3>
+                <div id="ccWorkersLedger" style="margin-top:10px;"></div>
+              </div>
+
+              <!-- Wage Payments List -->
+              <div class="admin-section" style="grid-column: span 2;">
+                <h3>Recent Wage Payments</h3>
+                <div id="ccPaymentsList" style="margin-top:10px;"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+    </div>
+  </main>
+  <div class="overlay" id="optModal"><div class="modal" id="optContent"></div></div>
+  <div id="ccToast" class="coconut-toast" role="status" hidden></div>
+  <script type="module" src="/src/coconut/main.js"></script>
+</body>
+</html>

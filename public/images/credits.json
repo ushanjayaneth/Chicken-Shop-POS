@@ -1,0 +1,135 @@
+{
+  "description": "Bundled grocery photographs used as representative demo product images. Source URLs and available attribution details are recorded per image. Legacy SVG illustrations were drawn in source code for this template.",
+  "assets": [
+    {
+      "file": "/images/grocery/biscuits.jpg",
+      "sourcePage": "https://taprovan.com/collections/cream-biscuits-and-puffs",
+      "sourceImage": "https://taprovan.com/cdn/shop/files/MALIBANCustardCreamSandwichBiscuit_200g.avif?v=1788652956&width=450",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/chips.jpg",
+      "sourcePage": "https://mart.mrdeal.lk/product/rancrisp-potato-chips-lightly-sea-salted-60g/4796005582653",
+      "sourceImage": "https://159.bpos.cloud/mrdeal/images/product/RANCRISP_POTATO_CHIPS_LIGHTLY_SEA_SALTED_60G105309-img.jpg",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/default.jpg",
+      "sourcePage": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=480&auto=format&fit=crop&q=80",
+      "sourceImage": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=480&auto=format&fit=crop&q=80",
+      "modifications": "Resized to a maximum dimension of 480 pixels and compressed as JPEG."
+    },
+    {
+      "file": "/images/grocery/detergent.jpg",
+      "sourcePage": "https://globalfoodcity.com/product/surf-excel-washing-powder-500g/",
+      "sourceImage": "https://globalfoodcity.com/wp-content/uploads/2020/10/surf-excel-500g-600x600.jpg",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/eggs.jpg",
+      "sourcePage": "https://www.pexels.com/photo/close-up-photo-of-eggs-on-egg-carton-1631180/",
+      "sourceImage": "https://images.pexels.com/photos/1631180/pexels-photo-1631180.jpeg?auto=compress&cs=tinysrgb&w=480",
+      "modifications": "Resized to a maximum dimension of 480 pixels and compressed as JPEG."
+    },
+    {
+      "file": "/images/grocery/flour.jpg",
+      "sourcePage": "https://spar2u.lk/products/spar-local-wheat-flour-1kg",
+      "sourceImage": "https://spar2u.lk/cdn/shop/files/3019094.jpg?v=1748383604&width=480",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/lentils.jpg",
+      "sourcePage": "https://kanela.ch/en/products/rapunzel-red-lentils-500g",
+      "sourceImage": "https://kanela.ch/cdn/shop/files/48437.jpg?v=1779287169",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/milk.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Glass_Milk_Bottles.tif",
+      "sourceImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Glass_Milk_Bottles.tif/lossy-page1-500px-Glass_Milk_Bottles.tif.jpg",
+      "modifications": "Resized to a maximum dimension of 480 pixels and compressed as JPEG.",
+      "creator": "Pkgx",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    {
+      "file": "/images/grocery/onion.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Red_Onion_on_White.JPG",
+      "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Red_Onion_on_White.JPG/500px-Red_Onion_on_White.JPG",
+      "modifications": "Resized to a maximum dimension of 480 pixels and compressed as JPEG.",
+      "creator": "Colin",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "attribution": "© User:Colin / Wikimedia Commons"
+    },
+    {
+      "file": "/images/grocery/potato.jpg",
+      "sourcePage": "https://www.pexels.com/photo/photo-of-potatoes-on-top-of-rice-sack-4110467/",
+      "sourceImage": "https://images.pexels.com/photos/4110467/pexels-photo-4110467.jpeg?auto=compress&cs=tinysrgb&w=480",
+      "modifications": "Resized to a maximum dimension of 480 pixels and compressed as JPEG."
+    },
+    {
+      "file": "/images/grocery/rice.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Mushqbudji_rice_grains_close-up.jpg",
+      "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Mushqbudji_rice_grains_close-up.jpg/500px-Mushqbudji_rice_grains_close-up.jpg",
+      "modifications": "Resized to a maximum dimension of 480 pixels and compressed as JPEG.",
+      "creator": "Zahoor Ahmad Reshi",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+    },
+    {
+      "file": "/images/grocery/shampoo.jpg",
+      "sourcePage": "https://ustore.lk/products/sunsilk-soft-smooth-shampoo-180ml",
+      "sourceImage": "https://ustore.lk/cdn/shop/files/1778811892_2450_137ad008-9f96-4485-831c-5359afaa037a_1200x1200.jpg?v=1794610165",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/soap.jpg",
+      "sourcePage": "https://lankagrocery.lk/product/sunlight-soap-yellow-115g/",
+      "sourceImage": "https://lankagrocery.lk/wp-content/uploads/2025/04/Pic13079.jpg",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/soda.jpg",
+      "sourcePage": "https://mayaasianmarket.com/products/fanta-orange-plastic-500ml",
+      "sourceImage": "https://mayaasianmarket.com/cdn/shop/files/b0f21387-8438-42a2-afd5-f9df71c2b73e.jpg?v=1750629352",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/sugar.jpg",
+      "sourcePage": "https://kayafoodsolutions.com/products/white-sugar-1kg",
+      "sourceImage": "https://kayafoodsolutions.com/cdn/shop/files/161.png?v=1761811147",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/tea.jpg",
+      "sourcePage": "https://ahmadtea.lk/products/ceylon-tea-premium-blend",
+      "sourceImage": "https://ahmadtea.lk/cdn/shop/files/ceylon_tea_premium_100g.jpg?v=1717144053",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/tissue.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:A_tissue_box.jpg",
+      "sourceImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/A_tissue_box.jpg/500px-A_tissue_box.jpg",
+      "modifications": "Resized to a maximum dimension of 480 pixels and compressed as JPEG.",
+      "creator": "Captain MarcusL",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    {
+      "file": "/images/grocery/toothpaste.jpg",
+      "sourcePage": "https://mart.mrdeal.lk/product/signal_strong_teeth_toothpaste_120g/4792081029457",
+      "sourceImage": "https://159.bpos.cloud/mrdeal/images/product/SIGNAL_STRONG_TEETH_120G114400-img.jpg",
+      "modifications": "Resized to maximum 480 pixels and JPEG compression."
+    },
+    {
+      "file": "/images/grocery/water.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Kirkland_Signature_Drinking_Water_1.5L_20050508.jpg",
+      "sourceImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Kirkland_Signature_Drinking_Water_1.5L_20050508.jpg/500px-Kirkland_Signature_Drinking_Water_1.5L_20050508.jpg",
+      "modifications": "Resized to a maximum dimension of 480 pixels and compressed as JPEG.",
+      "creator": "Original uploader was Jm51 at en.wikipedia",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/"
+    }
+  ]
+}

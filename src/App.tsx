@@ -1,0 +1,1086 @@
+import {chickenShop} from '../shared/chicken-shop';
+import {startPeripheralConnections} from './lib/peripherals';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BarChart3,
+  Bell,
+  Check,
+  CheckCheck,
+  ChevronRight,
+  ClipboardList,
+  Grid2X2,
+  History,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Package,
+  RefreshCw,
+  Settings,
+  ShieldCheck,
+  ShoppingBag,
+  ShoppingCart,
+  Store,
+  Users,
+  Wallet,
+  Wifi,
+  WifiOff,
+  X,
+  LockKeyhole,
+  Leaf,
+  MonitorSmartphone,
+  ArrowLeft,
+  Keyboard,
+  PauseCircle,
+  Database,
+} from "lucide-react";
+import { registerSW } from "virtual:pwa-register";
+import type { Page, Snapshot, User } from "../shared/types";
+import { api, ApiError } from "./lib/api";
+import { AppContext } from "./lib/context";
+import { browserDb } from "./lib/db";
+import { Spinner, Modal } from "./components/ui";
+import POS from "./pages/POS";
+import { Orders, Receipt } from "./pages/Operations";
+import HeldBills from './pages/HeldBills';
+import {NavigationProvider,useNavigation,useBackLayer} from './lib/navigation';
+import {useDevicePreferences,shortcutActions,keyboardCombination,dispatchShortcut,type ShortcutAction} from './lib/preferences';
+import {useWorkspaceMode,setWorkspaceMode,readSavedWorkspaceMode} from './lib/workspace-mode';
+import {getLocalWorkspaceInfo,type LocalWorkspaceInfo} from './lib/local/core';
+import {syncLocalProductPhotos} from './lib/media';
+import {flushBeforeAppUpdate} from './lib/update-safety';
+import {openSharedCloudWorkspace,sharedCloudSource,subscribeSharedCloudSource} from './lib/cloud-shared';
+import {cloudRequest,openAutomaticCloudWorkspace,syncDeviceCloud} from './lib/cloud-sync';
+import {authorizeOfflinePIN,authorizeOfflineSession,clearOfflineSession,getOfflineStatus,hasOfflinePIN,offlineSession,offlineSignIn} from './lib/cloud-offline';
+import {cloudPOSUser,cloudRuntimeApi,retryCloudConnection} from './lib/cloud-runtime';
+import {requestDevicePersistence} from './lib/local/storage';
+import ConnectivityStatus from './components/ConnectivityStatus';
+import {adminGrant,adminPages,cashierSnapshot,hydrateAdminAccess,lockAdmin,unlockAdmin,useAdminAccess} from './lib/admin-access';
+import CashierShift from './components/CashierShift';
+
+const Management = lazy(() => import('./pages/Management'));
+const StaffWorkspace = lazy(()=>import('./pages/Staff'));
+const Products = lazy(() => import('./pages/Products'));
+const WorkspacePreferences = lazy(() => import('./components/WorkspacePreferences').then(module=>({default:module.WorkspacePreferences})));
+const DeviceSetup = lazy(() => import('./components/DeviceSetup').then(module=>({default:module.DeviceSetup})));
+const InitialDeviceRestore = lazy(() => import('./components/DeviceSetup').then(module=>({default:module.InitialDeviceRestore})));
+
+// Optional UI preferences must never block access to committed business records.
+const uiStorage = {
+  getItem(key: string) {try {return localStorage.getItem(key);} catch {return null;}},
+  setItem(key: string, value: string) {try {localStorage.setItem(key, value);} catch {/* The device database remains authoritative. */}},
+  removeItem(key: string) {try {localStorage.removeItem(key);} catch {/* An unavailable preference store does not invalidate a session. */}},
+};
+
+const navigation = [
+  {
+    label: "WORKSPACE",
+    items: [
+      { id: "overview", label: "Overview", icon: LayoutDashboard },
+      { id: "pos", label: "Point of sale", icon: Grid2X2 },
+      { id: "orders", label: "Sales & returns", icon: ClipboardList },
+      { id: "held-bills", label: "Held bills", icon: PauseCircle },
+      { id: "sales-history", label: "Sales history", icon: History },
+    ],
+  },
+  {
+    label: "MANAGEMENT",
+    items: [
+      { id: "inventory", label: "Inventory", icon: Package },
+      { id: "products", label: "Products", icon: ShoppingBag },
+      { id: "purchases", label: "Purchases & suppliers", icon: ShoppingCart },
+      { id: "customers", label: "Customers & loans", icon: Users },
+      { id: "team", label: "Staff & payroll", icon: Users },
+      { id: "finance", label: "Day end & expenses", icon: Wallet },
+      { id: "reports", label: "Reports", icon: BarChart3 },
+      { id: "settings", label: "Settings", icon: Settings },
+    ],
+  },
+];
+const allPages = navigation.flatMap((n) => n.items.map((i) => i.id));
+const allowedPages: Record<string, string[]> = {
+  owner: allPages,
+  manager: allPages,
+  accountant: [
+    "overview",
+    "orders",
+    "sales-history",
+    "products",
+    "purchases",
+    "customers",
+    "finance",
+    "reports",
+    "settings",
+  ],
+  cashier: ["pos", "orders", "held-bills", "sales-history", "products", "customers", "finance", "reports", "settings"],
+  waiter: ["pos", "orders", "held-bills", "settings"],
+  kitchen: ["settings"],
+  storekeeper: ["products", "inventory", "purchases", "settings"],
+};
+function Brand({onAdmin,unlocked=false}:{onAdmin?:()=>void;unlocked?:boolean}={}) {
+  return (
+    <div className="brand">
+      {onAdmin?<button type="button" className="brand-mark admin-logo-button" aria-label={unlocked?'Lock admin access':'Unlock admin access'} title={unlocked?'Lock admin access':'Unlock admin access'} aria-pressed={unlocked} onClick={onAdmin}><img src="/icons/app-icon-192.png" alt="" width="40" height="40"/><span className={`admin-logo-status ${unlocked?'unlocked':''}`}><LockKeyhole size={10}/></span></button>:<div className="brand-mark"><img src="/icons/app-icon-192.png" alt="" width="40" height="40"/></div>}
+      <div className="brand-wordmark">
+        <div className="brand-name">{chickenShop.name}</div>
+        <span className="brand-caption">RETAIL WORKSPACE</span>
+      </div>
+    </div>
+  );
+}
+
+function Login({ onLogin,onSetup,onRestore,deviceInfo=null,cloudLogin }: { onLogin?: (user: User) => void;onSetup?:()=>void;onRestore?:()=>void;deviceInfo?:LocalWorkspaceInfo|null;cloudLogin?:(pin:string)=>Promise<void> }) {
+  const mode=useWorkspaceMode();
+  const [pin, setPin] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  async function login(value: string) {
+    setBusy(true);
+    setError("");
+    try {
+      if(cloudLogin){await cloudLogin(value);return;}
+      const result = await api<{ user: User }>("/login", { pin: value });
+      onLogin?.(result.user);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="login-page">
+      <section className="login-art">
+        <Brand />
+        <div className="login-copy">
+          <div className="eyebrow">
+            <span className="status-dot" /> A LITTLE MORE ORDER. A LOT LESS
+            FRICTION.
+          </div>
+          <h1>
+            Every product.
+            <br />
+            Every sale.
+            <br />
+            <em>Under control.</em>
+          </h1>
+          <p>
+            A clear view of your counter, your shelves, and the numbers that keep
+            your store moving.
+          </p>
+          <div className="login-badges">
+            <span>
+              {cloudLogin?<><Wifi size={14} /> Your shop, connected</>:<><WifiOff size={14} /> Works without internet</>}
+            </span>
+            <span>
+              <MonitorSmartphone size={14} /> Made for every screen
+            </span>
+          </div>
+        </div>
+        <div className="login-footer">
+          <ShieldCheck size={14} /> {cloudLogin?'One shop. The same data on every device.':'Stored at your branch. Synced on your terms.'}
+        </div>
+        <div className="login-orb" />
+      </section>
+      <section className="login-panel">
+        <form
+          className="login-box"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void login(pin);
+          }}
+        >
+          <a className="button button-ghost workspace-switch" href="/coconut.html"><Leaf size={15}/> Coconut workspace</a>
+          <div className="login-lock">
+            <LockKeyhole size={23} />
+          </div>
+          <div className="eyebrow">YOUR STORE, IN ORDER</div>
+          <h2>{!cloudLogin&&mode==='device'&&!deviceInfo?'Make it your store.':'Welcome back.'}</h2>
+          <p>{cloudLogin?'Enter your staff PIN. Your shop data opens automatically.':mode==='device'?'Enter your private staff PIN to open this device’s saved workspace.':'Enter your staff PIN to open your workspace.'}</p>
+          {error && (
+            <div className="error-message" role="alert">
+              {error}
+            </div>
+          )}
+          {(cloudLogin||mode==='hub'||deviceInfo)&&<>
+          <label className="field">
+            <span>Staff PIN</span>
+            <input
+              className="input pin-input"
+              type="password"
+              inputMode="numeric"
+              pattern={cloudLogin?'[0-9]{6,16}':'[0-9]{4,12}'}
+              autoComplete="current-password"
+              required
+              minLength={cloudLogin?6:4}
+              maxLength={cloudLogin?16:12}
+              value={pin}
+              onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+              placeholder="••••"
+              aria-label="Staff PIN"
+            />
+          </label>
+          <button
+            className="button button-primary login-submit"
+            disabled={busy}
+          >
+            {busy ? (
+              <RefreshCw size={15} className="spin" />
+            ) : (
+              <>
+                Open workspace <ArrowRight size={15} />
+              </>
+            )}
+          </button>
+          </>}
+          {!cloudLogin&&mode==='hub' && <><div className="login-divider">just looking around?</div>
+          <button
+            className="button demo-login"
+            type="button"
+            onClick={() => void login("1234")}
+            disabled={busy}
+          >
+            <Leaf size={15} /> Explore demo workspace <ArrowUpRight size={14} />
+          </button>
+          <p className="demo-caption">
+            Sample grocery products · no real payments
+            <br />
+            Demo owner PIN: 1234
+          </p></>}
+          {!cloudLogin&&mode==='hub'&&<div className="device-login-option"><div className="login-divider">work on this device</div>{deviceInfo?<button type="button" className="button full-width" onClick={()=>setWorkspaceMode('device')}><Database size={15}/> Open saved device workspace</button>:<><button type="button" className="button full-width" onClick={onSetup}><Database size={15}/> Set up this device</button><button type="button" className="button button-ghost full-width" onClick={onRestore}>Restore device backup</button><p className="demo-caption">Keep your workspace on this device. No hosted backend required.</p></>}</div>}
+          {!cloudLogin&&mode==='device'&&<><p className="demo-caption">{deviceInfo?'Saved on this device · Setup complete':'Device data is unavailable. Restore your backup or create a new workspace.'}<br/><button type="button" className="button button-ghost button-small" onClick={()=>setWorkspaceMode('hub')}>Use branch hub instead</button></p>{!deviceInfo&&<div className="device-login-option"><button type="button" className="button full-width" onClick={onRestore}>Restore device backup</button><button type="button" className="button button-primary full-width" onClick={onSetup}><Store size={16}/> Create your store</button></div>}</>}
+        </form>
+        <div className="login-bottom">
+          <ShieldCheck size={12} /> Your session stays on this device.
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function WorkspaceApp() {
+  const mode=useWorkspaceMode();
+  const admin=useAdminAccess(sharedCloudSource());
+  const adminLocked=admin.enabled&&!admin.unlocked;
+  const [adminDialog,setAdminDialog]=useState(false);
+  const [adminPin,setAdminPin]=useState('');
+  const [adminBusy,setAdminBusy]=useState(false);
+  const [adminError,setAdminError]=useState('');
+  useEffect(()=>{
+    const source=sharedCloudSource();if(!source)return;
+    void hydrateAdminAccess(source).catch(()=>{});
+    const required=(event:Event)=>{if((event as CustomEvent<{sourceId:string}>).detail?.sourceId===source){setAdminError('');setAdminDialog(true);}};
+    window.addEventListener('admin-access-required',required);
+    return()=>window.removeEventListener('admin-access-required',required);
+  },[]);
+  const deviceMode=mode==='device'&&!sharedCloudSource();
+  const [deviceInfo,setDeviceInfo]=useState<LocalWorkspaceInfo|null>(null);
+  const [deviceSetup,setDeviceSetup]=useState(false);
+  const [deviceRestore,setDeviceRestore]=useState(false);
+  const localWrites=useRef(0);
+  const updateActivated=useRef(false);
+  const updateRequested=useRef(false);
+  const updateReloading=useRef(false);
+  const updateActivationTimer=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
+  const {route,navigate:routeTo,back}=useNavigation();
+  const preferences=useDevicePreferences();
+  const [user, setUser] = useState<User | null>(null);
+  const [starting, setStarting] = useState(true);
+  const [data, setData] = useState<Snapshot | null>(null);
+  const [branchId, setBranchId] = useState(
+    () => uiStorage.getItem("retail-branch") || "b1",
+  );
+  useEffect(()=>{if(!user)return;return startPeripheralConnections(branchId);},[branchId,user?.id]);
+  // Restaurant-only links from copied bookmarks never render in the retail template.
+  const page: Page = ["tables","kitchen","production"].includes(route.page) ? "pos" : route.page;
+  useEffect(()=>{if(["tables","kitchen","production"].includes(route.page))routeTo("pos",null,true);},[route.page,routeTo]);
+  const [loadError, setLoadError] = useState("");
+  const [hubOnline, setHubOnline] = useState(true);
+  useEffect(()=>{
+    if(!deviceMode)return;
+    let timer:ReturnType<typeof setTimeout>|undefined;
+    const upload=()=>{if(navigator.onLine!==false){void syncDeviceCloud().catch(()=>{});}};
+    const change=()=>{clearTimeout(timer);timer=setTimeout(upload,1000);};
+    upload();const interval=setInterval(upload,12000);
+    window.addEventListener('online',upload);window.addEventListener('focus',upload);document.addEventListener('visibilitychange',upload);window.addEventListener('local-workspace-change',change);
+    return()=>{clearTimeout(timer);clearInterval(interval);window.removeEventListener('online',upload);window.removeEventListener('focus',upload);document.removeEventListener('visibilitychange',upload);window.removeEventListener('local-workspace-change',change);};
+  },[deviceMode]);
+  const [mobileNav, setMobileNav] = useState(false);
+  const [notifications, setNotifications] = useState(false);
+  const selectedOrder=route.orderId;
+  const setSelectedOrder=(id:string|null)=>routeTo('pos',id);
+  const [receiptId, setReceiptId] = useState<string | null>(null);
+  const [shortcutHelp,setShortcutHelp]=useState(false);
+  useBackLayer(mobileNav,()=>setMobileNav(false),'navigation');
+  useBackLayer(notifications,()=>setNotifications(false),'notifications');
+  useEffect(()=>{document.documentElement.style.setProperty('--font-scale',String(preferences.fontScale));},[preferences.fontScale]);
+  useEffect(()=>{
+    if(!deviceMode||!user)return;
+    const upload=()=>{void syncLocalProductPhotos().catch(()=>{});};
+    upload();const timer=setInterval(upload,45000);
+    window.addEventListener('online',upload);window.addEventListener('focus',upload);
+    return()=>{clearInterval(timer);window.removeEventListener('online',upload);window.removeEventListener('focus',upload);};
+  },[deviceMode,user]);
+  const [toasts, setToasts] = useState<
+    { id: number; message: string; type: string }[]
+  >([]);
+  const [updateReady, setUpdateReady] = useState(false);
+  const [updateOpen, setUpdateOpen] = useState(false);
+  const [updateBusy, setUpdateBusy] = useState(false);
+  const [updateError, setUpdateError] = useState('');
+  const updateDismissed = useRef(false);
+  const announcedWorker = useRef<ServiceWorker | null>(null);
+  const [updateWorker, setUpdateWorker] = useState<
+    ((reload?: boolean) => Promise<void>) | null
+  >(null);
+  const requestGeneration = useRef(0);
+  const activeRefresh = useRef<{key:string;promise:Promise<void>}|null>(null);
+  const refreshIdentity = `${mode}:${sharedCloudSource()??''}:${user?.id??''}:${branchId}`;
+  const latestRefreshIdentity = useRef(refreshIdentity);
+  latestRefreshIdentity.current = refreshIdentity;
+  const notify = useCallback(
+    (message: string, type: "success" | "error" = "success") => {
+      const id = Date.now() + Math.random();
+      setToasts((v) => [...v.slice(-3), { id, message, type }]);
+      setTimeout(() => setToasts((v) => v.filter((t) => t.id !== id)), 5500);
+    },
+    [],
+  );
+  const announceUpdate = useCallback((worker?: ServiceWorker | null) => {
+    if (worker && announcedWorker.current !== worker) {
+      announcedWorker.current = worker;
+      updateActivated.current = false;
+      updateDismissed.current = false;
+    }
+    setUpdateReady(true);
+    if (!updateDismissed.current) setUpdateOpen(true);
+  }, []);
+  const reportUpdateError = useCallback((message: string) => {
+    setUpdateBusy(false);
+    setUpdateError(message);
+    setUpdateOpen(true);
+    notify(message, 'error');
+  }, [notify]);
+  const checkAppUpdate = useCallback(async () => {
+    if (navigator.onLine === false || !("serviceWorker" in navigator)) return;
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) return;
+      if (registration.waiting) announceUpdate(registration.waiting);
+      await registration.update();
+      if (registration.waiting) announceUpdate(registration.waiting);
+    } catch {
+      /* An unavailable update must not interrupt local sales or stored drafts. */
+    }
+  }, [announceUpdate]);
+  const finishAppUpdate = useCallback(async () => {
+    if (updateReloading.current) return;
+    updateReloading.current = true;
+    try {
+      if (localWrites.current > 0) throw new Error('Wait for the current save to finish before reloading the app.');
+      await flushBeforeAppUpdate();
+      // A payment may start while a worker activates or a draft is being flushed.
+      if (localWrites.current > 0) throw new Error('Wait for the current save to finish before reloading the app.');
+      window.location.reload();
+    } catch (error) {
+      updateRequested.current = false;
+      updateReloading.current = false;
+      reportUpdateError((error as Error).message);
+    }
+  }, [reportUpdateError]);
+  useEffect(() => {
+    const checkForUpdate=()=>{
+      if(document.visibilityState==='visible')void checkAppUpdate();
+    };
+    const workerActivated = () => {
+      clearTimeout(updateActivationTimer.current);
+      updateActivated.current = true;
+      announceUpdate();
+      // Activation in another tab never grants permission to reload this page.
+      if (updateRequested.current) void finishAppUpdate();
+    };
+    let previousController = navigator.serviceWorker?.controller;
+    const controllerChanged = () => {
+      const next = navigator.serviceWorker.controller;
+      if (previousController && next !== previousController) workerActivated();
+      previousController = next;
+    };
+    const update = registerSW({
+      immediate:true,
+      onNeedRefresh() {
+        void navigator.serviceWorker.getRegistration().then(registration => announceUpdate(registration?.waiting)).catch(()=>{});
+      },
+      onRegisteredSW(_url, registration) {
+        if (registration?.waiting) announceUpdate(registration.waiting);
+      },
+      onNeedReload: workerActivated,
+      onRegisterError() {
+        /* Local network use remains available without PWA installation. */
+      },
+    });
+    setUpdateWorker(() => update);
+    window.addEventListener('focus',checkForUpdate);
+    window.addEventListener('online',checkForUpdate);
+    document.addEventListener('visibilitychange',checkForUpdate);
+    navigator.serviceWorker?.addEventListener('controllerchange',controllerChanged);
+    const timer = window.setInterval(checkForUpdate, 60 * 1000);
+    return()=>{window.clearInterval(timer);clearTimeout(updateActivationTimer.current);window.removeEventListener('focus',checkForUpdate);window.removeEventListener('online',checkForUpdate);document.removeEventListener('visibilitychange',checkForUpdate);navigator.serviceWorker?.removeEventListener('controllerchange',controllerChanged);};
+  }, [checkAppUpdate,finishAppUpdate,announceUpdate]);
+  async function reloadAppUpdate() {
+    if (updateReloading.current || updateRequested.current) return;
+    setUpdateError('');
+    if (localWrites.current > 0) {
+      reportUpdateError('Wait for the current save to finish before reloading the app.');
+      return;
+    }
+    if (!updateWorker) {
+      reportUpdateError('The app update is not ready. Refresh the workspace and try again.');
+      return;
+    }
+    setUpdateBusy(true);
+    try {
+      if (updateActivated.current) {
+        updateRequested.current = true;
+        await finishAppUpdate();
+        return;
+      }
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (updateActivated.current) {
+        updateRequested.current = true;
+        await finishAppUpdate();
+        return;
+      }
+      if (!registration?.waiting) throw new Error('No waiting worker is available.');
+      updateRequested.current = true;
+      clearTimeout(updateActivationTimer.current);
+      updateActivationTimer.current = setTimeout(() => {
+        if (!updateRequested.current || updateActivated.current) return;
+        updateRequested.current = false;
+        reportUpdateError('The app update has not finished activating. Keep this page open and try Update now again.');
+      }, 10000);
+      await updateWorker(true);
+    } catch {
+      clearTimeout(updateActivationTimer.current);
+      updateRequested.current = false;
+      reportUpdateError('The app update could not be applied. Keep this app open and try Update now again.');
+    }
+  }
+  useEffect(() => {
+    let active = true;
+    setStarting(true);setUser(null);setData(null);setLoadError('');
+    setBranchId(uiStorage.getItem(sharedCloudSource()?`retail-cloud-branch:${sharedCloudSource()}`:deviceMode?'retail-device-branch':'retail-branch')||'b1');
+    void (async()=>{
+      void requestDevicePersistence().catch(()=>{});
+      if(sharedCloudSource())return api<{user:User|null}>('/session');
+      const info=await getLocalWorkspaceInfo().catch(()=>null);
+      if(!active)return null;
+      setDeviceInfo(info);
+      if(info&&!sharedCloudSource()&&!readSavedWorkspaceMode()&&!deviceMode){setWorkspaceMode('device');return null;}
+      if(deviceMode)await (await import('./lib/local/backup')).recoverRestoredDrafts();
+      return api<{user:User|null}>('/session');
+    })()
+      .then((result) => {
+        if (!active||!result) return;
+        setUser(result.user);
+        if (result.user)
+          uiStorage.setItem(deviceMode?'retail-device-last-user':'retail-last-user', JSON.stringify(result.user));
+      })
+      .catch(() => {
+        if(!active)return;
+        try {
+          const saved = !deviceMode&&!sharedCloudSource()&&uiStorage.getItem("retail-last-user");
+          if (saved) setUser(JSON.parse(saved));
+          setHubOnline(false);
+        } catch {
+          uiStorage.removeItem("retail-last-user");
+        }
+      })
+      .finally(() => active && setStarting(false));
+    return () => {
+      active = false;
+    };
+  }, [mode]);
+  const refresh = useCallback(async (afterChange=false) => {
+    if (!user) return;
+    const identity = `${mode}:${sharedCloudSource()??''}:${user.id}:${branchId}`;
+    const pending = activeRefresh.current;
+    if(pending?.key===identity){
+      await pending.promise;
+      if(!afterChange||latestRefreshIdentity.current!==identity)return;
+    }
+    const generation = ++requestGeneration.current;
+    const cacheKey = sharedCloudSource()?`cloud:${sharedCloudSource()}:${user.id}:${branchId}`:`${user.id}:${branchId}`;
+    const request = (async()=>{
+    try {
+      const snapshot = await api<Snapshot>(
+        `/bootstrap?branchId=${encodeURIComponent(branchId)}`,
+      );
+      if (generation !== requestGeneration.current || latestRefreshIdentity.current!==identity) return;
+      setData(snapshot);
+      if(sharedCloudSource())uiStorage.setItem('retail-cloud-preferred-source',sharedCloudSource()!);
+      setHubOnline(snapshot.sync.hubOnline!==false);
+      setLoadError("");
+      if(!deviceMode&&!sharedCloudSource())await browserDb.snapshots
+        .put({
+          id: cacheKey,
+          data: snapshot,
+          savedAt: new Date().toISOString(),
+        })
+        .catch(() => {});
+    } catch (err) {
+      if (generation !== requestGeneration.current || latestRefreshIdentity.current!==identity) return;
+      setHubOnline(false);
+      if (err instanceof ApiError && err.status === 401) {
+        setUser(null);
+        setData(null);
+        uiStorage.removeItem(deviceMode?'retail-device-last-user':'retail-last-user');
+        return;
+      }
+      if (
+        err instanceof ApiError &&
+        err.status === 403 &&
+        user.branchId &&
+        branchId !== user.branchId
+      ) {
+        setBranchId(user.branchId);
+        return;
+      }
+      const cached = !deviceMode&&await browserDb.snapshots
+        .get(cacheKey)
+        .catch(() => undefined);
+      if (generation !== requestGeneration.current || latestRefreshIdentity.current!==identity) return;
+      if (cached) setData(cached.data);
+      else setLoadError((err as Error).message);
+    }
+    })();
+    activeRefresh.current={key:identity,promise:request};
+    try{await request;}finally{if(activeRefresh.current?.promise===request)activeRefresh.current=null;}
+  }, [user, branchId,mode]);
+  useEffect(() => {
+    void refresh();
+    if(deviceMode){
+      let timer:ReturnType<typeof setTimeout>|undefined;
+      const changed=()=>{if(localWrites.current)return;clearTimeout(timer);timer=setTimeout(()=>void refresh(),60);};
+      const visible=()=>{if(document.visibilityState==='visible')changed();};
+      const channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('retail-pos-device-changes'):null;
+      if(channel)channel.onmessage=changed;
+      window.addEventListener('local-workspace-change',changed);window.addEventListener('focus',changed);document.addEventListener('visibilitychange',visible);
+      return()=>{clearTimeout(timer);channel?.close();window.removeEventListener('local-workspace-change',changed);window.removeEventListener('focus',changed);document.removeEventListener('visibilitychange',visible);};
+    }
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") void refresh();
+    }, sharedCloudSource()?5000:12000);
+    const connected=()=>{const source=sharedCloudSource();if(source&&navigator.onLine)retryCloudConnection(source);void refresh();};
+    let refreshTimer:ReturnType<typeof setTimeout>|undefined;
+    const cachedCloudChanged=(event:Event)=>{
+      const change=(event as CustomEvent<{sourceId:string;branchId:string|null}>).detail;
+      if(change?.sourceId!==sharedCloudSource()||change.branchId&&change.branchId!==branchId)return;
+      clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>void refresh(),40);
+    };
+    const sessionChanged=(event:Event)=>{
+      const change=(event as CustomEvent<{sourceId:string;user:User|null}>).detail;
+      if(change?.sourceId===sharedCloudSource()&&change.user===null){setUser(null);setData(null);}
+    };
+    if(sharedCloudSource()){
+      window.addEventListener('online',connected);window.addEventListener('offline',connected);
+      window.addEventListener('cloud-runtime-refresh',cachedCloudChanged);
+      window.addEventListener('cloud-runtime-session',sessionChanged);
+    }
+    return () => {clearInterval(interval);clearTimeout(refreshTimer);window.removeEventListener('online',connected);window.removeEventListener('offline',connected);window.removeEventListener('cloud-runtime-refresh',cachedCloudChanged);window.removeEventListener('cloud-runtime-session',sessionChanged);};
+  }, [refresh]);
+  useEffect(() => {
+    if (!user) return;
+    const permitted = (allowedPages[user.role] || ["pos"]).filter(value=>!adminLocked||!adminPages.has(value));
+    if(sharedCloudSource()&&page==='team'){routeTo('pos',null,true);return;}
+    if (!permitted.includes(page)) routeTo(permitted[0] as Page,null,true);
+  }, [user, page,routeTo,adminLocked]);
+  const mutate = useCallback(
+    async <T,>(path: string, body?: unknown, method?: string): Promise<T> => {
+      localWrites.current++;
+      try{const result = await api<T>(path, body, method);await refresh(true);return result;}
+      catch(error){if(sharedCloudSource())await refresh(true);throw error;}
+      finally{localWrites.current--;}
+    },
+    [refresh],
+  );
+  function navigate(next: Page) {
+    if(adminLocked&&adminPages.has(next)){setAdminError('');setAdminDialog(true);return;}
+    routeTo(next);
+    setMobileNav(false);
+    setNotifications(false);
+  }
+  function openOrder(id: string) {
+    routeTo('pos',id);
+    setMobileNav(false);
+    setNotifications(false);
+  }
+  useEffect(()=>{
+    const handler=(event:KeyboardEvent)=>{
+      if(event.defaultPrevented||!user)return;
+      const target=event.target as HTMLElement;
+      if(target.closest('.shortcut-input')||target.isContentEditable)return;
+      const combination=keyboardCombination(event);
+      const action=shortcutActions.find(item=>preferences.shortcuts[item.id]===combination)?.id;
+      if(!action)return;
+      if(['INPUT','TEXTAREA','SELECT'].includes(target.tagName)&&event.key.length===1&&!event.ctrlKey&&!event.metaKey&&!event.altKey)return;
+      event.preventDefault();
+      if(action==='back'){back();return;}
+      if(action==='help'){setShortcutHelp(true);return;}
+      if(action==='print'&&receiptId){window.dispatchEvent(new Event('retail:print-receipt'));return;}
+      if(document.querySelector('[role="dialog"]'))return;
+      const shortcuts:Partial<Record<ShortcutAction,Page>>={'go-pos':'pos','go-held':'held-bills','go-sales':'sales-history','go-products':'products','go-customers':'customers','go-reports':'reports','go-finance':'finance','go-settings':'settings'};
+      const destination=shortcuts[action];
+      if(destination){if((allowedPages[user.role]||[]).includes(destination))navigate(destination);else notify('Your role does not have access to this page.','error');return;}
+      if(page==='pos')dispatchShortcut(action);else notify('Open Point of sale to use this shortcut.');
+    };
+    window.addEventListener('keydown',handler);
+    return()=>window.removeEventListener('keydown',handler);
+  },[user,page,preferences.shortcuts,receiptId,back,routeTo,notify,adminLocked]);
+  async function logout() {
+    try {
+      await api("/logout", {});
+    } catch {}
+    setUser(null);
+    setData(null);
+    uiStorage.removeItem(deviceMode?'retail-device-last-user':'retail-last-user');
+    if(!deviceMode)await browserDb.snapshots.clear().catch(() => {});
+  }
+  function onLogin(next: User) {
+    setUser(next);
+    uiStorage.setItem(deviceMode?'retail-device-last-user':'retail-last-user', JSON.stringify(next));
+    if (next.branchId) {
+      setBranchId(next.branchId);
+      uiStorage.setItem(deviceMode?'retail-device-branch':'retail-branch', next.branchId);
+    }
+    setStarting(false);
+  }
+  if (starting) return <Spinner />;
+  if (!user&&sharedCloudSource())return <CloudPOSEntry source={sharedCloudSource()!}/>;
+  if (!user) return <><Login onLogin={onLogin} onSetup={()=>setDeviceSetup(true)} onRestore={()=>setDeviceRestore(true)} deviceInfo={deviceInfo}/><Suspense fallback={<Spinner label="Opening device setup"/>}>{deviceSetup&&<DeviceSetup onClose={()=>setDeviceSetup(false)} onComplete={(next)=>{setDeviceSetup(false);setBranchId('b1');setUser(next);uiStorage.setItem('retail-device-last-user',JSON.stringify(next));void getLocalWorkspaceInfo().then(setDeviceInfo);}}/>}{deviceRestore&&<InitialDeviceRestore onClose={()=>setDeviceRestore(false)}/>}</Suspense></>;
+  if (!data || data.branch.id !== branchId) {
+    if (loadError)
+      return (
+        <div className="boot-error panel">
+          <h2>Let’s reconnect your workspace.</h2>
+          <p>{loadError}</p>
+          <button
+            className="button button-primary"
+            onClick={() => void refresh()}
+          >
+            <RefreshCw size={14} /> Try again
+          </button>
+          <button className="button button-ghost" onClick={() => void logout()}>
+            Sign out
+          </button>
+        </div>
+      );
+    return <Spinner label="Opening your branch workspace" />;
+  }
+  const title =
+    navigation.flatMap((n) => n.items).find((n) => n.id === page)?.label ||
+    "Workspace";
+  const visiblePages = (allowedPages[user.role] || ["pos"]).filter(value=>!adminLocked||!adminPages.has(value));
+  const activeOrders = data.orders.filter(
+    (o) => !["completed", "cancelled"].includes(o.status),
+  );
+  const lowStock = data.inventory.filter((i) => i.quantity <= i.minimum);
+  const receipt = data.orders.find((o) => o.id === receiptId);
+  const context = {
+    data: { ...(adminLocked?cashierSnapshot(data):data), sync: { ...data.sync, hubOnline } },
+    branchId,
+    locale: "en" as const,
+    t: (en: string, _si: string) => en,
+    refresh,
+    mutate,
+    notify,
+    navigate,
+    back,
+  };
+  return (
+    <AppContext.Provider value={context}>
+      <div className="app">
+        {mobileNav && (
+          <div className="mobile-overlay" onClick={() => setMobileNav(false)} />
+        )}
+        <aside className={`sidebar ${mobileNav ? "mobile-open" : ""}`}>
+          <Brand onAdmin={admin.enabled?()=>{
+            if(admin.unlocked){lockAdmin(sharedCloudSource());if(adminPages.has(page))routeTo('pos',null,true);notify('Admin access locked.');}
+            else{setAdminError('');setAdminPin('');setAdminDialog(true);}
+          }:undefined} unlocked={admin.unlocked}/>
+          <nav className="sidebar-scroll" aria-label="Main navigation">
+            {navigation.map((group) => (
+              <div key={group.label}>
+                <div className="nav-label">{group.label}</div>
+                {group.items
+                  .filter((item) => visiblePages.includes(item.id))
+                  .map((item) => (
+                    <button
+                      key={item.id}
+                      title={item.label}
+                      className={`nav-item ${page === item.id ? "active" : ""}`}
+                      onClick={() => navigate(item.id as Page)}
+                      aria-current={page === item.id ? "page" : undefined}
+                    >
+                      <item.icon size={17} strokeWidth={1.6} />
+                      <span>{item.label}</span>
+                      {item.id === "orders" && activeOrders.length > 0 && (
+                        <small className="nav-count">
+                          {activeOrders.length}
+                        </small>
+                      )}
+                    </button>
+                  ))}
+              </div>
+            ))}
+          </nav>
+          <div className="sidebar-footer">
+            <a className="nav-item workspace-switch" href="/coconut.html" title="Coconut workspace"><Leaf size={17}/><span>Coconut workspace</span></a>
+            {sharedCloudSource()&&user.role==='owner'&&!adminLocked&&<button type="button" className="nav-item workspace-switch" title="Download previous shop records" onClick={async()=>{
+              const source=sharedCloudSource(); if(!source)return;
+              try {
+                const archive=await cloudRequest('legacy-archive&sourceId='+encodeURIComponent(source),undefined,{headers:{'x-pos-admin-grant':adminGrant(source)??''}});
+                const url=URL.createObjectURL(new Blob([JSON.stringify(archive,null,2)],{type:'application/json'}));
+                const link=document.createElement('a');link.href=url;link.download='chicken-shop-legacy-archive.json';link.click();
+                setTimeout(()=>URL.revokeObjectURL(url),1000);
+              } catch(error){notify((error as Error).message,'error');}
+            }}><History size={17}/><span>Previous shop records</span></button>}
+            <div className="hub-status">
+              <i className={`status-dot ${!hubOnline ? "offline" : ""}`} />
+              <span>
+                {sharedCloudSource()?(data.sync.cloudOnline===false?'Offline billing ready':data.sync.pending?'Cloud sync pending':hubOnline?'Shared cloud connected':'Cloud unavailable'):deviceMode?'Device database ready':hubOnline ? "Branch hub connected" : "Hub unavailable"}
+              </span>
+            </div>
+            <div className="user-card">
+              <div className="avatar">{user.initials}</div>
+              <div className="user-details">
+                <strong>{user.name}</strong>
+                <small>{admin.enabled?(adminLocked?'Cashier mode':'Admin unlocked'):user.role}</small>
+              </div>
+              <button
+                className="logout-button"
+                onClick={() => void logout()}
+                title="Sign out"
+                aria-label="Sign out"
+              >
+                <LogOut size={15} />
+              </button>
+            </div>
+          </div>
+        </aside>
+        <main className="main">
+          <header className="topbar">
+            <button className="icon-button app-back-button" onClick={back} aria-label="Go back one step" title="Go back"><ArrowLeft size={17}/></button>
+            <button
+              className="icon-button mobile-menu-button"
+              onClick={() => setMobileNav(true)}
+              aria-label="Open navigation"
+            >
+              <Menu size={19} />
+            </button>
+            <div className="breadcrumb">
+              <span>Workspace</span>
+              <ChevronRight size={12} />
+              <strong>{title}</strong>
+            </div>
+            <div className="topbar-actions">
+              <ConnectivityStatus/>
+              <span className="topbar-date">
+                {new Intl.DateTimeFormat("en-GB", {
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
+                  timeZone: "Asia/Colombo",
+                }).format(new Date())}
+              </span>
+              <label className="branch-picker">
+                <Store size={14} />
+                <select
+                  value={branchId}
+                  aria-label="Choose branch"
+                  disabled={!!user.branchId}
+                  onChange={(e) => {
+                    setBranchId(e.target.value);
+                    uiStorage.setItem(sharedCloudSource()?`retail-cloud-branch:${sharedCloudSource()}`:deviceMode?'retail-device-branch':'retail-branch', e.target.value);
+                    routeTo(page,null,true);
+                  }}
+                >
+                  {data.branches.map((b) => (
+                    <option value={b.id} key={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                className="icon-button refresh-button"
+                onClick={() => {const source=sharedCloudSource();if(source)retryCloudConnection(source);void refresh();void checkAppUpdate();}}
+                title="Refresh workspace"
+                aria-label="Refresh workspace"
+              >
+                <RefreshCw size={15} />
+              </button>
+              <button className="icon-button shortcut-help-button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts" onClick={()=>setShortcutHelp(true)}><Keyboard size={16}/></button>
+              <button
+                className="icon-button notification-button"
+                onClick={() => setNotifications(!notifications)}
+                aria-label="Notifications"
+              >
+                <Bell size={16} />
+              </button>
+            </div>
+            {notifications && (
+              <div className="notification-popover">
+                <h3>Workspace updates</h3>
+                <div className="notification-row">
+                  <Package size={17} />
+                  <div>
+                    {lowStock.length
+                      ? `${lowStock.length} items need a stock check.`
+                      : "Stock levels are looking good."}
+                    <small>Current branch inventory</small>
+                  </div>
+                </div>
+                <div className="notification-row">
+                  {data.sync.configured ? (
+                    <Wifi size={17} />
+                  ) : (
+                    <ShieldCheck size={17} />
+                  )}
+                  <div>
+                    {data.sync.configured
+                      ? `${data.sync.pending} changes waiting to sync.`
+                      : deviceMode?'Your data is stored on this device.':"Your data is stored at this branch."}
+                    <small>
+                      {data.sync.configured
+                        ? "Cloud sync configured"
+                        : deviceMode?'Export encrypted backups in Settings':"Connect cloud sync in Settings"}
+                    </small>
+                  </div>
+                </div>
+                <button
+                  className="button button-ghost"
+                  onClick={() => navigate("settings")}
+                >
+                  View workspace settings <ArrowRight size={13} />
+                </button>
+              </div>
+            )}
+          </header>
+          <div className="workspace">
+            {sharedCloudSource()&&(data.sync.cloudOnline===false||data.sync.pending>0)&&<div className="notice-banner" role="status"><WifiOff size={16}/><span>{data.sync.cloudOnline===false?'Working offline. Bills, payments and receipts are saved on this device.':'Your saved bills are uploading.'} {data.sync.pending>0?`${data.sync.pending} saved updates waiting to sync. `:''}They upload automatically when this app can reach the cloud.{data.sync.lastError?` ${data.sync.lastError}`:''}</span></div>}
+            {!hubOnline && (
+              <div className="notice-banner">
+                <WifiOff size={16} /> The branch hub is unavailable. Viewing
+                saved data; new orders stay as drafts until you reconnect.
+              </div>
+            )}
+            <Suspense fallback={<Spinner label="Opening page"/>}>{adminLocked&&adminPages.has(page)?<Spinner label="Opening the register"/>:page === "pos" ? (
+              <POS
+                selectedOrderId={selectedOrder}
+                onSelectOrder={setSelectedOrder}
+                onReceipt={setReceiptId}
+              />
+            ) : page === "orders" || page === 'sales-history' ? (
+              <Orders key={page} historyView={page==='sales-history'} onOpen={openOrder} onReceipt={setReceiptId} />
+            ) : page === 'held-bills' ? (
+              <HeldBills onResume={bill=>{sessionStorage.setItem('retail-resume-held',bill.id);routeTo('pos');}}/>
+            ) : page === 'products' ? (
+              <Products/>
+            ) : page === 'team' ? (
+              <StaffWorkspace/>
+            ) : page==='settings'&&!['owner','manager'].includes(user.role) ? <><div className="page-heading"><div><div className="eyebrow">MAKE IT YOURS</div><h1>Settings<span className="heading-period">.</span></h1><p className="page-subtitle">Display, shortcuts, receipts and devices.</p></div></div><WorkspacePreferences/></> : (
+              adminLocked&&page==='finance'?<CashierShift/>:adminLocked&&page==='settings'?<WorkspacePreferences/>:<Suspense fallback={<Spinner label="Opening page"/>}><Management page={page} /></Suspense>
+            )}</Suspense>
+            <div className="footer-line">
+              <span>
+                <ShieldCheck size={10} /> {deviceMode?'Device workspace · Saved locally':'Local-first retail workspace'}
+              </span>
+              <span>
+                {chickenShop.name} <i style={{ opacity: 0.4 }}>·</i> v0.1.0
+              </span>
+            </div>
+          </div>
+        </main>
+        <div className="toast-stack" aria-live="polite">
+          {toasts.map((toast) => (
+            <div
+              className={`toast ${toast.type === "error" ? "error" : ""}`}
+              key={toast.id}
+            >
+              {toast.type === "error" ? (
+                <X size={16} />
+              ) : (
+                <CheckCheck size={17} />
+              )}
+              <span>{toast.message}</span>
+              <button
+                onClick={() =>
+                  setToasts((v) => v.filter((t) => t.id !== toast.id))
+                }
+                aria-label="Dismiss notification"
+              >
+                <X size={13} />
+              </button>
+            </div>
+          ))}
+        </div>
+        {updateReady && !updateOpen && <button className="update-reminder button" aria-label="Update available" onClick={() => {setUpdateError('');setUpdateOpen(true);}}><RefreshCw size={16}/><span>Update available</span></button>}
+      </div>
+      {receipt && (
+        <Receipt
+          order={receipt}
+          branch={data.branch}
+          settings={data.settings}
+          onClose={() => setReceiptId(null)}
+        />
+      )}
+      {shortcutHelp&&<Modal title="Keyboard shortcuts" subtitle="Your current shortcuts for this device." onClose={()=>setShortcutHelp(false)} wide><div className="shortcut-help">{shortcutActions.map(action=><div key={action.id}><span>{action.label}</span><kbd>{preferences.shortcuts[action.id]}</kbd></div>)}</div><div className="form-actions"><button className="button button-ghost" onClick={()=>{setShortcutHelp(false);navigate('settings');}}>Customize in Settings</button><button className="button button-primary" onClick={()=>setShortcutHelp(false)}>Done</button></div></Modal>}
+      {adminDialog&&<Modal title="Unlock admin access" subtitle="Enter the admin PIN to view private reports and manage products and stock." onClose={()=>{if(adminBusy)return false;setAdminDialog(false);setAdminPin('');}}>
+        <form onSubmit={event=>{event.preventDefault();if(adminBusy)return;const source=sharedCloudSource();if(!source)return;setAdminBusy(true);setAdminError('');void unlockAdmin(source,adminPin).then(async()=>{await refresh(true);setAdminDialog(false);setAdminPin('');notify('Admin access unlocked.');}).catch(error=>setAdminError((error as Error).message)).finally(()=>setAdminBusy(false));}}>
+          <div className="admin-unlock-symbol"><ShieldCheck size={28}/></div>
+          <label className="field"><span>Admin PIN</span><input className="input pin-input" type="password" inputMode="numeric" pattern="[0-9]{4,16}" minLength={4} maxLength={16} required autoComplete="off" value={adminPin} disabled={adminBusy} onChange={event=>{setAdminPin(event.target.value.replace(/\D/g,''));setAdminError('');}} placeholder="••••"/></label>
+          {adminError&&<div className="error-message" role="alert">{adminError}</div>}
+          <p className="admin-unlock-note">Admin access applies to this window. Select the shop logo again to lock it.</p>
+          <div className="form-actions"><button type="button" className="button button-ghost" disabled={adminBusy} onClick={()=>{setAdminDialog(false);setAdminPin('');}}>Cancel</button><button className="button button-primary" disabled={adminBusy||adminPin.length<4}><LockKeyhole size={16}/>{adminBusy?'Unlocking…':'Unlock admin'}</button></div>
+        </form>
+      </Modal>}
+      {updateReady && updateOpen && <Modal title="Update available" subtitle="A newer version of your workspace is ready." onClose={() => {if(updateBusy)return false;updateDismissed.current=true;setUpdateOpen(false);}}>
+        <div className="app-update-content" aria-busy={updateBusy}>
+          <div className={`app-update-symbol ${updateBusy?'is-updating':''}`} aria-hidden="true"><RefreshCw size={30} className={updateBusy?'spin':''}/></div>
+          <p>{updateBusy?'Saving your cart and applying the update. The app will reopen automatically.':'Your current cart will be saved and the app will reopen in the same workspace. Finish any other open forms before updating, or choose Later.'}</p>
+          <div className="app-update-safety"><ShieldCheck size={17}/><span>Your saved bills, stock and offline transactions stay on this device.</span></div>
+          {updateError && <div className="error-message" role="alert">{updateError}</div>}
+          <div className="form-actions"><button className="button button-ghost" disabled={updateBusy} onClick={() => {updateDismissed.current=true;setUpdateOpen(false);}}>Later</button><button className="button button-primary" disabled={updateBusy} onClick={() => void reloadAppUpdate()}><RefreshCw size={16} className={updateBusy?'spin':''}/>{updateBusy?'Updating…':'Update now'}</button></div>
+        </div>
+      </Modal>}
+    </AppContext.Provider>
+  );
+}
+
+function CloudPOSEntry({source}:{source?:string}){
+  const [authenticated,setAuthenticated]=useState<boolean|null>(null);
+  useEffect(()=>{
+    const changed=(event:Event)=>{
+      const change=(event as CustomEvent<{sourceId:string;user:User|null}>).detail;
+      const remembered=source??uiStorage.getItem('retail-cloud-preferred-source');
+      if(change?.sourceId===remembered&&change.user===null)setAuthenticated(false);
+    };
+    window.addEventListener('cloud-runtime-session',changed);
+    return()=>window.removeEventListener('cloud-runtime-session',changed);
+  },[source]);
+  const [error,setError]=useState('');
+  const [attempt,setAttempt]=useState(0);
+  const opening=useRef<{attempt:number;promise:Promise<string|null>}|null>(null);
+  useEffect(()=>{
+    let active=true;
+    setError('');
+    const remembered=source??uiStorage.getItem('retail-cloud-preferred-source');
+    const cached=async()=>{
+      if(!remembered||!/^[A-Za-z0-9_-]{1,160}$/.test(remembered))return false;
+      const [user,state,hasPIN]=await Promise.all([offlineSession(remembered),getOfflineStatus(remembered),hasOfflinePIN(remembered)]);
+      if((!user&&!hasPIN)||!state.ready)return false;
+      if(!active)return true;
+      if(!source)openSharedCloudWorkspace(remembered);
+      else setAuthenticated(Boolean(user)&&uiStorage.getItem(`retail-cloud-lock:${remembered}`)!=='1');
+      return true;
+    };
+    void (async()=>{
+      // The installed app starts at /. A prepared browser already knows its
+      // shop, so open that local replica before attempting cloud discovery.
+      if(!source&&navigator.onLine!==false&&await cached())return;
+      if(navigator.onLine===false){if(!await cached())throw new Error('Open this device once while online before using offline billing.');return;}
+      if(remembered&&uiStorage.getItem(`retail-cloud-lock:${remembered}`)==='1'){if(active)setAuthenticated(false);return;}
+      try{
+        const value=remembered?{authenticated:Boolean((await cloudRuntimeApi<{user:User|null}>(remembered,'/session')).user)}:await cloudRequest<{authenticated:boolean}>('pos-session',undefined,{signal:AbortSignal.timeout(8000)});
+        if(active)setAuthenticated(value.authenticated&&(!remembered||await hasOfflinePIN(remembered)));
+      }catch(error){const status=(error as {status?:number}).status;if((!status||status>=500)&&await cached())return;throw error;}
+    })().catch(error=>{if(active)setError((error as Error).message);});
+    return()=>{active=false;};
+  },[attempt]);
+  useEffect(()=>{
+    if(!authenticated||source)return;
+    let active=true;
+    setError('');
+    if(opening.current?.attempt!==attempt)opening.current={attempt,promise:openAutomaticCloudWorkspace()};
+    void opening.current.promise.then(workspace=>{
+      if(!active)return;
+      if(!workspace)throw new Error('Your shop data is still connecting. Keep this device online and try again.');
+      uiStorage.setItem('retail-cloud-preferred-source',workspace);
+      openSharedCloudWorkspace(workspace);
+    }).catch(error=>{
+      if(!active)return;
+      if((error as Error&{status?:number}).status===401)setAuthenticated(false);
+      setError((error as Error).message);
+    });
+    return()=>{active=false;};
+  },[authenticated,attempt,source]);
+  const signIn=async(pin:string)=>{
+    const remembered=source??uiStorage.getItem('retail-cloud-preferred-source');
+    if(navigator.onLine===false){
+      if(!remembered)throw new Error('Sign in once while online to prepare offline access.');
+      await offlineSignIn(remembered,pin);
+      uiStorage.removeItem(`retail-cloud-lock:${remembered}`);
+      if(source)location.reload();else openSharedCloudWorkspace(remembered);
+      return;
+    }
+    try{await cloudRequest('pos-login',{pin},remembered?{signal:AbortSignal.timeout(2000)}:{});}
+    catch(error){
+      const status=(error as {status?:number}).status;
+      if(remembered&&(!status||status>=500)&&await hasOfflinePIN(remembered)){
+        await offlineSignIn(remembered,pin);uiStorage.removeItem(`retail-cloud-lock:${remembered}`);
+        if(source)location.replace(`/?shared=${encodeURIComponent(remembered)}`);else openSharedCloudWorkspace(remembered);return;
+      }
+      throw error;
+    }
+    const workspace=source??await openAutomaticCloudWorkspace();
+    if(!workspace)throw new Error('Your shop data is still connecting. Keep this device online and try again.');
+    await authorizeOfflinePIN(workspace,pin,cloudPOSUser);
+    uiStorage.removeItem(`retail-cloud-lock:${workspace}`);
+    uiStorage.setItem('retail-cloud-preferred-source',workspace);
+    if(source)location.replace(`/?shared=${encodeURIComponent(workspace)}`);else openSharedCloudWorkspace(workspace);
+  };
+  if(authenticated===false)return <Login cloudLogin={signIn}/>;
+  if(error)return <div className="boot-error panel"><h2>Let’s reconnect your workspace.</h2><p role="alert">{error}</p><button className="button button-primary" onClick={()=>setAttempt(value=>value+1)}><RefreshCw size={14}/> Try again</button></div>;
+  if(authenticated&&source)return <NavigationProvider><WorkspaceApp/></NavigationProvider>;
+  return <Spinner label="Connecting your shop data"/>;
+}
+function AutomaticCloudEntry(){
+  const [configured,setConfigured]=useState<boolean|null>(null);
+  const [error,setError]=useState('');
+  const [attempt,setAttempt]=useState(0);
+  useEffect(()=>{
+    const reconnect=()=>{setConfigured(null);setAttempt(value=>value+1);};
+    window.addEventListener('online',reconnect);
+    return()=>window.removeEventListener('online',reconnect);
+  },[]);
+  useEffect(()=>{
+    let active=true;
+    const knownConfiguration=uiStorage.getItem('retail-cloud-configured');
+    const remembered=knownConfiguration==='1';
+    setError('');
+    if(remembered){setConfigured(true);return;}
+    if(navigator.onLine===false){setConfigured(remembered);return;}
+    void cloudRequest<{configured:boolean}>('status').then(value=>{
+      if(value.configured)uiStorage.setItem('retail-cloud-configured','1');
+      else if(!remembered)uiStorage.setItem('retail-cloud-configured','0');
+      if(active)setConfigured(value.configured||remembered);
+    }).catch(error=>{
+      if(!active)return;
+      if(remembered)setConfigured(true);
+      else if(knownConfiguration==='0'||(error as Error&{status?:number}).status===404)setConfigured(false);
+      else setError((error as Error).message);
+    });
+    return()=>{active=false;};
+  },[attempt]);
+  if(error)return <div className="boot-error panel"><h2>Let’s reconnect your workspace.</h2><p role="alert">{error}</p><button className="button button-primary" onClick={()=>setAttempt(value=>value+1)}><RefreshCw size={14}/> Try again</button></div>;
+  if(configured===null)return <Spinner label="Opening retail workspace"/>;
+  return configured?<CloudPOSEntry/>:<NavigationProvider><WorkspaceApp/></NavigationProvider>;
+}
+export default function App(){
+  const source=useSyncExternalStore(subscribeSharedCloudSource,sharedCloudSource,()=>null);
+  const params=new URLSearchParams(location.search);
+  useEffect(()=>{if(params.has('local'))uiStorage.removeItem('retail-cloud-preferred-source');},[]);
+  if(source)return <CloudPOSEntry key={source} source={source}/>;
+  const cloudEnabled = import.meta.env.VITE_ENABLE_CLOUD !== "false";
+  return params.has('local')||!cloudEnabled?<NavigationProvider><WorkspaceApp/></NavigationProvider>:<AutomaticCloudEntry/>;
+}
