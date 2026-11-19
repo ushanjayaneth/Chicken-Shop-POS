@@ -770,11 +770,18 @@ function WorkspaceApp() {
             >
               <Menu size={19} />
             </button>
-            <div className="breadcrumb">
-              <span>Workspace</span>
-              <ChevronRight size={12} />
-              <strong>{title}</strong>
-            </div>
+            {page === "pos" ? (
+              <div className="breadcrumb pos-breadcrumb">
+                <ShoppingCart size={18} aria-hidden="true" />
+                <strong>{title}</strong>
+              </div>
+            ) : (
+              <div className="breadcrumb">
+                <span>Workspace</span>
+                <ChevronRight size={12} />
+                <strong>{title}</strong>
+              </div>
+            )}
             <div className="topbar-actions">
               <ConnectivityStatus/>
               <span className="topbar-date">

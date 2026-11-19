@@ -10,7 +10,7 @@ export default defineConfig({
     manifest: {
       name: 'Mr. Chicken House POS', short_name: 'Chicken House',
       description: 'Retail point of sale, stock and customer accounts',
-      theme_color: '#0d1114', background_color: '#0d1114', display: 'standalone',
+      theme_color: '#061125', background_color: '#061125', display: 'standalone',
       lang: 'en', id: '/', scope: '/', start_url: '/',
       icons: [
         {src:'/icons/app-icon-192.png',sizes:'192x192',type:'image/png',purpose:'any'},
