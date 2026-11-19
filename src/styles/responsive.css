@@ -180,37 +180,6 @@ html, body, #root {
     min-height: 44px;
   }
 
-  .product-info h3 {
-    line-height: 1.5;
-  }
-
-  .product-bottom {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .product-add {
-    width: 40px;
-    height: 40px;
-    flex: none;
-    margin-left: auto;
-  }
-
-  .order-panel.cart-open {
-    height: calc(100dvh - 64px);
-    overflow-y: auto;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .order-panel > * {
-    flex-shrink: 0;
-  }
-
-  .order-panel .cart-lines {
-    flex: 1 0 auto;
-    overflow: visible;
-  }
-
   .order-types button, .quantity-control button {
     min-height: 40px;
   }
@@ -236,13 +205,6 @@ html, body, #root {
   .order-table-select select {
     max-width: 100%;
     min-height: 40px;
-  }
-
-  .mobile-cart-button {
-    bottom: max(12px, env(safe-area-inset-bottom));
-    left: max(14px, env(safe-area-inset-left));
-    right: max(14px, env(safe-area-inset-right));
-    width: auto;
   }
 
   .cloud-header {
@@ -300,3 +262,28 @@ html, body, #root {
 }
 
 .settings-layout.settings-cloud { grid-template-columns: minmax(0, 1fr); }
+
+@media (max-width: 1024px) {
+  .order-panel.cart-open {
+    height: calc(100dvh - var(--ticket-top, 64px));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .order-panel .cart-lines {
+    flex: 1 0 auto;
+    overflow: visible;
+  }
+
+  .mobile-cart-button {
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: max(14px, env(safe-area-inset-left));
+    right: max(14px, env(safe-area-inset-right));
+    width: auto;
+    min-height: 48px;
+    padding: 8px 14px;
+  }
+}
+
+@media (pointer: coarse) {
+  .product-add { width: 40px; height: 40px; }
+}

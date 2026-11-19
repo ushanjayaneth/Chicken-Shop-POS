@@ -536,18 +536,8 @@ export default function POS({
         <NumberPad title="Item quantity" value={String(cart.find(line => line.menuItemId === quantityProduct.id)?.quantity ?? 1)}
           min={1} max={1000} onClose={() => setQuantityItem(null)} onConfirm={value => applyQuantity(Number(value))}/>)}
       {draftSaveError&&<div className="error-message" role="alert">{draftSaveError}</div>}
-      <div className="page-heading">
-        <div>
-          <div className="eyebrow">
-            <span className="status-dot" /> YOUR COUNTER, UNDER CONTROL
-          </div>
-          <h1>
-            Point of sale<span className="heading-period">.</span>
-          </h1>
-          <p className="page-subtitle">
-            Fast checkout. Accurate stock. Every sale accounted for.
-          </p>
-        </div>
+      <div className="page-heading pos-heading">
+        <h1>Point of sale<span className="heading-period">.</span></h1>
         <div className="pos-heading-meta">
           <span className={`shift-pill ${!currentShift ? "shift-closed" : ""}`}>
             <span className="status-dot" />
@@ -571,71 +561,79 @@ export default function POS({
           </button>
         </div>
       </div>
-      <div className="price-mode-bar"><div className="price-mode-switch" role="group" aria-label="Selling price mode"><button type="button" className={priceMode==='retail'?'active':''} aria-pressed={priceMode==='retail'} disabled={!!activeOrder||busy} onClick={()=>changePriceMode('retail')}><ShoppingBag size={15}/><span>Retail<small>Everyday prices</small></span></button><button type="button" className={priceMode==='wholesale'?'active':''} aria-pressed={priceMode==='wholesale'} disabled={!!activeOrder||busy} onClick={()=>changePriceMode('wholesale')}><Package size={16}/><span>Wholesale<small>Trade prices</small></span></button></div><p>{priceMode==='wholesale'?'Wholesale prices apply to this bill. Products without a trade price use retail.':'Retail prices apply to this bill. Switch to Wholesale for trade customers.'}</p></div>
       <div className="pos-layout">
         <section className="catalog">
-          <div className="catalog-tools">
-            <div className="search-input">
-              <Search size={16} />
-              <input
-                ref={searchRef}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key !== "Enter") return;
-                  const query = search.trim();
-                  if (!query) return;
-                  const product = pricedMenu.find(
-                    (item) =>
-                      item.barcode === query ||
-                      item.sku?.toLowerCase() === query.toLowerCase(),
-                  );
-                  if (!product) return;
-                  event.preventDefault();
-                  add(product);
-                  setSearch("");
-                }}
-                placeholder="Search name, SKU or barcode..."
-                aria-label="Search products"
-              />
-              <kbd>{preferences.shortcuts.search}</kbd>
-              {search && (
-                <button onClick={() => setSearch("")} aria-label="Clear search">
-                  <X size={13} />
+          <div className="catalog-toolbar">
+            <div className="catalog-tools">
+              <div className="search-input">
+                <Search size={16} />
+                <input
+                  ref={searchRef}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter") return;
+                    const query = search.trim();
+                    if (!query) return;
+                    const product = pricedMenu.find(
+                      (item) =>
+                        item.barcode === query ||
+                        item.sku?.toLowerCase() === query.toLowerCase(),
+                    );
+                    if (!product) return;
+                    event.preventDefault();
+                    add(product);
+                    setSearch("");
+                  }}
+                  placeholder="Search name, SKU or barcode..."
+                  aria-label="Search products"
+                />
+                <kbd>{preferences.shortcuts.search}</kbd>
+                {search && (
+                  <button onClick={() => setSearch("")} aria-label="Clear search">
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+              <label className="sort-select">
+                <SlidersHorizontal size={14} />
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                  aria-label="Sort products"
+                >
+                  <option value="featured">Featured</option>
+                  <option value="price-low">Price: low to high</option>
+                  <option value="price-high">Price: high to low</option>
+                  <option value="name">Name</option>
+                </select>
+              </label>
+            </div>
+            <div className="price-mode-switch" role="group" aria-label="Selling price mode">
+              <button type="button" className={priceMode === 'retail' ? 'active' : ''} aria-pressed={priceMode === 'retail'} disabled={!!activeOrder || busy} onClick={() => changePriceMode('retail')}>
+                <ShoppingBag size={14} /> Retail
+              </button>
+              <button type="button" className={priceMode === 'wholesale' ? 'active' : ''} aria-pressed={priceMode === 'wholesale'} disabled={!!activeOrder || busy} onClick={() => changePriceMode('wholesale')}>
+                <Package size={14} /> Wholesale
+              </button>
+            </div>
+            {canManageCatalog && (
+              <div className="pos-catalog-actions">
+                <button
+                  className="button button-ghost"
+                  onClick={() => setCategoryDialog(true)}
+                >
+                  <Tag size={13} /> Add category
                 </button>
-              )}
-            </div>
-            <label className="sort-select">
-              <SlidersHorizontal size={14} />
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-                aria-label="Sort products"
-              >
-                <option value="featured">Featured</option>
-                <option value="price-low">Price: low to high</option>
-                <option value="price-high">Price: high to low</option>
-                <option value="name">Name</option>
-              </select>
-            </label>
+                <button
+                  className="button button-ghost"
+                  onClick={() => setProductDialog(true)}
+                >
+                  <Plus size={13} /> Add product
+                </button>
+              </div>
+            )}
           </div>
-          {canManageCatalog && (
-            <div className="pos-catalog-actions">
-              <span>Manage products</span>
-              <button
-                className="button button-ghost"
-                onClick={() => setCategoryDialog(true)}
-              >
-                <Tag size={13} /> Add category
-              </button>
-              <button
-                className="button button-ghost"
-                onClick={() => setProductDialog(true)}
-              >
-                <Plus size={13} /> Add product
-              </button>
-            </div>
-          )}
           <div
             className="category-tabs"
             role="tablist"
@@ -677,9 +675,6 @@ export default function POS({
                 : data.categories.find((c) => c.id === category)?.name}
               <span>{items.length} items</span>
             </h2>
-            <span className="catalog-hint">
-              <Leaf size={12} /> Stocked for everyday life
-            </span>
           </div>
           <div className="menu-grid">
             {items.map((item) => {
@@ -701,33 +696,21 @@ export default function POS({
                     aria-label={`Add ${item.name}`}
                   >
                     <div className="product-image-wrap">
-                      <ProductPhoto src={item.image} alt={item.name} loading="lazy" />
-                      {item.badge && (
-                        <span
-                          className={`product-badge ${item.badge.toLowerCase().includes("popular") ? "popular" : ""}`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
-                      {!item.available && (
-                        <span className="sold-out">Sold out</span>
-                      )}
-                      {count > 0 && (
-                        <span className="product-count">
-                          <Check size={10} />
-                          {count} added
-                        </span>
-                      )}
+                      <ProductPhoto src={item.image} alt="" loading="lazy" />
                     </div>
                     <div className="product-info">
                       <h3>{item.name}</h3>
-                      <p>{item.description}</p>
-                      {lowStock&&<small className="product-low-stock">Low stock · {number(stock.quantity??0)} left</small>}
+                      {!item.available && <small className="product-status">Sold out</small>}
+                      {item.available && lowStock && <small className="product-low-stock">Low stock · {number(stock.quantity ?? 0)} left</small>}
+                      {count > 0 && <span className="product-count"><Check size={10} /> {count} added</span>}
                     </div>
                   </button>
                   <div className="product-bottom">
                     <div>
-<strong>{money(item.price)}</strong>{priceMode==='wholesale'&&(!item.wholesalePrice||item.wholesalePrice<=0)&&<small className="retail-fallback-price">Retail price</small>}
+                      <strong>{money(item.price)}</strong>
+                      {priceMode === 'wholesale' && (!item.wholesalePrice || item.wholesalePrice <= 0) && (
+                        <small className="retail-fallback-price">Retail price</small>
+                      )}
                       <span>
                         Per {item.saleUnit || stock.unit || "pcs"}
                       </span>
@@ -748,7 +731,7 @@ export default function POS({
           {items.length === 0 && (
             <div className="empty-state">
               <Search size={26} />
-              <h3>No dishes found</h3>
+              <h3>No products found</h3>
               <p>Try another name or choose a different category.</p>
               <button
                 className="button button-ghost"
@@ -761,10 +744,6 @@ export default function POS({
               </button>
             </div>
           )}
-          <div className="catalog-bottom">
-            <ShieldCheck size={12} />
-            <span>Orders are saved securely at your branch.</span>
-          </div>
         </section>
         <aside className={`order-panel panel ${mobileCart ? "cart-open" : ""}`} aria-label="Current order" tabIndex={0}>
           <div className="order-panel-header">

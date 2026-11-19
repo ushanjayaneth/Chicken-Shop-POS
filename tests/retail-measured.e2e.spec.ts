@@ -131,4 +131,42 @@ test('a phone sells 100 grams offline using touch keys and retains stock after r
   expect(orders[0].total).toBe(3000);
   expect((await records(reopened, 'inventory')).find(row => row.menuItemId === 'm2').quantity).toBe(47.9);
   expect(await reopened.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+});test('the compact catalog keeps the first products visible before scrolling', async ({browser, baseURL}) => {
+  const context = await browser.newContext({baseURL, hasTouch: true});
+  try {
+    const page = await context.newPage();
+    await setup(page);
+    const screens = [
+      {width: 1920, height: 1080, visible: 16},
+      {width: 1366, height: 768, visible: 16},
+      {width: 1280, height: 720, visible: 16},
+      {width: 1024, height: 600, visible: 16},
+      {width: 768, height: 1024, visible: 16},
+      {width: 390, height: 844, visible: 8},
+      {width: 360, height: 640, visible: 6},
+    ];
+    for (const {width, height, visible} of screens) {
+      await page.setViewportSize({width, height});
+      await expect.poll(() => page.evaluate(count => {
+        window.scrollTo(0, 0);
+        const cart = document.querySelector('.mobile-cart-button');
+        const bottom = cart?.getClientRects().length ? cart.getBoundingClientRect().top : window.innerHeight;
+        return [...document.querySelectorAll('.product-card')].slice(0, count).filter(card => {
+          const rect = card.getBoundingClientRect();
+          return rect.top >= 0 && rect.bottom <= bottom && rect.left >= 0 && rect.right <= window.innerWidth;
+        }).length;
+      }, visible), {message: 'Fully visible products at ' + width + '×' + height}).toBe(visible);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    }
+
+    await page.setViewportSize({width: 768, height: 1024});
+    await page.getByRole('button', {name: 'Add Cream biscuits', exact: true}).click();
+    await page.getByRole('button', {name: /View order/}).click();
+    const cart = page.getByRole('complementary', {name: 'Current order'});
+    await expect(cart.getByText('Cream biscuits', {exact: true})).toBeVisible();
+    await cart.getByRole('button', {name: 'Close order', exact: true}).click();
+    await expect(cart).toBeHidden();
+  } finally {
+    await context.close();
+  }
 });
