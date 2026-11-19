@@ -131,7 +131,9 @@ test('a phone sells 100 grams offline using touch keys and retains stock after r
   expect(orders[0].total).toBe(3000);
   expect((await records(reopened, 'inventory')).find(row => row.menuItemId === 'm2').quantity).toBe(47.9);
   expect(await reopened.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
-});test('the compact catalog keeps the first products visible before scrolling', async ({browser, baseURL}) => {
+});
+
+test('the compact catalog keeps the first products visible before scrolling', async ({browser, baseURL}) => {
   const context = await browser.newContext({baseURL, hasTouch: true});
   try {
     const page = await context.newPage();
@@ -160,7 +162,17 @@ test('a phone sells 100 grams offline using touch keys and retains stock after r
     }
 
     await page.setViewportSize({width: 768, height: 1024});
-    await page.getByRole('button', {name: 'Add Cream biscuits', exact: true}).click();
+    const biscuitCard = page.locator('.product-card').filter({has: page.getByRole('heading', {name: 'Cream biscuits', exact: true})});
+    const photo = await biscuitCard.locator('.product-image-wrap').boundingBox();
+    const card = await biscuitCard.boundingBox();
+    const details = await biscuitCard.locator('.product-info').boundingBox();
+    expect(photo).not.toBeNull();
+    expect(card).not.toBeNull();
+    expect(details).not.toBeNull();
+    expect(photo!.width).toBeGreaterThanOrEqual(card!.width * 0.42);
+    expect(photo!.height).toBeGreaterThanOrEqual(card!.height - 2);
+    expect(details!.x).toBeGreaterThanOrEqual(photo!.x + photo!.width);
+    await page.mouse.click(photo!.x + photo!.width / 2, photo!.y + photo!.height / 2);
     await page.getByRole('button', {name: /View order/}).click();
     const cart = page.getByRole('complementary', {name: 'Current order'});
     await expect(cart.getByText('Cream biscuits', {exact: true})).toBeVisible();

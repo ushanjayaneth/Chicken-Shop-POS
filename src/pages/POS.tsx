@@ -689,40 +689,36 @@ export default function POS({
                   key={item.id}
                   title={lowStock?`Low stock: ${number(stock.quantity??0)} remaining. Alert at ${number(stock.threshold)}.`:undefined}
                 >
-                  <button
-                    className="product-main"
-                    onClick={() => add(item)}
-                    disabled={!item.available}
-                    aria-label={`Add ${item.name}`}
-                  >
-                    <div className="product-image-wrap">
-                      <ProductPhoto src={item.image} alt="" loading="lazy" />
+                  <div className="product-image-wrap">
+                    <ProductPhoto src={item.image} alt="" loading="lazy" />
+                  </div>
+                  <div className="product-info">
+                    <h3>{item.name}</h3>
+                    {(!item.available || lowStock || count > 0) && (
+                      <div className="product-indicators">
+                        {!item.available && <small className="product-status">Sold out</small>}
+                        {item.available && lowStock && <small className="product-low-stock">Low stock · {number(stock.quantity ?? 0)} left</small>}
+                        {count > 0 && <span className="product-count"><Check size={10} /> {count} added</span>}
+                      </div>
+                    )}
+                    <strong className="product-price">{money(item.price)}</strong>
+                    <div className="product-bottom">
+                      <div className="product-price-details">
+                        <span>Per {item.saleUnit || stock.unit || "pcs"}</span>
+                        {priceMode === 'wholesale' && (!item.wholesalePrice || item.wholesalePrice <= 0) && (
+                          <small className="retail-fallback-price">Retail price</small>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        className="product-add"
+                        disabled={!item.available}
+                        onClick={() => add(item)}
+                        aria-label={`Add ${item.name}`}
+                      >
+                        <Plus size={15} />
+                      </button>
                     </div>
-                    <div className="product-info">
-                      <h3>{item.name}</h3>
-                      {!item.available && <small className="product-status">Sold out</small>}
-                      {item.available && lowStock && <small className="product-low-stock">Low stock · {number(stock.quantity ?? 0)} left</small>}
-                      {count > 0 && <span className="product-count"><Check size={10} /> {count} added</span>}
-                    </div>
-                  </button>
-                  <div className="product-bottom">
-                    <div>
-                      <strong>{money(item.price)}</strong>
-                      {priceMode === 'wholesale' && (!item.wholesalePrice || item.wholesalePrice <= 0) && (
-                        <small className="retail-fallback-price">Retail price</small>
-                      )}
-                      <span>
-                        Per {item.saleUnit || stock.unit || "pcs"}
-                      </span>
-                    </div>
-                    <button
-                      className="product-add"
-                      disabled={!item.available || !!activeOrder}
-                      onClick={() => add(item)}
-                      aria-label={`Add one ${item.name}`}
-                    >
-                      <Plus size={17} />
-                    </button>
                   </div>
                 </article>
               );

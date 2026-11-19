@@ -41,7 +41,6 @@
   color: var(--mint);
   border-color: #efc27930;
 }
-.retail-fallback-price { display: block; color: var(--muted); font-size: 9px; }
 @media(max-width:600px){.retail-section{padding:16px;}.retail-payment-form{grid-template-columns:1fr;}.retail-payment-form>*{min-width:0;}}
 :root {
   --mint: #efc279;

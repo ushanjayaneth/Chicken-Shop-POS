@@ -283,7 +283,3 @@ html, body, #root {
     padding: 8px 14px;
   }
 }
-
-@media (pointer: coarse) {
-  .product-add { width: 40px; height: 40px; }
-}
