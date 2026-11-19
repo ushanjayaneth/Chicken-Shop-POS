@@ -10,7 +10,7 @@ export function createFixtureServer() {
       breast:{name:'Chicken breast',type:'weighted',unit:'kg',price:1800,costPrice:1350,categoryId:'chicken',barcode:'111002',stockBatches:[{batchId:'br1',quantity:8,costPrice:1350,dateAdded:'2026-11-14'}]},
       fish:{name:'Fresh tuna',type:'weighted',unit:'kg',price:2200,costPrice:1600,categoryId:'fish',barcode:'111003',stockBatches:[{batchId:'fi1',quantity:12,costPrice:1600,dateAdded:'2026-11-14'}]},
       eggs:{name:'Farm eggs',type:'unit',unit:'pcs',price:45,costPrice:35,categoryId:'eggs',barcode:'111004',stockBatches:[{batchId:'eg1',quantity:60,costPrice:35,dateAdded:'2026-11-14'}]}
-    },sales:{},loans:{},loan_customers:{},coconut_purchases:{},coconut_husking:{},coconut_sales:{},coconut_copra:{},coconut_oil:{},coconut_workers:{},coconut_worker_payments:{},cash_movements:{},day_ends:{}
+    },sales:{},loans:{},loan_customers:{},coconut_purchases:{},coconut_husking:{},coconut_gradings:{},coconut_sales:{},coconut_copra:{},coconut_oil:{},coconut_workers:{},coconut_worker_payments:{},cash_movements:{},day_ends:{}
   };
   function read(path){return path?path.split('/').reduce((value,key)=>value?.[key],state)??null:structuredClone(state);}
   function set(path,value){const keys=path.split('/').filter(Boolean);let node=state;for(const key of keys.slice(0,-1)){node[key]??={};node=node[key];}if(value===null)delete node[keys.at(-1)];else node[keys.at(-1)]=structuredClone(value);}

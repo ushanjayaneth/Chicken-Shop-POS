@@ -33,6 +33,10 @@ test('phone bills offline, preserves the receipt on reopen, and shares both devi
     expect(await page.evaluate(() => S.cart.length)).toBe(0);
     expect(await page.evaluate(() => IDB.queueCount())).toBe(1);
     expect(Object.keys(app.state.sales)).toHaveLength(0);
+    await page.locator('#receiptModal .modal-x').click();
+    await expect(page.locator('#posTab')).not.toHaveClass(/show-cart/);
+    await expect(page.getByRole('button',{name:'Add to cart Farm eggs'})).toBeVisible();
+    await expect(page.locator('#mobileCartBtn')).toBeVisible();
 
     await addEggs(counter);
     await counter.locator('#checkoutBtn').click();

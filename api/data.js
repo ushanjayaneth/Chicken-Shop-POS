@@ -4,7 +4,7 @@ import {firebaseConfigured, firebaseTransport} from '../lib/firebase-transport.m
 
 const roots = new Set([
   'settings', 'categories', 'items', 'sales', 'loan_customers', 'loans',
-  'coconut_purchases', 'coconut_husking', 'coconut_sales', 'coconut_copra', 'coconut_oil',
+  'coconut_purchases', 'coconut_husking', 'coconut_gradings', 'coconut_sales', 'coconut_copra', 'coconut_oil',
   'coconut_workers', 'coconut_worker_payments', 'cash_movements', 'day_ends'
 ]);
 

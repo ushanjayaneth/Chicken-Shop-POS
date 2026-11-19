@@ -628,6 +628,7 @@ const SaleAccounting = {
           S.cart = S.cart.filter(line => !allCart.includes(line));
           if (!S.cart.length) { S.cartDisc = 0; S.cartDiscType = 'percent'; }
           Cart.render();
+          if (!silent && !S.cart.length) POS.toggleCartView(false);
           await loadAll();
           if (!silent) { try { Receipt.show(sale); } catch (error) { toast('Sale saved. Receipt could not open: ' + error.message, 'error'); } }
           if (!silent) toast('Sale completed', 'success');

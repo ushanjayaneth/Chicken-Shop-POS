@@ -1,6 +1,6 @@
 /* Offline transactions and queued Firebase writes share one durable commit. */
 const CacheTree = {
-  roots: ['categories', 'items', 'sales', 'loan_customers', 'loans', 'coconut_purchases', 'coconut_husking', 'coconut_sales', 'coconut_copra', 'coconut_oil', 'coconut_workers', 'coconut_worker_payments', 'cash_movements', 'day_ends'],
+  roots: ['categories', 'items', 'sales', 'loan_customers', 'loans', 'coconut_purchases', 'coconut_husking', 'coconut_gradings', 'coconut_sales', 'coconut_copra', 'coconut_oil', 'coconut_workers', 'coconut_worker_payments', 'cash_movements', 'day_ends'],
   path(value) {
     if (typeof value !== 'string') throw new Error('A database path is required.');
     const parts = value.replace(/^\/+|\/+$/g, '').split('/');

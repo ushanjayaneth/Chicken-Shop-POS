@@ -89,7 +89,8 @@ const CoconutMgr = {
         const current = this.calcStock();
         const labels = {
           rawLargeStock: 'raw large coconuts', rawSmallStock: 'raw small coconuts',
-          peeledStock: 'peeled coconuts', husksStock: 'coconut husks',
+          ...Object.fromEntries(Object.values(CoconutLedger.peeledGrades).map(({field,label}) => [field,label.toLowerCase()])),
+          husksStock: 'coconut husks',
           copraStock: 'copra (kg)', oilStock: 'coconut oil (L)', poonacStock: 'poonac (kg)'
         };
         Object.entries(required).forEach(([field, quantity]) => {
@@ -106,7 +107,7 @@ const CoconutMgr = {
       _validateStockRemoval(collection, id) {
         const record = S[collection].find(entry => entry.id === id);
         if (!record) throw new Error('Record not found');
-        const collections = ['coconut_purchases', 'coconut_husking', 'coconut_copra', 'coconut_oil', 'coconut_sales'];
+        const collections = ['coconut_purchases', 'coconut_husking', 'coconut_gradings', 'coconut_copra', 'coconut_oil', 'coconut_sales'];
         const dates = new Set([this._today()]);
         collections.forEach(name => S[name].forEach(entry => {
           const date = String(entry.date || '').slice(0, 10);
@@ -116,7 +117,8 @@ const CoconutMgr = {
           const date = String(entry.date || '').slice(0, 10);
           if (date) dates.add(date);
         });
-        const fields = ['rawLargeStock', 'rawSmallStock', 'peeledStock', 'husksStock', 'copraStock', 'oilStock', 'poonacStock'];
+        const fields = ['rawLargeStock', 'rawSmallStock', 'husksStock', 'copraStock', 'oilStock', 'poonacStock',
+          ...Object.values(CoconutLedger.peeledGrades).map(grade => grade.field)];
         dates.forEach(date => {
           const before = this.calcStock(date);
           const after = this.calcStock(date, collection + '/' + id);
@@ -137,6 +139,10 @@ const CoconutMgr = {
       },
 
       async _saveRecord(collection, data, movements = []) {
+        if (Array.isArray(S[collection])) {
+          const after = {...S,[collection]:[...S[collection],data]};
+          CoconutLedger.validateCoconutLedger(S,after,{[collection]:data});
+        }
         const id = DB.newId();
         const operations = [{ type: 'set', path: collection + '/' + id, data }];
         movements.forEach(movement => operations.push({
@@ -216,7 +222,7 @@ const CoconutMgr = {
         const selectedDate = document.getElementById('coconutDate')?.value || this._today();
         const dateChanged = this._selectedDate !== selectedDate;
         this._selectedDate = selectedDate;
-        ['ccBuyDate', 'ccHuskDate', 'ccCopraDate', 'ccOilDate', 'ccSaleDate', 'ccPayDate'].forEach(id => {
+        ['ccBuyDate', 'ccHuskDate', 'ccGradeDate', 'ccCopraDate', 'ccOilDate', 'ccSaleDate', 'ccPayDate'].forEach(id => {
           const input = document.getElementById(id);
           if (input && (dateChanged || !input.value)) input.value = selectedDate;
         });
@@ -230,6 +236,7 @@ const CoconutMgr = {
           this.updateWorkerDropdowns();
           this.calcHuskTotal(false);
           this.calcCopraTotal();
+          this.renderGradeAvailability();
           this.renderProcessingLists();
         } else if (tab === 'sale') {
           this.updateSaleLabels(false);
@@ -241,56 +248,48 @@ const CoconutMgr = {
       },
 
       calcStock(asOfDate = '', excludedPath = '') {
-        const records = name => (S[name] || []).filter(record => {
-          const recordDate = String(record.date || '').slice(0, 10);
-          return name + '/' + record.id !== excludedPath && (!asOfDate || !recordDate || recordDate <= asOfDate);
-        });
-        const purchases = records('coconut_purchases');
-        const husking = records('coconut_husking');
-        const copra = records('coconut_copra');
-        const oil = records('coconut_oil');
-        const sales = records('coconut_sales');
-        const sum = (rows, field) => rows.reduce((total, row) => total + this._value(row[field]), 0);
-        const rawLargePurchased = sum(purchases, 'largeCount');
-        const rawSmallPurchased = sum(purchases, 'smallCount');
-        let rawLargeHusked = 0;
-        let rawSmallHusked = 0;
-        husking.forEach(record => {
-          const large = this._value(record.largeCount);
-          const small = this._value(record.smallCount);
-          rawLargeHusked += large || small ? large : this._value(record.count);
-          rawSmallHusked += small;
-        });
-        const saleCount = (type, field) => sales.filter(sale => sale.type === type).reduce((total, sale) => {
-          const large = this._value(sale.largeCount);
-          const small = this._value(sale.smallCount);
-          if (field === 'largeCount' && !large && !small) return total + this._value(sale.qty);
-          return total + this._value(sale[field]);
-        }, 0);
-        const rawLargeSold = saleCount('unhusked', 'largeCount');
-        const rawSmallSold = saleCount('unhusked', 'smallCount');
-        const totalPeeledSold = saleCount('husked', 'largeCount') + saleCount('husked', 'smallCount');
-        const peeledCopraUsed = sum(copra, 'nutsUsed');
-        const totalHusked = rawLargeHusked + rawSmallHusked;
-        const copraUnknownBatches = copra.filter(record => !this._hasCopraYield(record)).length;
-        const copraProducedKg = sum(copra.filter(record => this._hasCopraYield(record)), 'copraKg');
-        const copraSoldKg = saleCount('copra', 'qty');
-        const oilSoldL = saleCount('oil', 'qty');
-        const poonacSoldKg = saleCount('poonac', 'qty');
-        return {
-          rawLargeStock: rawLargePurchased - rawLargeHusked - rawLargeSold,
-          rawSmallStock: rawSmallPurchased - rawSmallHusked - rawSmallSold,
-          peeledStock: totalHusked - peeledCopraUsed - totalPeeledSold,
-          rawLargePurchased, rawSmallPurchased, rawLargeHusked, rawSmallHusked,
-          rawLargeSold, rawSmallSold, peeledCopraUsed, totalPeeledSold,
-          husksStock: totalHusked - saleCount('husks', 'qty'),
-          shellsSold: saleCount('shells', 'qty'),
-          copraSoldKg, oilSoldL, poonacSoldKg, copraProducedKg, copraUnknownBatches,
-          copraStockKnown: copraUnknownBatches === 0,
-          copraStock: copraProducedKg - sum(oil, 'copraUsed') - copraSoldKg,
-          oilStock: sum(oil, 'oilQty') - oilSoldL,
-          poonacStock: sum(oil, 'poonacQty') - poonacSoldKg
+        return CoconutLedger.getCoconutStockBalances(S, asOfDate, excludedPath);
+      },
+
+      _saleGrade() {
+        return document.getElementById('ccSaleGrade')?.value || 'unsorted';
+      },
+
+      _isItemizedSale(type) {
+        return type === 'unhusked' || (type === 'husked' && this._saleGrade() === 'unsorted');
+      },
+
+      renderGradeAvailability() {
+        const hint = document.getElementById('ccGradeAvailable');
+        const date = document.getElementById('ccGradeDate')?.value;
+        if (hint) hint.textContent = 'Unsorted peeled nuts available: ' +
+          Math.max(0, this.calcStock(date).peeledStock).toLocaleString('en-GB');
+      },
+
+      async saveGrading() {
+        const date = this._date('ccGradeDate');
+        const counts = {
+          large: this._number('ccGradeLarge', 'Large nuts', true),
+          small: this._number('ccGradeSmall', 'Small nuts', true),
+          drying: this._number('ccGradeDrying', 'Nuts set aside for drying', true)
         };
+        const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+        if (!total) throw new Error('Enter how many peeled coconuts you sorted.');
+        this._requireStock({peeledStock:total},date);
+        await this._saveRecord('coconut_gradings',{date,counts,createdAt:new Date().toISOString()});
+        for (const id of ['ccGradeLarge','ccGradeSmall','ccGradeDrying']) document.getElementById(id).value = '';
+        await loadAll();
+        toast('Sorting saved', 'success');
+        return true;
+      },
+
+      async deleteGrading(id) {
+        if (!confirm('Remove this sorting record and return its nuts to unsorted stock?')) return false;
+        this._validateStockRemoval('coconut_gradings',id);
+        await this._deleteRecord('coconut_gradings',id);
+        await loadAll();
+        toast('Sorting record removed', 'info');
+        return true;
       },
 
       calcBuyTotal(updatePayment = true) {
@@ -324,7 +323,7 @@ const CoconutMgr = {
 
       calcSaleTotal(updatePayment = true) {
         const type = document.getElementById('ccSaleType')?.value;
-        const itemized = type === 'unhusked' || type === 'husked';
+        const itemized = this._isItemizedSale(type);
         const total = itemized
           ? this._previewNumber('ccSaleLargeCount') * this._previewNumber('ccSaleLargePrice')
             + this._previewNumber('ccSaleSmallCount') * this._previewNumber('ccSaleSmallPrice')
@@ -343,8 +342,17 @@ const CoconutMgr = {
 
         const itemizedContainer = document.getElementById('ccSaleItemizedContainer');
         const singleContainer = document.getElementById('ccSaleSingleContainer');
+        const gradeGroup = document.getElementById('ccSaleGradeGroup');
+        if (gradeGroup) gradeGroup.style.display = type === 'husked' ? '' : 'none';
+        if (type === 'husked') {
+          const grade = CoconutLedger.peeledGrades[this._saleGrade()];
+          const date = document.getElementById('ccSaleDate')?.value;
+          const stock = this.calcStock(date);
+          document.getElementById('ccSaleGradeAvailable').textContent =
+            Math.max(0,stock[grade.field]).toLocaleString('en-GB') + ' nuts available';
+        }
 
-        if (type === 'unhusked' || type === 'husked') {
+        if (this._isItemizedSale(type)) {
           if (itemizedContainer) itemizedContainer.style.display = 'block';
           if (singleContainer) singleContainer.style.display = 'none';
         } else {
@@ -352,7 +360,10 @@ const CoconutMgr = {
           if (singleContainer) singleContainer.style.display = 'block';
 
           if (qtyLbl && priceLbl) {
-            if (type === 'husks') {
+            if (type === 'husked') {
+              qtyLbl.textContent = 'Quantity (Nuts)';
+              priceLbl.textContent = 'Price per Nut (Rs.)';
+            } else if (type === 'husks') {
               qtyLbl.textContent = 'Quantity (Pcs)';
               priceLbl.textContent = 'Price per Husk (Rs.)';
             } else if (type === 'shells') {
@@ -548,11 +559,16 @@ const CoconutMgr = {
         });
       },
 
+      _saleTypeLabel(sale) {
+        const grade = CoconutLedger.peeledGrades[sale.peeledGrade];
+        return sale.type === 'husked' && grade ? grade.label : this._coconutTypeLabel(sale.type);
+      },
+
       buildSalePrintDoc(s) {
         const rows = [];
         const transportCost = this._value(s.transportCost);
         if (s.type === 'unhusked' || s.type === 'husked') {
-          const typeName = this._coconutTypeLabel(s.type);
+          const typeName = this._saleTypeLabel(s);
           const largeCount = this._value(s.largeCount);
           const largePrice = this._value(s.largePrice);
           const smallCount = this._value(s.smallCount);
@@ -700,16 +716,23 @@ const CoconutMgr = {
 
       async saveCopra() {
         const date = this._date('ccCopraDate');
-        const nutsUsed = this._number('ccCopraNuts', 'Peeled coconuts used', true);
+        const inputNuts = {
+          unsorted: this._number('ccCopraNuts', 'Unsorted peeled nuts used', true),
+          large: this._number('ccCopraLarge', 'Large peeled nuts used', true),
+          small: this._number('ccCopraSmall', 'Small peeled nuts used', true),
+          drying: this._number('ccCopraDrying', 'Peeled nuts set aside for drying', true)
+        };
+        const nutsUsed = Object.values(inputNuts).reduce((sum,quantity) => sum + quantity,0);
         const copraKg = this._number('ccCopraKg', 'Copra output');
         const dryingCost = this._amount('ccCopraCost', 'Drying cost');
         const paidDrawer = this._amount('ccCopraPaidDrawer', 'Paid from drawer');
         if (nutsUsed <= 0) throw new Error('Please enter coconuts used');
         if (copraKg <= 0) throw new Error('Please enter measured copra output in kg');
-        this._requireStock({ peeledStock: nutsUsed }, date);
+        const required = Object.fromEntries(Object.entries(inputNuts).map(([grade,quantity]) => [CoconutLedger.peeledGrades[grade].field,quantity]));
+        this._requireStock(required, date);
         this._withinTotal(paidDrawer, dryingCost, 'Paid from drawer');
         const data = {
-          date, nutsUsed, copraKg, dryingCost, paidDrawer,
+          date, nutsUsed, inputNuts, copraKg, dryingCost, paidDrawer,
           notes: document.getElementById('ccCopraNotes').value.trim(),
           createdAt: new Date().toISOString()
         };
@@ -717,7 +740,7 @@ const CoconutMgr = {
           ? [{ type: 'out', amount: paidDrawer, reason: '🥥 Copra Drying Batch', source: 'coconut_copra' }]
           : [];
         await this._saveRecord('coconut_copra', data, movements);
-        ['ccCopraNuts', 'ccCopraKg', 'ccCopraNotes'].forEach(id => { document.getElementById(id).value = ''; });
+        ['ccCopraNuts', 'ccCopraLarge', 'ccCopraSmall', 'ccCopraDrying', 'ccCopraKg', 'ccCopraNotes'].forEach(id => { document.getElementById(id).value = ''; });
         document.getElementById('ccCopraCost').value = '0';
         document.getElementById('ccCopraPaidDrawer').value = '0';
         this.calcCopraTotal();
@@ -799,7 +822,9 @@ const CoconutMgr = {
           date, buyer, type, transportCost, transportPaidDrawer, payMethod, recDrawer,
           notes: document.getElementById('ccSaleNotes').value.trim(), createdAt: new Date().toISOString()
         };
-        if (type === 'unhusked' || type === 'husked') {
+        const peeledGrade = this._saleGrade();
+        if (type === 'husked') data.peeledGrade = peeledGrade;
+        if (this._isItemizedSale(type)) {
           const largeCount = this._number('ccSaleLargeCount', 'Large count', true);
           const smallCount = this._number('ccSaleSmallCount', 'Small count', true);
           const largePrice = this._amount('ccSaleLargePrice', 'Large price');
@@ -813,13 +838,15 @@ const CoconutMgr = {
             : { peeledStock: qty };
           this._requireStock(required, date);
         } else {
-          const qty = this._number('ccSaleCount', 'Sold quantity', type === 'husks');
+          const qty = this._number('ccSaleCount', 'Sold quantity', type === 'husks' || type === 'husked');
           const price = this._amount('ccSalePrice', 'Selling price');
           if (qty <= 0) throw new Error('Please enter sold quantity');
           if (price <= 0) throw new Error('Please enter selling price');
           Object.assign(data, { qty, price, total: this._round(qty * price) });
           const stockFields = { husks: 'husksStock', copra: 'copraStock', oil: 'oilStock', poonac: 'poonacStock' };
-          if (stockFields[type]) this._requireStock({ [stockFields[type]]: qty }, date);
+          const field = type === 'husked' ? CoconutLedger.peeledGrades[peeledGrade]?.field : stockFields[type];
+          if (type === 'husked' && !field) throw new Error('Choose a valid peeled stock grade.');
+          if (field) this._requireStock({[field]:qty},date);
         }
         this._withinTotal(recDrawer, data.total, 'Received to drawer');
         const movements = [];
@@ -992,11 +1019,13 @@ const CoconutMgr = {
               <div class="stat-val text-orange" style="color:#f59e0b;">${stock.rawSmallStock.toLocaleString('en-GB')}</div>
               <div class="stat-sub">Nuts</div>
             </div>
-            <div class="stat-card">
-              <div class="stat-lbl">Peeled Stock</div>
-              <div class="stat-val text-green">${stock.peeledStock.toLocaleString('en-GB')}</div>
-              <div class="stat-sub">Nuts</div>
-            </div>
+            ${Object.values(CoconutLedger.peeledGrades).map(({field,label}) => `
+              <div class="stat-card">
+                <div class="stat-lbl">${label}</div>
+                <div class="stat-val text-green">${stock[field].toLocaleString('en-GB')}</div>
+                <div class="stat-sub">Nuts</div>
+              </div>
+            `).join('')}
             <div class="stat-card">
               <div class="stat-lbl">Husks Stock</div>
               <div class="stat-val text-cyan">${stock.husksStock.toLocaleString('en-GB')}</div>
@@ -1399,6 +1428,25 @@ const CoconutMgr = {
 
       renderProcessingLists() {
         const selDate = document.getElementById('coconutDate')?.value || this._today();
+        const grading = document.getElementById('ccGradingList');
+        if (grading) {
+          const entries = S.coconut_gradings.filter(entry => entry.date === selDate);
+          grading.replaceChildren();
+          if (!entries.length) grading.textContent = 'No sorting records on this date.';
+          for (const entry of entries) {
+            const row = document.createElement('div');
+            row.className = 'total-row';
+            const label = document.createElement('span');
+            label.textContent = Object.entries(entry.counts || {}).filter(([,count]) => count > 0)
+              .map(([grade,count]) => count + ' ' + (grade === 'drying' ? 'for drying' : grade)).join(' · ');
+            const remove = document.createElement('button');
+            remove.className = 'btn btn-ghost btn-xs';
+            remove.textContent = 'Remove';
+            remove.addEventListener('click', () => this.deleteGrading(entry.id));
+            row.append(label,remove);
+            grading.append(row);
+          }
+        }
 
         // 1. Husking list
         const huskEl = document.getElementById('ccHuskList');
@@ -1510,7 +1558,7 @@ const CoconutMgr = {
               return `
               <tr style="border-bottom:1px solid var(--border2);">
                 <td style="padding:8px 0;font-weight:600;">${esc(s.buyer)}</td>
-                <td style="padding:8px 0;"><span class="badge badge-cyan" style="text-transform:capitalize;">${esc(s.type)}</span></td>
+                <td style="padding:8px 0;"><span class="badge badge-cyan" style="text-transform:capitalize;">${esc(this._saleTypeLabel(s))}</span></td>
                 <td style="padding:8px 0;text-align:right;" class="mono">${qtyDetails}</td>
                 <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${this._value(s.total).toFixed(2)}</td>
                 <td style="padding:8px 0;text-align:right;color:var(--green);" class="mono">Rs. ${this._value(s.recDrawer).toFixed(2)} <span style="font-size:8px;color:var(--t3)">(${esc(s.payMethod)})</span></td>
@@ -1600,7 +1648,7 @@ const CoconutMgr = {
 
 // Serialize Coconut mutations so repeated clicks cannot save duplicate records.
 for (const methodName of [
-  'savePurchase', 'deletePurchase', 'saveHusking', 'deleteHusking', 'saveCopra', 'recordCopraYield',
+  'savePurchase', 'deletePurchase', 'saveHusking', 'deleteHusking', 'saveGrading', 'deleteGrading', 'saveCopra', 'recordCopraYield',
   'deleteCopra', 'saveOil', 'deleteOil', 'saveSale', 'deleteSale', 'saveWorker',
   'saveWorkerPayment', 'deleteWorkerPayment', 'saveOperatingExpense', 'deleteExpense',
   'saveDrawerMove', 'saveOpeningFloat', 'saveDayEnd'

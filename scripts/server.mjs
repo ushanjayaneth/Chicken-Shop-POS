@@ -6,7 +6,7 @@ import dataHandler from '../api/data.js';
 import sessionHandler from '../api/session.js';
 import statusHandler from '../api/status.js';
 const root=fileURLToPath(new URL('../',import.meta.url));
-const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.woff2':'font/woff2','.ico':'image/x-icon'};
+const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.mjs':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.woff2':'font/woff2','.ico':'image/x-icon'};
 export function createPOSServer({api = dataHandler, session = sessionHandler} = {}) {
   return createServer(async(request,response)=>{
     try {

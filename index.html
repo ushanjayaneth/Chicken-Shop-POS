@@ -4239,6 +4239,16 @@
                 <button class="btn btn-primary w-full" onclick="CoconutMgr.saveHusking()">💾 Save Husking Session</button>
               </div>
 
+              <div class="admin-section">
+                <h3>Sort Peeled Coconuts</h3>
+                <div class="form-group"><label for="ccGradeDate">Date</label><input type="date" id="ccGradeDate" onchange="CoconutMgr.renderGradeAvailability()"></div>
+                <p id="ccGradeAvailable" class="info-hint"></p>
+                <div class="form-group"><label for="ccGradeLarge">Large nuts</label><input type="number" id="ccGradeLarge" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                <div class="form-group"><label for="ccGradeSmall">Small nuts</label><input type="number" id="ccGradeSmall" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                <div class="form-group"><label for="ccGradeDrying">Nuts set aside for drying</label><input type="number" id="ccGradeDrying" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                <button class="btn btn-primary w-full" onclick="CoconutMgr.saveGrading()">Save Sorting</button>
+              </div>
+
               <!-- COPRA PRODUCTION WIDGET -->
               <div class="admin-section">
                 <h3>🥥 Copra Production Registry</h3>
@@ -4247,10 +4257,17 @@
                   <input type="date" id="ccCopraDate">
                 </div>
                 <div class="form-group">
-                  <label>Peeled Coconuts Used (Nuts)</label>
+                  <label>Unsorted Peeled Coconuts Used (Nuts)</label>
                   <input type="number" id="ccCopraNuts" placeholder="0" min="0" inputmode="numeric">
                 </div>
-<div class="form-group"><label for="ccCopraKg">Copra output (kg)</label><input type="number" id="ccCopraKg" min="0.001" step="0.001" inputmode="decimal" placeholder="0.000"></div>
+
+                <details class="form-group">
+                  <summary>Use sorted coconuts</summary>
+                  <div class="form-group"><label for="ccCopraLarge">Large nuts used</label><input type="number" id="ccCopraLarge" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                  <div class="form-group"><label for="ccCopraSmall">Small nuts used</label><input type="number" id="ccCopraSmall" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                  <div class="form-group"><label for="ccCopraDrying">Nuts set aside for drying used</label><input type="number" id="ccCopraDrying" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+                </details>
+                <div class="form-group"><label for="ccCopraKg">Copra output (kg)</label><input type="number" id="ccCopraKg" min="0.001" step="0.001" inputmode="decimal" placeholder="0.000"></div>
                 <div class="form-group">
                   <label>Labor / Drying Cost (Rs.)</label>
                   <input type="number" id="ccCopraCost" placeholder="0.00" step="0.01" value="0" inputmode="decimal">
@@ -4304,6 +4321,8 @@
                 <div>
                   <h4 style="margin-bottom:6px; color:var(--cyan);">⚒️ Husking Records</h4>
                   <div id="ccHuskList"></div>
+                  <h4 style="margin:14px 0 6px;">Sorting Records</h4>
+                  <div id="ccGradingList"></div>
                 </div>
                 <div>
                   <h4 style="margin-bottom:6px; color:var(--cyan);">🥥 Copra Records</h4>
@@ -4343,7 +4362,18 @@
                   </select>
                 </div>
                 
-                <!-- Itemized (for Raw / Peeled Coconuts) -->
+
+                <div class="form-group" id="ccSaleGradeGroup" style="display:none">
+                  <label for="ccSaleGrade">Peeled stock</label>
+                  <select id="ccSaleGrade" onchange="CoconutMgr.updateSaleLabels()">
+                    <option value="unsorted">Unsorted</option>
+                    <option value="large">Large</option>
+                    <option value="small">Small</option>
+                    <option value="drying">Set aside for drying</option>
+                  </select>
+                  <p id="ccSaleGradeAvailable" class="info-hint"></p>
+                </div>
+                <!-- Itemized (for Raw / Unsorted Peeled Coconuts) -->
                 <div id="ccSaleItemizedContainer" style="grid-column: span 2; display: block; border: 1px solid var(--border2); padding: 12px; border-radius: var(--r8); background: var(--bg3); margin-top: 5px;">
                   <div style="font-size: 12px; font-weight: bold; color: var(--cyan); margin-bottom: 8px;">Coconut Details</div>
                   <div class="grid-2">
@@ -4803,6 +4833,7 @@
 
   <script src="data-core.js"></script>
   <script src="cloud-access.js"></script>
+  <script type="module" src="coconut-ledger-browser.mjs"></script>
   <script src="coconut.js"></script>
   <script src="sales.js"></script>
   <script src="returns.js"></script>
@@ -4822,6 +4853,7 @@
       'loans',
       'coconut_purchases',
       'coconut_husking',
+      'coconut_gradings',
       'coconut_sales',
       'coconut_copra',
       'coconut_oil',
@@ -4911,7 +4943,7 @@
     // 100% Offline-only POS Config
     const S = {
       categories: [], items: [], sales: [],
-      coconut_purchases: [], coconut_husking: [], coconut_sales: [], cash_movements: [], day_ends: [],
+      coconut_purchases: [], coconut_husking: [], coconut_gradings: [], coconut_sales: [], cash_movements: [], day_ends: [],
       coconut_copra: [], coconut_oil: [], coconut_workers: [], coconut_worker_payments: [],
       loans: [], loan_customers: [],
       settings: { shopName: 'Mr. Chicken House', adminPin: '1234', currency: 'Rs.', lowStockAlert: 5, receiptNote: DEFAULT_RECEIPT_NOTE, apiServerUrl: '' },
@@ -5023,7 +5055,7 @@
     }
 
     async function loadAll(forceRender = false) {
-      const [cats, items, sales, cp, ch, cs, cm, de, loans, custs, c_copra, c_oil, c_workers, c_payments] = await Promise.all([
+      const [cats, items, sales, cp, ch, cs, cm, de, loans, custs, c_copra, c_oil, c_workers, c_payments, c_gradings] = await Promise.all([
         DB.get('categories'),
         DB.get('items'),
         DB.get('sales'),
@@ -5037,7 +5069,8 @@
         DB.get('coconut_copra'),
         DB.get('coconut_oil'),
         DB.get('coconut_workers'),
-        DB.get('coconut_worker_payments')
+        DB.get('coconut_worker_payments'),
+        DB.get('coconut_gradings')
       ]);
 
       // Create a fast, lightweight structural change check
@@ -5069,7 +5102,8 @@
         copraVal: c_copra,
         oilVal: c_oil,
         wrkVal: c_workers,
-        payVal: c_payments
+        payVal: c_payments,
+        gradingVal: c_gradings
       });
 
       const isUnchanged = (currentStr === _lastDataStr);
@@ -5080,6 +5114,7 @@
       S.sales = DB.obj2arr(sales).sort((a, b) => new Date(b.date) - new Date(a.date));
       S.coconut_purchases = DB.obj2arr(cp).sort((a, b) => new Date(b.date) - new Date(a.date));
       S.coconut_husking = DB.obj2arr(ch).sort((a, b) => new Date(b.date) - new Date(a.date));
+      S.coconut_gradings = DB.obj2arr(c_gradings).sort((a, b) => String(b.createdAt || b.date).localeCompare(String(a.createdAt || a.date)));
       S.coconut_sales = DB.obj2arr(cs).sort((a, b) => new Date(b.date) - new Date(a.date));
       S.coconut_copra = DB.obj2arr(c_copra).sort((a, b) => new Date(b.date) - new Date(a.date));
       S.coconut_oil = DB.obj2arr(c_oil).sort((a, b) => new Date(b.date) - new Date(a.date));

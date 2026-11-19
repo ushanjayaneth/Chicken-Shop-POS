@@ -5,7 +5,7 @@ A responsive point of sale for Chicken House and a separate Coconut Business wor
 - Billing, weighted quantities, retail and wholesale prices, discounts, receipts, returns and exchange credits
 - Stock receipts, low-stock alerts, barcode labels, product photos and recorded stock adjustments
 - Customer loans with deposits and partial repayments
-- Coconut purchases, processing yields, sales, worker payments and day-end reconciliation
+- Coconut purchases, separate peeled-stock grades, processing yields, sales, worker payments and day-end reconciliation
 
 ## Run locally
 
@@ -22,6 +22,10 @@ Open the app online once to download your workspace and prepare the offline shel
 The app saves completed transactions and their pending uploads together in IndexedDB. The status dots show network and cloud status separately. On reconnect, pending transactions upload first and the app then loads current shared records. A cloud conflict keeps the pending change on the device for review.
 
 Settings contains JSON backup export and restore. Restore replaces the selected workspace data and queues those records for the shared database. Keep a current export before restoring an older snapshot.
+
+## Coconut stock flow
+
+Raw large and small nuts can be sold directly or sent to husking. Sort peeled stock into Large, Small and Set aside for drying in Processing. Choose the peeled stock group when selling. A copra batch can consume nuts from one or more groups and adds its measured output in kilograms. Sell copra directly or mill part of it into oil and poonac.
 
 ## Server and printing
 

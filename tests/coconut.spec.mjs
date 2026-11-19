@@ -168,3 +168,45 @@ test('offline worker payment cannot exceed earned balance and paid work cannot b
   await page.evaluate(id=>CoconutMgr.deleteHusking(id),work.id);
   expect(await records(page,'coconut_husking')).toHaveLength(0);
 });
+
+test('sorting, sales and mixed copra runs consume the recorded stock groups', async ({page,app}) => {
+  await purchase(page);
+  await page.locator('#ccTab_sale').click();
+  await fill(page,{ccSaleBuyer:'Raw buyer',ccSaleLargeCount:20,ccSaleLargePrice:120});
+  await page.getByRole('button',{name:'Save Sale',exact:false}).click();
+  await expect.poll(async()=>(await records(page,'coconut_sales')).length).toBe(1);
+
+  await worker(page);
+  await husk(page);
+  await fill(page,{ccGradeLarge:20,ccGradeSmall:10,ccGradeDrying:15});
+  await page.getByRole('button',{name:'Save Sorting'}).click();
+  await expect(page.locator('#ccGradingList')).toContainText('15 for drying');
+  await expect(page.locator('#ccGradeAvailable')).toContainText('5');
+
+  await page.locator('#ccTab_sale').click();
+  await page.locator('#ccSaleType').selectOption('husked');
+  await page.locator('#ccSaleGrade').selectOption('large');
+  await expect(page.locator('#ccSaleGradeAvailable')).toContainText('20 nuts');
+  await fill(page,{ccSaleBuyer:'Large nuts buyer',ccSaleCount:6,ccSalePrice:150});
+  await page.getByRole('button',{name:'Save Sale',exact:false}).click();
+  await expect.poll(async()=>(await records(page,'coconut_sales')).length).toBe(2);
+  const gradedSale = (await records(page,'coconut_sales')).find(entry=>entry.peeledGrade==='large');
+  expect(gradedSale).toMatchObject({qty:6,total:900});
+  expect(await page.evaluate(row=>CoconutMgr.buildSalePrintDoc(row).text,gradedSale)).toContain('Large peeled coconuts');
+  await expect(page.locator('#ccSaleGradeAvailable')).toContainText('14 nuts');
+
+  await page.locator('#ccTab_processing').click();
+  await page.locator('#ccSection_processing summary').filter({hasText:'Use sorted coconuts'}).click();
+  await fill(page,{ccCopraNuts:2,ccCopraLarge:1,ccCopraSmall:2,ccCopraDrying:10,ccCopraKg:4});
+  await page.getByRole('button',{name:'Save Copra Registry',exact:false}).click();
+  await expect.poll(async()=>(await records(page,'coconut_copra')).length).toBe(1);
+  const production = (await records(page,'coconut_copra'))[0];
+  expect(production).toMatchObject({nutsUsed:15,copraKg:4,inputNuts:{unsorted:2,large:1,small:2,drying:10}});
+
+  const graded = (await records(page,'coconut_gradings'))[0];
+  expect(await page.evaluate(id=>CoconutMgr.deleteGrading(id),graded.id)).toBe(false);
+  const stock = await page.evaluate(()=>CoconutMgr.calcStock());
+  expect(stock).toMatchObject({rawLargeStock:30,peeledStock:3,peeledLargeStock:13,peeledSmallStock:8,peeledDryingStock:5,copraStock:4});
+  await expect.poll(()=>Object.values(app.state.coconut_gradings).length).toBe(1);
+  expect(app.state.coconut_copra[production.id].copraKg).toBe(4);
+});

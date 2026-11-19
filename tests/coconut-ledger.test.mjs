@@ -34,7 +34,8 @@ test('peeled, husks, measured copra, oil and poonac stocks preserve their units 
     coconut_oil: {oil: {date: firstDate, copraUsed: 1, oilQty: .6, poonacQty: .3}}
   });
   assert.deepEqual(getCoconutStockBalances(original), {
-    rawLargeStock: 4, rawSmallStock: 2, peeledStock: 2, husksStock: 6,
+    rawLargeStock: 4, rawSmallStock: 2, peeledStock: 2, peeledLargeStock: 0, peeledSmallStock: 0, peeledDryingStock: 0,
+    husksStock: 6,
     copraStock: 1, oilStock: .6, poonacStock: .3,
     copraStockKnown: true, copraUnknownBatches: 0, workerOutstanding: {worker: 18}
   });
@@ -109,4 +110,21 @@ test('pre-existing negative balances may improve without blocking unrelated vali
     'coconut_worker_payments/new': {date: nextDate, workerId: 'worker', amount: 1}
   })), isConflict);
   assert.doesNotThrow(() => validateCoconutLedger(original, original, {'settings/main/shopName': 'Sample'}));
+});
+
+test('graded coconuts cannot be spent twice or returned to unsorted stock after use', () => {
+  const date='2026-11-18';
+  const base={
+    coconut_purchases:{purchase:{date,largeCount:30}},
+    coconut_husking:{husking:{date,largeCount:20}},
+    coconut_gradings:{sorting:{date,counts:{large:10,small:3,drying:5}}},
+    coconut_sales:{first:{date,type:'husked',peeledGrade:'large',qty:7}},
+    coconut_copra:{copra:{date,nutsUsed:4,inputNuts:{unsorted:1,drying:3},copraKg:1}}
+  };
+  assert.equal(getCoconutStockBalances(base).peeledLargeStock,3);
+  assert.equal(getCoconutStockBalances(base).peeledStock,1);
+  assert.equal(getCoconutStockBalances(base).peeledDryingStock,2);
+  const extra={...base,coconut_sales:{...base.coconut_sales,second:{date,type:'husked',peeledGrade:'large',qty:4}}};
+  assert.throws(()=>validateCoconutLedger(base,extra,{'coconut_sales/second':{}}),/large peeled coconuts/);
+  assert.throws(()=>validateCoconutLedger(base,{...base,coconut_gradings:{}},{'coconut_gradings/sorting':null}),/large peeled coconuts/);
 });
