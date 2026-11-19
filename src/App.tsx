@@ -35,7 +35,8 @@ import {
   PauseCircle,
   Database,
 } from "lucide-react";
-import { registerSW } from "virtual:pwa-register";
+import {applyAppUpdate, appUpdateReadyEvent} from './lib/app-worker';
+import {InstallAppButton} from './components/InstallApp';
 import type { Page, Snapshot, User } from "../shared/types";
 import { api, ApiError } from "./lib/api";
 import { AppContext } from "./lib/context";
@@ -190,7 +191,10 @@ function Login({ onLogin,onSetup,onRestore,deviceInfo=null,cloudLogin }: { onLog
             void login(pin);
           }}
         >
-          <a className="button button-ghost workspace-switch" href="/coconut.html"><Leaf size={15}/> Coconut workspace</a>
+          <div className="login-links">
+            <a className="button button-ghost workspace-switch" href="/coconut.html"><Leaf size={15}/> Coconut workspace</a>
+            <InstallAppButton className="button button-ghost" />
+          </div>
           <div className="login-lock">
             <LockKeyhole size={23} />
           </div>
@@ -330,9 +334,6 @@ function WorkspaceApp() {
   const [updateError, setUpdateError] = useState('');
   const updateDismissed = useRef(false);
   const announcedWorker = useRef<ServiceWorker | null>(null);
-  const [updateWorker, setUpdateWorker] = useState<
-    ((reload?: boolean) => Promise<void>) | null
-  >(null);
   const requestGeneration = useRef(0);
   const activeRefresh = useRef<{key:string;promise:Promise<void>}|null>(null);
   const refreshIdentity = `${mode}:${sharedCloudSource()??''}:${user?.id??''}:${branchId}`;
@@ -389,6 +390,8 @@ function WorkspaceApp() {
     }
   }, [reportUpdateError]);
   useEffect(() => {
+    const serviceWorker = navigator.serviceWorker;
+    if (!serviceWorker) return;
     const checkForUpdate=()=>{
       if(document.visibilityState==='visible')void checkAppUpdate();
     };
@@ -399,42 +402,31 @@ function WorkspaceApp() {
       // Activation in another tab never grants permission to reload this page.
       if (updateRequested.current) void finishAppUpdate();
     };
-    let previousController = navigator.serviceWorker?.controller;
+    let previousController = serviceWorker.controller;
     const controllerChanged = () => {
-      const next = navigator.serviceWorker.controller;
+      const next = serviceWorker.controller;
       if (previousController && next !== previousController) workerActivated();
       previousController = next;
     };
-    const update = registerSW({
-      immediate:true,
-      onNeedRefresh() {
-        void navigator.serviceWorker.getRegistration().then(registration => announceUpdate(registration?.waiting)).catch(()=>{});
-      },
-      onRegisteredSW(_url, registration) {
+    const reportWaiting = () => {
+      void serviceWorker.getRegistration().then(registration => {
         if (registration?.waiting) announceUpdate(registration.waiting);
-      },
-      onNeedReload: workerActivated,
-      onRegisterError() {
-        /* Local network use remains available without PWA installation. */
-      },
-    });
-    setUpdateWorker(() => update);
+      }).catch(() => {});
+    };
+    window.addEventListener(appUpdateReadyEvent, reportWaiting);
+    reportWaiting();
     window.addEventListener('focus',checkForUpdate);
     window.addEventListener('online',checkForUpdate);
     document.addEventListener('visibilitychange',checkForUpdate);
-    navigator.serviceWorker?.addEventListener('controllerchange',controllerChanged);
+    serviceWorker.addEventListener('controllerchange',controllerChanged);
     const timer = window.setInterval(checkForUpdate, 60 * 1000);
-    return()=>{window.clearInterval(timer);clearTimeout(updateActivationTimer.current);window.removeEventListener('focus',checkForUpdate);window.removeEventListener('online',checkForUpdate);document.removeEventListener('visibilitychange',checkForUpdate);navigator.serviceWorker?.removeEventListener('controllerchange',controllerChanged);};
+    return()=>{window.clearInterval(timer);clearTimeout(updateActivationTimer.current);window.removeEventListener('focus',checkForUpdate);window.removeEventListener('online',checkForUpdate);document.removeEventListener('visibilitychange',checkForUpdate);serviceWorker.removeEventListener('controllerchange',controllerChanged);window.removeEventListener(appUpdateReadyEvent,reportWaiting);};
   }, [checkAppUpdate,finishAppUpdate,announceUpdate]);
   async function reloadAppUpdate() {
     if (updateReloading.current || updateRequested.current) return;
     setUpdateError('');
     if (localWrites.current > 0) {
       reportUpdateError('Wait for the current save to finish before reloading the app.');
-      return;
-    }
-    if (!updateWorker) {
-      reportUpdateError('The app update is not ready. Refresh the workspace and try again.');
       return;
     }
     setUpdateBusy(true);
@@ -458,7 +450,7 @@ function WorkspaceApp() {
         updateRequested.current = false;
         reportUpdateError('The app update has not finished activating. Keep this page open and try Update now again.');
       }, 10000);
-      await updateWorker(true);
+      await applyAppUpdate();
     } catch {
       clearTimeout(updateActivationTimer.current);
       updateRequested.current = false;
@@ -734,6 +726,7 @@ function WorkspaceApp() {
             ))}
           </nav>
           <div className="sidebar-footer">
+            <InstallAppButton className="nav-item" />
             <a className="nav-item workspace-switch" href="/coconut.html" title="Coconut workspace"><Leaf size={17}/><span>Coconut workspace</span></a>
             {sharedCloudSource()&&user.role==='owner'&&!adminLocked&&<button type="button" className="nav-item workspace-switch" title="Download previous shop records" onClick={async()=>{
               const source=sharedCloudSource(); if(!source)return;

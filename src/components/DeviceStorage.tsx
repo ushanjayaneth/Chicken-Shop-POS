@@ -1,33 +1,14 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { ArchiveRestore, Check, Database, Download, HardDrive, LoaderCircle, RefreshCw, ShieldCheck, Smartphone, Upload } from 'lucide-react';
+import { ArchiveRestore, Database, Download, HardDrive, LoaderCircle, RefreshCw, ShieldCheck, Upload } from 'lucide-react';
 import { usePOS } from '../lib/context';
 import { isDeviceWorkspace, useWorkspaceMode } from '../lib/workspace-mode';
 import { sharedCloudSource } from '../lib/cloud-shared';
 import { deviceStorageStatus, requestDevicePersistence, storageBytes, type DeviceStorageStatus } from '../lib/local/storage';
 import { createEncryptedBackup, downloadBackupFile, inspectEncryptedBackup, markBackupDownloaded, restoreDeviceBackup } from '../lib/local/backup';
 import { Modal } from './ui';
+import { AppInstallSettings } from './InstallApp';
 import '../styles/storage.css';
 
-interface InstallPrompt extends Event {
-  prompt(): Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
-}
-let pendingInstall: InstallPrompt | null = null;
-if (typeof window !== 'undefined') {
-  window.addEventListener('beforeinstallprompt', event => {
-    event.preventDefault();
-    pendingInstall = event as InstallPrompt;
-    window.dispatchEvent(new Event('device-install-ready'));
-  });
-  window.addEventListener('appinstalled', () => {
-    pendingInstall = null;
-    window.dispatchEvent(new Event('device-install-ready'));
-  });
-}
-
-function installedDisplay() {
-  return window.matchMedia('(display-mode: standalone)').matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
-}
 const dateLabel = (value: string) => new Date(value).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
 type InspectedBackup = Awaited<ReturnType<typeof inspectEncryptedBackup>>;
 
@@ -53,9 +34,6 @@ function DeviceStoragePanel({sharedSource}:{sharedSource:string|null}) {
   const [confirmName, setConfirmName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [installed, setInstalled] = useState(installedDisplay);
-  const [canInstall, setCanInstall] = useState(Boolean(pendingInstall));
-  const [installing, setInstalling] = useState(false);
   const owner = data.user.role === 'owner';
   const businessName = data.settings.businessName;
   const persistenceSupported = typeof navigator.storage?.persist === 'function';
@@ -73,19 +51,8 @@ function DeviceStoragePanel({sharedSource}:{sharedSource:string|null}) {
   useEffect(() => { void refreshStorage(); }, [refreshStorage, data.serverTime]);
   useEffect(() => {
     const refreshOnFocus = () => void refreshStorage();
-    const installStatus = () => { setInstalled(installedDisplay()); setCanInstall(Boolean(pendingInstall)); };
-    const onInstalled = () => { setInstalled(true); setCanInstall(false); };
-    const standalone = window.matchMedia('(display-mode: standalone)');
     window.addEventListener('focus', refreshOnFocus);
-    window.addEventListener('device-install-ready', installStatus);
-    window.addEventListener('appinstalled', onInstalled);
-    standalone.addEventListener('change', installStatus);
-    return () => {
-      window.removeEventListener('focus', refreshOnFocus);
-      window.removeEventListener('device-install-ready', installStatus);
-      window.removeEventListener('appinstalled', onInstalled);
-      standalone.removeEventListener('change', installStatus);
-    };
+    return () => window.removeEventListener('focus', refreshOnFocus);
   }, [refreshStorage]);
 
   function closeDialog() {
@@ -145,19 +112,6 @@ function DeviceStoragePanel({sharedSource}:{sharedSource:string|null}) {
       setBusy(false);
     }
   }
-  async function install() {
-    const prompt = pendingInstall;
-    if (!prompt || installed || installing) return;
-    setInstalling(true);
-    try {
-      await prompt.prompt();
-      const choice = await prompt.userChoice;
-      pendingInstall = null; setCanInstall(false);
-      if (choice.outcome === 'accepted') setInstalled(true);
-    } catch (cause) { notify(cause instanceof Error ? cause.message : 'Use your browser’s Install app option.', 'error'); }
-    finally { setInstalling(false); }
-  }
-
   const percent = status?.usage !== null && status?.usage !== undefined && status.quota !== null && status.quota > 0 ? Math.min(100, status.usage / status.quota * 100) : null;
   const almostFull = percent !== null && percent >= 90;
   return <section className="panel preference-card device-storage" aria-label="Device storage and backups">
@@ -181,7 +135,7 @@ function DeviceStoragePanel({sharedSource}:{sharedSource:string|null}) {
     {(statusError || status && !status.available) && <div className="error-message" role="alert">{statusError || 'This browser’s workspace storage could not be opened. Keep the app open and try refreshing the storage information.'}</div>}
     <p className="storage-footnote">Usage includes this website’s cached app and saved data. The browser sets the available quota. Persistent storage protects against automatic eviction; it does not prevent deliberate site-data clearing, formatting or device loss. Installing the PWA does not provide that protection either.</p>
     {sharedSource?<p className="storage-owner-note">Local .retailbackup export and replacement apply to the original device workspace, not this shared cloud workspace. Keep the original encrypted backup and a separate cloud recovery plan.</p>:owner ? <div className="storage-backup-actions"><button type="button" className="button button-primary" onClick={() => openDialog('export')} disabled={!status?.available}><Download size={15} /> Export encrypted backup</button><button type="button" className="button" onClick={() => openDialog('restore')} disabled={!status?.available}><ArchiveRestore size={15} /> Restore backup</button></div> : <p className="storage-owner-note">Ask the workspace owner to export or restore an encrypted backup.</p>}
-    {sharedSource?<div className="storage-install"><Database size={20}/><div><strong>Ready in your browser</strong><p>Open this website on any authorized device to use the same Firebase records. No app download or installation is required.</p></div><Check size={18} className="storage-positive"/></div>:<div className="storage-install"><Smartphone size={20} /><div><strong>{installed ? 'App installed' : 'Open this workspace as an app'}</strong><p>{installed ? 'Launch the installed app from this device’s home screen or app list.' : canInstall ? 'Install the app for a dedicated window and quick access from this device.' : 'Use your browser’s Install app or Add to Home Screen option. In Safari, open Share, then Add to Home Screen.'}</p></div>{!installed && canInstall && <button type="button" className="button button-small" onClick={() => void install()} disabled={installing}><Download size={14} />{installing ? 'Installing…' : 'Install app'}</button>}{installed && <Check size={18} className="storage-positive" />}</div>}
+    <AppInstallSettings />
 
     {dialog === 'export' && <Modal title="Export encrypted backup" subtitle="Save a password-protected copy of this device’s workspace." onClose={closeDialog}>
       <form className="storage-backup-form" onSubmit={exportBackup}>

@@ -19,6 +19,7 @@ export default defineConfig({
       ],
     },
     workbox: {
+      clientsClaim:true,
       globPatterns:['**/*.{js,css,html,svg,woff2,jpg,png}'], globIgnores:['**/icons/app-icon-source.png'], maximumFileSizeToCacheInBytes: 4_000_000,
       navigateFallbackDenylist:[/^\/api\//,/^\/coconut\.html$/], cleanupOutdatedCaches:true,
       runtimeCaching:[{

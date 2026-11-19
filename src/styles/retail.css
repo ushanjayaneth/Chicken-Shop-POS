@@ -90,4 +90,4 @@ input:focus, textarea:focus, select:focus { border-color: #c99e59 !important; bo
 }
 
 .workspace-switch { text-decoration: none; }
-.login-box .workspace-switch { align-self: flex-end; margin-bottom: 12px; }
+.login-links { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }

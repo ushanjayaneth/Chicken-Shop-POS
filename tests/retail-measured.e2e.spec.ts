@@ -163,6 +163,7 @@ test('the compact catalog keeps the first products visible before scrolling', as
 
     await page.setViewportSize({width: 768, height: 1024});
     const biscuitCard = page.locator('.product-card').filter({has: page.getByRole('heading', {name: 'Cream biscuits', exact: true})});
+    await expect(biscuitCard.locator('img')).toHaveCSS('object-fit', 'cover');
     const photo = await biscuitCard.locator('.product-image-wrap').boundingBox();
     const card = await biscuitCard.boundingBox();
     const details = await biscuitCard.locator('.product-info').boundingBox();
