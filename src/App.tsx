@@ -35,7 +35,7 @@ import {
   PauseCircle,
   Database,
 } from "lucide-react";
-import {applyAppUpdate, appUpdateReadyEvent} from './lib/app-worker';
+import {applyAppUpdate, appUpdateReadyEvent, offlineShellReady, subscribeOfflineShell} from './lib/app-worker';
 import {InstallAppButton} from './components/InstallApp';
 import type { Page, Snapshot, User } from "../shared/types";
 import { api, ApiError } from "./lib/api";
@@ -200,7 +200,7 @@ function Login({ onLogin,onSetup,onRestore,deviceInfo=null,cloudLogin }: { onLog
           </div>
           <div className="eyebrow">YOUR STORE, IN ORDER</div>
           <h2>{!cloudLogin&&mode==='device'&&!deviceInfo?'Make it your store.':'Welcome back.'}</h2>
-          <p>{cloudLogin?'Enter your staff PIN. Your shop data opens automatically.':mode==='device'?'Enter your private staff PIN to open this device’s saved workspace.':'Enter your staff PIN to open your workspace.'}</p>
+          <p>{cloudLogin?'Sign in online once on a new device. Wait for Offline ready before disconnecting.':mode==='device'?'Enter your private staff PIN to open this device’s saved workspace.':'Enter your staff PIN to open your workspace.'}</p>
           {error && (
             <div className="error-message" role="alert">
               {error}
@@ -347,6 +347,30 @@ function WorkspaceApp() {
     },
     [],
   );
+  const shopSource = sharedCloudSource();
+  const shellReady = useSyncExternalStore(subscribeOfflineShell, offlineShellReady);
+  const cloudCopyReady = data?.sync.offlineReady === true;
+  const [preparedSource, setPreparedSource] = useState<string | null>(null);
+  const readyForOffline = shellReady && cloudCopyReady && Boolean(shopSource && preparedSource === shopSource);
+
+  useEffect(() => {
+    let active = true;
+    if (shopSource && cloudCopyReady) {
+      void hasOfflinePIN(shopSource).then(ready => {
+        if (active) setPreparedSource(ready ? shopSource : null);
+      }).catch(() => {});
+    }
+    return () => { active = false; };
+  }, [shopSource, cloudCopyReady, user?.id]);
+
+  useEffect(() => {
+    if (!readyForOffline || !shopSource || navigator.onLine === false) return;
+    const key = 'retail-offline-ready:' + shopSource;
+    if (uiStorage.getItem(key)) return;
+    uiStorage.setItem(key, '1');
+    notify('Offline ready. This device can reopen and bill without internet.');
+  }, [readyForOffline, shopSource, notify]);
+
   const announceUpdate = useCallback((worker?: ServiceWorker | null) => {
     if (worker && announcedWorker.current !== worker) {
       announcedWorker.current = worker;
@@ -740,7 +764,7 @@ function WorkspaceApp() {
             <div className="hub-status">
               <i className={`status-dot ${!hubOnline ? "offline" : ""}`} />
               <span>
-                {sharedCloudSource()?(data.sync.cloudOnline===false?'Offline billing ready':data.sync.pending?'Cloud sync pending':hubOnline?'Shared cloud connected':'Cloud unavailable'):deviceMode?'Device database ready':hubOnline ? "Branch hub connected" : "Hub unavailable"}
+                {sharedCloudSource()?(data.sync.pending?'Cloud sync pending':readyForOffline?'Offline ready':navigator.serviceWorker?'Preparing offline access':'Shared cloud connected'):deviceMode?'Device database ready':hubOnline ? "Branch hub connected" : "Hub unavailable"}
               </span>
             </div>
             <div className="user-card">
@@ -988,7 +1012,7 @@ function CloudPOSEntry({source}:{source?:string}){
       // The installed app starts at /. A prepared browser already knows its
       // shop, so open that local replica before attempting cloud discovery.
       if(!source&&navigator.onLine!==false&&await cached())return;
-      if(navigator.onLine===false){if(!await cached())throw new Error('Open this device once while online before using offline billing.');return;}
+      if(navigator.onLine===false){if(!await cached())throw new Error('Connect this device to the internet, sign in with your PIN and wait for Offline ready.');return;}
       if(remembered&&uiStorage.getItem(`retail-cloud-lock:${remembered}`)==='1'){if(active)setAuthenticated(false);return;}
       try{
         const value=remembered?{authenticated:Boolean((await cloudRuntimeApi<{user:User|null}>(remembered,'/session')).user)}:await cloudRequest<{authenticated:boolean}>('pos-session',undefined,{signal:AbortSignal.timeout(8000)});
@@ -1020,7 +1044,7 @@ function CloudPOSEntry({source}:{source?:string}){
       if(!remembered)throw new Error('Sign in once while online to prepare offline access.');
       await offlineSignIn(remembered,pin);
       uiStorage.removeItem(`retail-cloud-lock:${remembered}`);
-      if(source)location.reload();else openSharedCloudWorkspace(remembered);
+      if(source) setAuthenticated(true); else openSharedCloudWorkspace(remembered);
       return;
     }
     try{await cloudRequest('pos-login',{pin},remembered?{signal:AbortSignal.timeout(2000)}:{});}
@@ -1028,7 +1052,8 @@ function CloudPOSEntry({source}:{source?:string}){
       const status=(error as {status?:number}).status;
       if(remembered&&(!status||status>=500)&&await hasOfflinePIN(remembered)){
         await offlineSignIn(remembered,pin);uiStorage.removeItem(`retail-cloud-lock:${remembered}`);
-        if(source)location.replace(`/?shared=${encodeURIComponent(remembered)}`);else openSharedCloudWorkspace(remembered);return;
+        if(source) setAuthenticated(true); else openSharedCloudWorkspace(remembered);
+        return;
       }
       throw error;
     }
@@ -1037,7 +1062,7 @@ function CloudPOSEntry({source}:{source?:string}){
     await authorizeOfflinePIN(workspace,pin,cloudPOSUser);
     uiStorage.removeItem(`retail-cloud-lock:${workspace}`);
     uiStorage.setItem('retail-cloud-preferred-source',workspace);
-    if(source)location.replace(`/?shared=${encodeURIComponent(workspace)}`);else openSharedCloudWorkspace(workspace);
+    if(source) setAuthenticated(true); else openSharedCloudWorkspace(workspace);
   };
   if(authenticated===false)return <Login cloudLogin={signIn}/>;
   if(error)return <div className="boot-error panel"><h2>Let’s reconnect your workspace.</h2><p role="alert">{error}</p><button className="button button-primary" onClick={()=>setAttempt(value=>value+1)}><RefreshCw size={14}/> Try again</button></div>;
@@ -1056,10 +1081,15 @@ function AutomaticCloudEntry(){
   useEffect(()=>{
     let active=true;
     const knownConfiguration=uiStorage.getItem('retail-cloud-configured');
-    const remembered=knownConfiguration==='1';
+    const remembered=knownConfiguration==='1'||Boolean(uiStorage.getItem('retail-cloud-preferred-source'));
     setError('');
     if(remembered){setConfigured(true);return;}
-    if(navigator.onLine===false){setConfigured(remembered);return;}
+    if(navigator.onLine===false){
+      if(knownConfiguration==='0'){setConfigured(false);return;}
+      void getLocalWorkspaceInfo().then(info=>{if(active)setConfigured(!info);})
+        .catch(()=>{if(active)setConfigured(true);});
+      return()=>{active=false;};
+    }
     void cloudRequest<{configured:boolean}>('status').then(value=>{
       if(value.configured)uiStorage.setItem('retail-cloud-configured','1');
       else if(!remembered)uiStorage.setItem('retail-cloud-configured','0');

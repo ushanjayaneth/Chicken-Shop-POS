@@ -6,7 +6,7 @@ export default defineConfig({
   css:{postcss:{plugins:[{postcssPlugin:'workspace-font-scale',Declaration(declaration:{prop:string;value:string}){if(declaration.prop==='font-size'&&/^\d+(?:\.\d+)?px$/.test(declaration.value))declaration.value=`calc(${declaration.value} * var(--font-scale, 1))`;}}]}},
   plugins: [react(), VitePWA({
     registerType: 'prompt',
-    includeAssets: ['icons/app-icon-192.png', 'icons/app-icon-512.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon.ico', 'images/*.jpg'],
+    includeAssets: ['icons/app-icon-192.png', 'icons/app-icon-512.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon.ico'],
     manifest: {
       name: 'Mr. Chicken House POS', short_name: 'Chicken House',
       description: 'Retail point of sale, stock and customer accounts',
@@ -20,9 +20,14 @@ export default defineConfig({
     },
     workbox: {
       clientsClaim:true,
-      globPatterns:['**/*.{js,css,html,svg,woff2,jpg,png}'], globIgnores:['**/icons/app-icon-source.png'], maximumFileSizeToCacheInBytes: 4_000_000,
+      // Keep the shell, feature chunks and bundled product photos available on a cold start.
+      globPatterns:['**/*.{js,css,html}', 'images/grocery/*.jpg'], maximumFileSizeToCacheInBytes: 4_000_000,
       navigateFallbackDenylist:[/^\/api\//,/^\/coconut\.html$/], cleanupOutdatedCaches:true,
       runtimeCaching:[{
+        urlPattern:({request,url})=>request.destination==='font' && url.origin===self.location.origin,
+        handler:'CacheFirst',
+        options:{cacheName:'chicken-pos-fonts-v1'},
+      },{
         // Uploaded/private photos remain in the authorized workspace database.
         // External product links keep their first downloaded image for offline use.
         urlPattern:({request,url})=>request.destination==='image' && url.origin!==self.location.origin && !url.pathname.startsWith('/api/') &&
