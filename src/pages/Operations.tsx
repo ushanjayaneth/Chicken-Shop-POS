@@ -1,5 +1,5 @@
 import {printPeripheralText} from '../lib/peripherals';
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   ArrowRight,
   Check,
@@ -984,11 +984,13 @@ export function Tables({
 
 export function Receipt({
   order,
+  autoPrint = false,
   branch,
   settings,
   onClose,
 }: {
   order: Order;
+  autoPrint?: boolean;
   branch: Branch;
   settings: Settings;
   onClose: () => void;
@@ -996,11 +998,21 @@ export function Receipt({
   useDevicePreferences();
   const {notify}=usePOS();
   const [printing,setPrinting]=useState(false);
-  async function printReceipt(){if(printing)return;setPrinting(true);try{
+  const printInProgress=useRef(false);
+  const autoPrinted=useRef(false);
+  async function printReceipt(){if(printInProgress.current)return;printInProgress.current=true;setPrinting(true);try{
     const text=[settings.businessName,branch.name,branch.address,branch.phone,`Receipt ${order.number}`,dateTime(order.createdAt),'--------------------------------',...order.lines.flatMap(line=>[`${line.quantity} x ${line.name}`,money(line.lineTotal)]),'--------------------------------',`Subtotal: ${money(order.subtotal)}`,`Discount: ${money(order.discount)}`,`Tax: ${money(order.tax)}`,`Service: ${money(order.serviceCharge)}`,`TOTAL: ${money(order.total)}`,`Paid: ${money(order.paid)}`,`Balance: ${money(Math.max(0,order.total-order.paid))}`,...order.payments.map(payment=>`${payment.method.toUpperCase()}: ${money(payment.amount)}${payment.change?` / Change ${money(payment.change)}`:''}`),settings.receiptFooter].filter(Boolean).join('\n');
     if(!await printPeripheralText(branch.id,text))window.print();
-  }catch(error){notify((error as Error).message,'error');}finally{setPrinting(false);}}
-  useEffect(()=>{const listener=()=>{void printReceipt();};window.addEventListener('retail:print-receipt',listener);return()=>window.removeEventListener('retail:print-receipt',listener);});
+  }catch(error){notify((error as Error).message,'error');}finally{printInProgress.current=false;setPrinting(false);}}
+  useEffect(() => {
+    if (autoPrint && !autoPrinted.current) {
+      autoPrinted.current = true;
+      void printReceipt();
+    }
+    const listener = () => {void printReceipt();};
+    window.addEventListener('retail:print-receipt', listener);
+    return () => window.removeEventListener('retail:print-receipt', listener);
+  });
   const dimensions = receiptDimensions(settings);
   const itemDiscount = order.lines.reduce(
     (sum, line) => sum + (line.discount || 0),

@@ -314,6 +314,11 @@ function WorkspaceApp() {
   const selectedOrder=route.orderId;
   const setSelectedOrder=(id:string|null)=>routeTo('pos',id);
   const [receiptId, setReceiptId] = useState<string | null>(null);
+  const [printReceiptId, setPrintReceiptId] = useState<string | null>(null);
+  function openReceipt(id: string, print = false) {
+    setPrintReceiptId(print ? id : null);
+    setReceiptId(id);
+  }
   const [shortcutHelp,setShortcutHelp]=useState(false);
   useBackLayer(mobileNav,()=>setMobileNav(false),'navigation');
   useBackLayer(notifications,()=>setNotifications(false),'notifications');
@@ -607,7 +612,6 @@ function WorkspaceApp() {
   useEffect(() => {
     if (!user) return;
     const permitted = (allowedPages[user.role] || ["pos"]).filter(value=>!adminLocked||!adminPages.has(value));
-    if(sharedCloudSource()&&page==='team'){routeTo('pos',null,true);return;}
     if (!permitted.includes(page)) routeTo(permitted[0] as Page,null,true);
   }, [user, page,routeTo,adminLocked]);
   const mutate = useCallback(
@@ -902,10 +906,10 @@ function WorkspaceApp() {
               <POS
                 selectedOrderId={selectedOrder}
                 onSelectOrder={setSelectedOrder}
-                onReceipt={setReceiptId}
+                onReceipt={openReceipt}
               />
             ) : page === "orders" || page === 'sales-history' ? (
-              <Orders key={page} historyView={page==='sales-history'} onOpen={openOrder} onReceipt={setReceiptId} />
+              <Orders key={page} historyView={page==='sales-history'} onOpen={openOrder} onReceipt={openReceipt} />
             ) : page === 'held-bills' ? (
               <HeldBills onResume={bill=>{sessionStorage.setItem('retail-resume-held',bill.id);routeTo('pos');}}/>
             ) : page === 'products' ? (
@@ -952,7 +956,9 @@ function WorkspaceApp() {
       </div>
       {receipt && (
         <Receipt
+          key={receipt.id}
           order={receipt}
+          autoPrint={printReceiptId === receipt.id}
           branch={data.branch}
           settings={data.settings}
           onClose={() => setReceiptId(null)}

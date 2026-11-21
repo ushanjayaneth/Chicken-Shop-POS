@@ -64,7 +64,7 @@ export default function POS({
 }: {
   selectedOrderId: string | null;
   onSelectOrder: (id: string | null) => void;
-  onReceipt: (id: string) => void;
+  onReceipt: (id: string, print?: boolean) => void;
 }) {
   const { data, branchId, mutate, notify, navigate } = usePOS();
   const preferences = useDevicePreferences();
@@ -84,6 +84,8 @@ export default function POS({
   const [loadedBranch, setLoadedBranch] = useState("");
   const [draftSaveError,setDraftSaveError]=useState('');
   const [busy, setBusy] = useState(false);
+  const checkoutRef = useRef<HTMLButtonElement>(null);
+  const savingOrder = useRef(false);
   const [paymentOrder, setPaymentOrder] = useState<string | null>(null);
   const [noteDialog, setNoteDialog] = useState(false);
   const [discountDialog, setDiscountDialog] = useState(false);
@@ -275,7 +277,7 @@ export default function POS({
     );
   const total =
     activeOrder?.total ?? subtotal - actualDiscount + serviceCharge + tax;
-  const currentShift = data.shifts.find((s) => s.status === "open");
+  const currentShift = data.shifts.find(s => s.branchId === branchId && s.status === "open");
   const quantityProduct = pricedMenu.find(item => item.id === quantityItem);
   function applyQuantity(count: number) {
     const item = quantityProduct;
@@ -350,7 +352,8 @@ export default function POS({
       if (pay) {setPaymentMethod(preferredMethod);setPaymentOrder(activeOrder.id);}
       return;
     }
-    if (!lines.length) return;
+    if (!lines.length || savingOrder.current) return;
+    savingOrder.current = true;
     setBusy(true);
     try {
       const result = await mutate<{ ok: boolean; order: Order }>("/orders", {
@@ -380,6 +383,7 @@ export default function POS({
     } catch (err) {
       notify((err as Error).message, "error");
     } finally {
+      savingOrder.current = false;
       setBusy(false);
     }
   }
@@ -469,8 +473,7 @@ export default function POS({
       } else if (action === "new-bill") newOrder();
       else if (action === "hold-bill") openHold();
       else if (action === "order-drawer") setMobileCart(true);
-      else if (action === "checkout" && canTakePayment && !busy)
-        void submit(true);
+      else if (action === "checkout") checkoutRef.current?.click();
       else if (action === "print") {
         if (activeOrder) {
           onReceipt(activeOrder.id);
@@ -485,6 +488,7 @@ export default function POS({
     const handler = (event: KeyboardEvent) => {
       if (
         event.defaultPrevented ||
+        event.isComposing ||
         event.ctrlKey ||
         event.metaKey ||
         event.altKey ||
@@ -506,12 +510,23 @@ export default function POS({
           now - scan.last < 140 &&
           (now - scan.start) / barcode.length < 70;
         scan.text = "";
-        if (barcode.length >= 3) {
+        if (barcode.length >= 3 && now - scan.last < 1000) {
           const product = pricedMenu.find(
             (item) => item.barcode === barcode || item.sku === barcode,
           );
-          if (product) {event.preventDefault();add(product);}
-          else if(fast)notify("That barcode is not assigned to a product.", "error");
+          if (product || fast) {
+            event.preventDefault();
+            if (product) add(product);
+            else notify("That barcode is not assigned to a product.", "error");
+            return;
+          }
+        }
+        const checkout = checkoutRef.current;
+        const focusedControl = target.closest("button, a, [role=button]");
+        if (checkout && !checkout.disabled && !event.repeat && !event.shiftKey &&
+            (!focusedControl || focusedControl === checkout || target.closest(".product-card"))) {
+          event.preventDefault();
+          checkout.click();
         }
         return;
       }
@@ -1048,6 +1063,7 @@ export default function POS({
             ) : (
               <>
                 <button
+                  ref={checkoutRef}
                   className="button button-primary checkout-button"
                   disabled={
                     busy ||
@@ -1106,11 +1122,11 @@ export default function POS({
           orderId={paymentOrder}
           initialMethod={paymentMethod}
           onClose={() => setPaymentOrder(null)}
-          onPaid={(id) => {
+          onPaid={(id, print) => {
             setPaymentOrder(null);
             setMobileCart(false);
             resetOrder();
-            onReceipt(id);
+            onReceipt(id, print || data.settings.autoPrint);
           }}
         />
       )}
@@ -1443,7 +1459,7 @@ export function PaymentDialog({
   initialMethod?:'cash'|'credit';
   orderId: string;
   onClose: () => void;
-  onPaid: (id: string) => void;
+  onPaid: (id: string, print?: boolean) => void;
 }) {
   const { data, mutate, notify } = usePOS();
   const order = data.orders.find((o) => o.id === orderId);
@@ -1462,6 +1478,9 @@ export function PaymentDialog({
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
   const [numberPad,setNumberPad]=useState<'amount'|'received'|'paid-now'|null>(null);
   const [id] = useState(commandId);
+  const [shiftCommand, setShiftCommand] = useState(commandId);
+  const [openingFloat, setOpeningFloat] = useState("0");
+  const submitting = useRef(false);
   if (!order) return null;
   const customer = data.customers.find((item) => item.id === (selectedCustomerId || order.customerId));
   const canChooseCustomer = order.payments.length === 0 && order.paid === 0 && order.refunded === 0;
@@ -1470,9 +1489,14 @@ export function PaymentDialog({
   const paidNowMinor = Math.round(Number(paidNow) * 100);
   const loanAmount = method === 'credit' ? Math.max(0, minor - paidNowMinor) : 0;
   const invalidPaidNow = method === 'credit' && (!Number.isSafeInteger(paidNowMinor) || paidNowMinor < 0 || paidNowMinor >= minor);
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!order || busy) return;
+  const needsShift = !data.shifts.some(shift => shift.branchId === order.branchId && shift.status === "open");
+  const openingCash = Math.round(Number(openingFloat) * 100);
+  const invalidOpeningCash = needsShift && (!openingFloat.trim() || !Number.isSafeInteger(openingCash) || openingCash < 0 || openingCash > 1_000_000_000);
+  const cannotPay = busy || invalidOpeningCash || !Number.isSafeInteger(minor) || minor <= 0 || minor > due ||
+    (method === "cash" && (!Number.isSafeInteger(receivedMinor) || receivedMinor < minor)) ||
+    (method === "credit" && !customer) || invalidPaidNow || (method !== "cash" && !confirmed);
+  async function submit(print = false) {
+    if (!order || cannotPay || submitting.current) return;
     if (method === "credit" && !customer) {
       setError(
         "Choose or add a customer before confirming this customer loan.",
@@ -1481,8 +1505,12 @@ export function PaymentDialog({
     }
     if(invalidPaidNow){setError('Enter a cash amount below the payment amount. Choose Cash for a full cash payment.');return;}
     setError("");
+    submitting.current = true;
     setBusy(true);
     try {
+      if (needsShift) {
+        await mutate("/shifts/open", {commandId: shiftCommand, branchId: order.branchId, openingFloat: openingCash});
+      }
       await mutate(`/orders/${order.id}/payments`, {
         commandId: id,
         expectedVersion: order.version,
@@ -1500,10 +1528,11 @@ export function PaymentDialog({
             ? "Partial payment recorded."
             : "Payment recorded. Thank you!",
       );
-      onPaid(order.id);
+      onPaid(order.id, print);
     } catch (err) {
       setError((err as Error).message);
     } finally {
+      submitting.current = false;
       setBusy(false);
     }
   }
@@ -1522,7 +1551,14 @@ export function PaymentDialog({
       subtitle={`${order.number} · ${order.type.replace("-", " ")}`}
       onClose={() => !busy && onClose()}
     >
-      <form onSubmit={(e) => void submit(e)}>
+      <form onSubmit={event => {event.preventDefault(); void submit();}} onKeyDown={event => {
+        if (event.key !== "Enter" || event.defaultPrevented || event.nativeEvent.isComposing ||
+            event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+        const control = (event.target as HTMLElement).closest("button, select, textarea, a, input[type=checkbox]");
+        if (control && !(control instanceof HTMLButtonElement && control.type === "submit")) return;
+        event.preventDefault();
+        if (!event.repeat && !cannotPay && event.currentTarget.reportValidity()) void submit(true);
+      }}>
         <div className="payment-due">
           <span>Balance due</span>
           <strong>{money(due)}</strong>
@@ -1675,6 +1711,12 @@ export function PaymentDialog({
             </span>
           </label>
         )}
+        {needsShift && <label className="field">
+          <span>Opening cash float (LKR)</span>
+          <input className="input" type="number" inputMode="decimal" min="0" max="10000000" step="0.01"
+            required disabled={busy} value={openingFloat} onChange={event => {setOpeningFloat(event.target.value); setShiftCommand(commandId());}} />
+          <small>Enter the cash already in the drawer. Confirming opens the shift and records this payment.</small>
+        </label>}
         <div className="form-actions">
           <button
             type="button"
@@ -1686,15 +1728,7 @@ export function PaymentDialog({
           </button>
           <button
             className="button button-primary"
-            disabled={
-              busy ||
-              minor <= 0 ||
-              minor > due ||
-              (method === "cash" && receivedMinor < minor) ||
-              (method === "credit" && !customer) ||
-              invalidPaidNow ||
-              (method !== "cash" && !confirmed)
-            }
+            disabled={cannotPay}
           >
             <CheckCircle2 size={15} />
             {busy
