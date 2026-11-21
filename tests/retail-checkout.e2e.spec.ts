@@ -13,8 +13,11 @@ const pin = '58291438';
 const productName = 'LongProductNameForTheCheckoutAndReturnsPanelWithoutWhitespace';
 
 async function signIn(page: Page, origin: string) {
+  await page.context().setOffline(false);
   await page.goto(origin + '/index.html');
-  await page.getByLabel('Staff PIN', {exact: true}).fill(pin);
+  const pinField = page.getByLabel('Staff PIN', {exact: true});
+  await expect(pinField).toBeVisible({timeout: 20_000});
+  await pinField.fill(pin);
   await page.getByRole('button', {name: 'Open workspace', exact: true}).click();
   await expect(page.getByRole('heading', {level: 1, name: /Point of sale/})).toBeVisible();
 }
@@ -53,6 +56,27 @@ test('shared POS opens a shift, prints an offline keyboard checkout once and syn
     await expect(product).toHaveCount(0);
     await navigate(page, /^Point of sale/);
     const other = await second.newPage();
+    let shiftConflictSeen = false;
+    await other.route('**/api/cloud?*', async route => {
+      const url = new URL(route.request().url());
+      if (url.searchParams.get('action') === 'bootstrap') {
+        // Simulate a register with current sales but an outdated cash drawer snapshot.
+        url.searchParams.delete('ifVersion');
+        const response = await route.fetch({url: url.href});
+        const snapshot = await response.json();
+        if (!shiftConflictSeen && snapshot.offlineState) {
+          snapshot.shifts = [];
+          snapshot.offlineState.records = snapshot.offlineState.records.filter((record: {kind: string}) => record.kind !== 'shift');
+        }
+        return route.fulfill({response, json: snapshot});
+      }
+      if (url.searchParams.get('action') === 'offline-commit') {
+        const response = await route.fetch();
+        if (response.status() === 409 && (await response.json()).code === 'SHIFT_ALREADY_OPEN') shiftConflictSeen = true;
+        return route.fulfill({response});
+      }
+      return route.continue();
+    });
     await signIn(other, origin);
     await expect(other.getByRole('button', {name: 'Add ' + productName, exact: true})).toBeVisible();
 
@@ -89,10 +113,11 @@ test('shared POS opens a shift, prints an offline keyboard checkout once and syn
     await other.getByRole('button', {name: 'Add ' + productName, exact: true}).click();
     await other.keyboard.press('Enter');
     const onlinePayment = other.getByRole('dialog', {name: 'Take payment', exact: true});
-    await expect(onlinePayment.getByLabel('Opening cash float (LKR)')).toHaveCount(0);
     await onlinePayment.getByRole('button', {name: 'Confirm payment', exact: true}).click();
     await expect(other.getByRole('dialog', {name: 'Order receipt', exact: true})).toContainText('125.00');
+    expect(shiftConflictSeen).toBe(true);
   } finally {
+    await Promise.all(second.pages().map(page => page.unrouteAll({behavior: 'ignoreErrors'})));
     await second.close();
     await app.close();
   }

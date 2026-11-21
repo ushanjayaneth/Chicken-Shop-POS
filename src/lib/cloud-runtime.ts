@@ -54,10 +54,10 @@ async function flush(sourceId:string,background=false){
 }
 /** Network reads do not hold the cashier lock. Cache replacement itself checks
  * pending writes and newer cloud versions in one IndexedDB transaction. */
-async function bootstrapCloud(sourceId:string,url:URL):Promise<Snapshot>{
+async function bootstrapCloud(sourceId:string,url:URL,force=false):Promise<Snapshot>{
   if(!online())return localSnapshot(sourceId,url.pathname+url.search);
   const state=await getOfflineStatus(sourceId);
-  if(state.ready&&coolingDown(sourceId))return localSnapshot(sourceId,url.pathname+url.search);
+  if(!force&&state.ready&&coolingDown(sourceId))return localSnapshot(sourceId,url.pathname+url.search);
   if(state.pending){
     const result=await withCloudOfflineLock(sourceId,()=>flush(sourceId,true));
     if(result.pending){
@@ -68,8 +68,8 @@ async function bootstrapCloud(sourceId:string,url:URL):Promise<Snapshot>{
   const key=`${sourceId}:${url.searchParams.get('branchId')??''}`,cached=snapshots.get(key);
   try{
     const query=new URLSearchParams(url.searchParams);query.set('sourceId',sourceId);query.set('includeOffline','1');
-    if(cached&&state.ready)query.set('ifVersion',String(cached.cloudVersion??0));
-    const result=await transport<CloudSnapshot>(sourceId,`bootstrap&${query}`,undefined,state.ready?2000:8000);
+    if(!force&&cached&&state.ready)query.set('ifVersion',String(cached.cloudVersion??0));
+    const result=await transport<CloudSnapshot>(sourceId,`bootstrap&${query}`,undefined,state.ready&&!force?2000:8000);
     if(locked(sourceId))throw Object.assign(new Error('Enter your staff PIN to open this workspace.'),{status:401});
     if(result.notModified&&cached){
       const status=await getOfflineStatus(sourceId);
@@ -199,6 +199,15 @@ export async function cloudRuntimeApi<T>(sourceId:string,path:string,body?:unkno
         await markCloudCommandOffline(sourceId,payload.commandId);
       }
       return result;
+    }).catch(async error => {
+      if (url.pathname === '/shifts/open' && (error as {code?: string}).code === 'SHIFT_ALREADY_OPEN') {
+        // Release the write lock before fetching the shift opened on the other register.
+        const snapshotUrl = new URL('/bootstrap', url.origin);
+        const branchId = (body as {branchId?: string})?.branchId;
+        if (branchId) snapshotUrl.searchParams.set('branchId', branchId);
+        await bootstrapCloud(sourceId, snapshotUrl, true);
+      }
+      throw error;
     });
   }
   // Ledgers, reports, receipts and cached media already have authorized local

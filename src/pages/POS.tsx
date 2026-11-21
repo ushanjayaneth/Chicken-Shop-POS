@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import type { CartLine, MenuItem, Order } from "../../shared/types";
 import { usePOS } from "../lib/context";
+import { ApiError } from "../lib/api";
 import { browserDb } from "../lib/db";
 import { commandId, money, number, time } from "../lib/format";
 import {productStockState} from '../../shared/stock';
@@ -1461,7 +1462,7 @@ export function PaymentDialog({
   onClose: () => void;
   onPaid: (id: string, print?: boolean) => void;
 }) {
-  const { data, mutate, notify } = usePOS();
+  const { data, mutate, notify, refresh } = usePOS();
   const order = data.orders.find((o) => o.id === orderId);
   const [method, setMethod] = useState<"cash" | "card" | "qr" | "credit">(
     initialMethod,
@@ -1509,7 +1510,12 @@ export function PaymentDialog({
     setBusy(true);
     try {
       if (needsShift) {
-        await mutate("/shifts/open", {commandId: shiftCommand, branchId: order.branchId, openingFloat: openingCash});
+        try {
+          await mutate("/shifts/open", {commandId: shiftCommand, branchId: order.branchId, openingFloat: openingCash});
+        } catch (error) {
+          if (!(error instanceof ApiError) || error.code !== "SHIFT_ALREADY_OPEN") throw error;
+          await refresh();
+        }
       }
       await mutate(`/orders/${order.id}/payments`, {
         commandId: id,

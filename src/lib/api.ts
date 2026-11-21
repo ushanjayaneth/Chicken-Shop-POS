@@ -5,7 +5,7 @@ import {isAdminOperation,redactAdminResult} from '../../shared/admin-access';
 import type {Snapshot} from '../../shared/types';
 
 export class ApiError extends Error {
-  constructor(message: string, public status = 0) { super(message); this.name = 'ApiError'; }
+  constructor(message: string, public status = 0, public code?: string) { super(message); this.name = 'ApiError'; }
 }
 export async function api<T>(path: string, body?: unknown, method?: string): Promise<T> {
   if(sharedCloudSource()){
@@ -15,11 +15,11 @@ export async function api<T>(path: string, body?: unknown, method?: string): Pro
       const result=await sharedCloudApi<T>(path,body,method);
       if(path.split('?')[0].replace(/^\/api/,'')==='/bootstrap'&&!adminAccess(source).unlocked)return cashierSnapshot(result as Snapshot) as T;
       return adminAccess(source).unlocked?result:redactAdminResult(result);
-    }catch(error){const value=error as Error&{status?:number};throw new ApiError(value.message,value.status??0);}
+    }catch(error){const value=error as Error&{status?:number;code?:string};throw new ApiError(value.message,value.status??0,value.code);}
   }
   if(isDeviceWorkspace()){
     try {const {localApi}=await import('./local/core');return await localApi(path,body,method) as T;}
-    catch(error){const value=error as Error&{status?:number;statusCode?:number};throw new ApiError(value.message,value.status??value.statusCode??0);}
+    catch(error){const value=error as Error&{status?:number;statusCode?:number;code?:string};throw new ApiError(value.message,value.status??value.statusCode??0,value.code);}
   }
   return hubApi<T>(path,body,method);
 }
@@ -33,7 +33,7 @@ export async function hubApi<T>(path:string,body?:unknown,method?:string):Promis
     throw new ApiError('The POS backend is not connected to this website. Connect the branch hub to enable sign-in.', 404);
   }
   const result = await response.json().catch(()=>({message:'The server returned an invalid response.'}));
-  if (!response.ok) throw new ApiError(result.message ?? result.error ?? 'This action could not be completed.',response.status);
+  if (!response.ok) throw new ApiError(result.message ?? result.error ?? 'This action could not be completed.',response.status,result.code);
   return result as T;
 }
 
